@@ -1,6 +1,8 @@
 import requests
 import json
 import time
+import traceback
+
 
 class MultiplayerAPI:
     def __init__(self, sessionID, accountID):
@@ -31,7 +33,6 @@ class MultiplayerAPI:
                     json = body,
                     cookies = {"PHPSESSID": self.sessionID}
                 )
-                print("Successfully connect to server.")
                 response_body = json.loads(response.text)
                 self.myID = response_body["myId"]
 
@@ -61,6 +62,7 @@ class MultiplayerAPI:
             except Exception as e:
                     print("Unable to connect to GeoFS. Check your connection and restart the application.")
                     print(f"Error message: {e}")
+                    traceback.print_exc()
                     time.sleep(5)
 
     def sendMsg(self, msg):
@@ -90,6 +92,7 @@ class MultiplayerAPI:
             except Exception as e:
                     print("Unable to connect to GeoFS. Check your connection and restart the application.")
                     print(f"Error message: {e}")
+                    traceback.print_exc()
                     time.sleep(5)
 
     def getMessages(self):
@@ -121,4 +124,5 @@ class MultiplayerAPI:
             except Exception as e:
                 print("Unable to connect to GeoFS. Check your connection and restart the application.")
                 print(f"Error message: {e}")
+                traceback.print_exc()
                 time.sleep(5)

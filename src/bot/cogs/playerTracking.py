@@ -9,21 +9,27 @@ from scipy.ndimage import gaussian_filter
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 import os
+import sys
 from MindsEye import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from shared import mapAPI
+
 class PlayerTracker(commands.Cog):
     def __init__(self, bot):
+        # gets envs
         load_dotenv()
         self.bot = bot
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        self.mapAPI = mapAPI.MapAPI()
         mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
-        self.mongodbClient = AsyncIOMotorClient(mongodbURI)
+        self.mongodbClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
-    playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.")
+    playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
 
     @playersGroup.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
-    async def toggleHeatmapCumulation(self, interaction: discord.Interaction):
+    async def toggleHeatmapCumulation(self, interaction: discord.Interaction): # toggles the cumulation of player locations for the heatmap
         db = self.mongodbClient["OspreyEyes"]
         collection = db["configurations"]
         configuration = await collection.find_one()
@@ -32,7 +38,7 @@ class PlayerTracker(commands.Cog):
         await interaction.response.send_message(f"Set accumulateHeatMap to {newConfiguration}")
     
     @playersGroup.command(name="toggle_player_location_tracking", description="Toggle the tracking of player locations.")
-    async def togglePlayerLocationTracking(self, interaction: discord.Interaction):
+    async def togglePlayerLocationTracking(self, interaction: discord.Interaction): # toggles pulling player locations from the map API
         db = self.mongodbClient["OspreyEyes"]
         collection = db["configurations"]
         configuration = await collection.find_one()
@@ -41,21 +47,23 @@ class PlayerTracker(commands.Cog):
         await interaction.response.send_message(f"Set fetchOnlineUsers to {newConfiguration}")
 
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
-    async def getOnlineUsers(self, interaction: discord.Interaction):
+    async def getOnlineUsers(self, interaction: discord.Interaction): # gets the online users from the map API
         stringifiedUsers = []
-        for user in self.currentOnlineUsers:
+        currentOnlineUsers = self.mapAPI.getUsers(False)
+        for user in currentOnlineUsers:
             stringifiedUsers.append(f"Callsign: {user.userInfo["callsign"]}, Account ID: {user.userInfo["id"]} Latitude: {user.coordinates[0]}, Longitude: {user.coordinates[1]} Aircraft: {user.aircraft["type"]}")
         embed = PaginatedEmbed(stringifiedUsers, title="Online Users", description="List of online users.")
-        await interaction.response.send_message(embed=embed.embed, view=embed)
+        await interaction.response.send_message(embed=embed.embed, view=embed) # sends the online users in a paginated embed
 
 
     @playersGroup.command(name="generate_player_heatmap", description="Generate a heatmap of player activity locations.")
-    async def heatmap(self, interaction: discord.Interaction):
+    async def heatmap(self, interaction: discord.Interaction): # generates a heatmap of player activity locations
         await interaction.response.defer()
 
         db = self.mongodbClient["OspreyEyes"]
         collection = db["player_locations"]
         cursor = collection.find()
+        # get the latitudes and longitudes from the database
         data = await cursor.to_list(length=None)
         latitudes = [doc["latitude"] for doc in data]
         longitudes = [doc["longitude"] for doc in data]
