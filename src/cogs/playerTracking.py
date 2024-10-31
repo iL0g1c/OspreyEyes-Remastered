@@ -22,6 +22,7 @@ class PlayerTracker(commands.Cog):
         mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongodbClient = AsyncIOMotorClient(mongodbURI)
         self.currentOnlineUsers = []
+        print("Starting map server heartbeat...")
         self.fetchOnlineUsers.start()
 
 

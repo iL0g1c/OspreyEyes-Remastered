@@ -30,7 +30,7 @@ class MindsEyeBot(commands.Bot):
             print(f"Synced {len(synced)} command(s)")
         except Exception as e:
             print(e)
-        print("Complete.")
+        print("Connecting to discord...")
 
     async def _load_extensions(self) -> None:
         for extension in ("chatLogging", "playerTracking", "mrpTracking",):
