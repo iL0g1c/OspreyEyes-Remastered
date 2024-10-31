@@ -26,18 +26,18 @@ class PlayerTracker(commands.Cog):
     async def toggleHeatmapCumulation(self, interaction: discord.Interaction):
         db = self.mongodbClient["OspreyEyes"]
         collection = db["configurations"]
-        configuration = collection.find_one()
+        configuration = await collection.find_one()
         newConfiguration = not configuration["accumulateHeatMap"]
-        collection.update_one({}, {"$set": {"accumulateHeatMap": newConfiguration}})
+        await collection.update_one({}, {"$set": {"accumulateHeatMap": newConfiguration}})
         await interaction.response.send_message(f"Set accumulateHeatMap to {newConfiguration}")
     
     @playersGroup.command(name="toggle_player_location_tracking", description="Toggle the tracking of player locations.")
     async def togglePlayerLocationTracking(self, interaction: discord.Interaction):
         db = self.mongodbClient["OspreyEyes"]
         collection = db["configurations"]
-        configuration = collection.find_one()
+        configuration = await collection.find_one()
         newConfiguration = not configuration["fetchOnlineUsers"]
-        collection.update_one({}, {"$set": {"fetchOnlineUsers": newConfiguration}})
+        await collection.update_one({}, {"$set": {"fetchOnlineUsers": newConfiguration}})
         await interaction.response.send_message(f"Set fetchOnlineUsers to {newConfiguration}")
 
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")

@@ -29,23 +29,24 @@ class DataCollectionLayer():
             for message in self.multiplayerAPI.getMessages()
         ]
         if self.currentChatMessages:
-            db = self.mongodbClient["OspreyEyes"]
+            db = self.mongoDBClient["OspreyEyes"]
             collection = db["chat_messages"]
             collection.insert_many(self.currentChatMessages)
 
     def addPlayerLocationSnapshot(self):
-        db = self.mongodbClient["OspreyEyes"]
+        db = self.mongoDBClient["OspreyEyes"]
         collection = db["player_locations"]
         newLatitudes = np.array([user.coordinates[0] for user in self.currentOnlineUsers])
         newLongitudes = np.array([user.coordinates[1] for user in self.currentOnlineUsers])
         docs = [{"latitude": lat, "longitude": lon} for lat, lon in zip(newLatitudes, newLongitudes)]
-        collection.insert_many(docs)
+        if docs:
+            collection.insert_many(docs)
     
     def fetchOnlineUsers(self):
-        self.currentOnlineUsers = self.mapAPI.getUsers(False)
+        self.currentOnlineUsers = self.mapAPI.getUsers(False)       
     
     def getConfigurationSettings(self):
-        db = self.mongodbClient["OspreyEyes"]
+        db = self.mongoDBClient["OspreyEyes"]
         collection = db["configurations"]
         return collection.find_one()
 
@@ -55,12 +56,24 @@ def main():
         db = dataCollectionLayer.mongoDBClient["OspreyEyes"]
         collection = db["configurations"]
         configuration = collection.find_one()
+        if configuration == None:
+            collection.insert_one({
+                "saveChatMessages": False,
+                "accumulateHeatMap": False,
+                "fetchOnlineUsers": False
+            })
+        
+        configuration = collection.find_one()
         if configuration["saveChatMessages"]:
+            print("Fetching chat messages...")
             dataCollectionLayer.fetchChatMessages()
         if configuration["accumulateHeatMap"]:
+            print("Adding player location snapshot...")
             dataCollectionLayer.addPlayerLocationSnapshot()
         if configuration["fetchOnlineUsers"]:
+            print("Fetching online users...")
             dataCollectionLayer.fetchOnlineUsers()
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     main()
