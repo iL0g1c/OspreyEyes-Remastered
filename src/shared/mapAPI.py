@@ -16,7 +16,7 @@ class Player:
         self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
         self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
         try:
-            with open("../data/aircraftcodes.json", "r") as reader:
+            with open("../../data/aircraftcodes.json", "r") as reader:
                 aircrafCodes = json.load(reader)
             self.aircraft = {
                 'type':aircrafCodes[str(userobj['ac'])],

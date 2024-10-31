@@ -1,0 +1,93 @@
+import time
+from pymongo import MongoClient
+import os
+import sys
+from dotenv import load_dotenv
+from urllib.parse import unquote
+from datetime import datetime
+import numpy as np
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from shared import multiplayerAPI, mapAPI
+
+
+
+class DataCollectionLayer():
+    def __init__(self):
+        # gets envs
+        load_dotenv()
+        self.sessionID = os.getenv('GEOFS_SESSION_ID')
+        self.accountID = os.getenv('GEOFS_ACCOUNT_ID')
+
+        # initializes APIs
+        self.multiplayerAPI = multiplayerAPI.MultiplayerAPI(self.sessionID, self.accountID)
+        self.multiplayerAPI.handshake()
+        self.mapAPI = mapAPI.MapAPI()
+        self.currentChatMessages = []
+        self.currentOnlineUsers = []
+        DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
+
+    def fetchChatMessages(self): # fetches chat messages from the multiplayer API
+        self.currentChatMessages = [
+            {**message, "msg": unquote(message["msg"]), "datetime": datetime.now()}
+            for message in self.multiplayerAPI.getMessages()
+        ]
+        if self.currentChatMessages:
+            db = self.mongoDBClient["OspreyEyes"]
+            collection = db["chat_messages"]
+            collection.insert_many(self.currentChatMessages)
+
+    def addPlayerLocationSnapshot(self): # adds a snapshot of player locations to the database
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["player_locations"]
+        newLatitudes = np.array([user.coordinates[0] for user in self.currentOnlineUsers])
+        newLongitudes = np.array([user.coordinates[1] for user in self.currentOnlineUsers])
+        docs = [{"latitude": lat, "longitude": lon} for lat, lon in zip(newLatitudes, newLongitudes)]
+        if docs:
+            collection.insert_many(docs)
+    
+    def fetchOnlineUsers(self): # fetches online users from the map API
+        self.currentOnlineUsers = self.mapAPI.getUsers(False)       
+    
+    def getConfigurationSettings(self): # gets the configuration settings from the database
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        return collection.find_one()
+
+def main():
+    print("Starting data collection layer...")
+    dataCollectionLayer = DataCollectionLayer()
+    lastSnapshotTime = 1800
+
+    db = dataCollectionLayer.mongoDBClient["OspreyEyes"]
+    collection = db["configurations"]
+    configuration = collection.find_one()
+    if configuration == None: # initializes the configuration settings if they don't exist
+        collection.insert_one({
+            "saveChatMessages": False,
+            "accumulateHeatMap": False,
+            "fetchOnlineUsers": False
+        })
+    previousConfiguration = collection.find_one() 
+    print("Data collection layer started.")
+    while True: # loops every second for api calls
+        configuration = collection.find_one()
+
+        for key in previousConfiguration: # checks if the configuration settings have changed
+            if previousConfiguration[key] != configuration[key]:
+                print(f"Configuration setting {key} changed to {configuration[key]}")
+                previousConfiguration[key] = configuration[key]
+
+        if configuration["saveChatMessages"]:
+            dataCollectionLayer.fetchChatMessages()
+        if configuration["accumulateHeatMap"] and (time.time() - lastSnapshotTime >= 1800):
+            lastSnapshotTime = time.time()
+            dataCollectionLayer.addPlayerLocationSnapshot()
+        if configuration["fetchOnlineUsers"]:
+            dataCollectionLayer.fetchOnlineUsers()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
