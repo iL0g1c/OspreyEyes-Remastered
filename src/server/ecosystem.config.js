@@ -5,7 +5,7 @@ module.exports = {
         script: "dataCollectionLayer.py", // Replace with your bot's main script
         interpreter: "python3",
         env: {
-          PYTHONPATH: "../venv/bin/python"
+          PYTHONPATH: "../../venv/bin/python"
         },
       },
     ],
