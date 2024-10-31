@@ -21,17 +21,22 @@ class PlayerTracker(commands.Cog):
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongodbClient = AsyncIOMotorClient(mongodbURI)
+        self.currentOnlineUsers = []
+        self.fetchOnlineUsers.start()
 
 
     async def addPlayerLocationSnapshot(self):
         db = self.mongodbClient["OspreyEyes"]
         collection = db["player_locations"]
-        online_users = self.mapAPI.getUsers(False)
-        newLatitudes = np.array([user.coordinates[0] for user in online_users])
-        newLongitudes = np.array([user.coordinates[1] for user in online_users])
+        newLatitudes = np.array([user.coordinates[0] for user in self.currentOnlineUsers])
+        newLongitudes = np.array([user.coordinates[1] for user in self.currentOnlineUsers])
         docs = [{"latitude": lat, "longitude": lon} for lat, lon in zip(newLatitudes, newLongitudes)]
         await collection.insert_many(docs)
 
+
+    @tasks.loop(seconds=1)
+    async def fetchOnlineUsers(self):
+        self.currentOnlineUsers = self.mapAPI.getUsers(False)
 
     @tasks.loop(minutes=30)
     async def add_snapshot(self):
@@ -52,9 +57,8 @@ class PlayerTracker(commands.Cog):
 
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
     async def getOnlineUsers(self, interaction: discord.Interaction):
-        online_users = self.mapAPI.getUsers(False)
         stringifiedUsers = []
-        for user in online_users:
+        for user in self.currentOnlineUsers:
             stringifiedUsers.append(f"Callsign: {user.userInfo["callsign"]}, Account ID: {user.userInfo["id"]} Latitude: {user.coordinates[0]}, Longitude: {user.coordinates[1]} Aircraft: {user.aircraft["type"]}")
         embed = PaginatedEmbed(stringifiedUsers, title="Online Users", description="List of online users.")
         await interaction.response.send_message(embed=embed.embed, view=embed)
