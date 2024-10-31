@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
@@ -10,51 +10,35 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 import os
 from MindsEye import MindsEyeBot
-from mapAPI import MapAPI
 from paginationEmbed import PaginatedEmbed
 
 class PlayerTracker(commands.Cog):
     def __init__(self, bot):
-        load_dotenv
+        load_dotenv()
         self.bot = bot
-        self.mapAPI = MapAPI()
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongodbClient = AsyncIOMotorClient(mongodbURI)
-        self.currentOnlineUsers = []
-        print("Starting map server heartbeat...")
-        self.fetchOnlineUsers.start()
-
-
-    async def addPlayerLocationSnapshot(self):
-        db = self.mongodbClient["OspreyEyes"]
-        collection = db["player_locations"]
-        newLatitudes = np.array([user.coordinates[0] for user in self.currentOnlineUsers])
-        newLongitudes = np.array([user.coordinates[1] for user in self.currentOnlineUsers])
-        docs = [{"latitude": lat, "longitude": lon} for lat, lon in zip(newLatitudes, newLongitudes)]
-        await collection.insert_many(docs)
-
-
-    @tasks.loop(seconds=1)
-    async def fetchOnlineUsers(self):
-        self.currentOnlineUsers = self.mapAPI.getUsers(False)
-
-    @tasks.loop(minutes=30)
-    async def add_snapshot(self):
-        print("Adding snapshot...")
-        await self.addPlayerLocationSnapshot()
-        print("Snapshot added.")
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.")
 
     @playersGroup.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
     async def toggleHeatmapCumulation(self, interaction: discord.Interaction):
-        if self.add_snapshot.is_running():
-            self.add_snapshot.stop()
-            await interaction.response.send_message("Heatmap cumulation stopped.")
-        else:
-            self.add_snapshot.start()
-            await interaction.response.send_message("Heatmap cumulation started.")
+        db = self.mongodbClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = collection.find_one()
+        newConfiguration = not configuration["accumulateHeatMap"]
+        collection.update_one({}, {"$set": {"accumulateHeatMap": newConfiguration}})
+        await interaction.response.send_message(f"Set accumulateHeatMap to {newConfiguration}")
+    
+    @playersGroup.command(name="toggle_player_location_tracking", description="Toggle the tracking of player locations.")
+    async def togglePlayerLocationTracking(self, interaction: discord.Interaction):
+        db = self.mongodbClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = collection.find_one()
+        newConfiguration = not configuration["fetchOnlineUsers"]
+        collection.update_one({}, {"$set": {"fetchOnlineUsers": newConfiguration}})
+        await interaction.response.send_message(f"Set fetchOnlineUsers to {newConfiguration}")
 
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
     async def getOnlineUsers(self, interaction: discord.Interaction):
