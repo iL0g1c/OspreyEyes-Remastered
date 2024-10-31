@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from urllib.parse import unquote
 from datetime import datetime
 import numpy as np
+import requests
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -29,11 +30,30 @@ class DataCollectionLayer():
         mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
+    def checkChatMessagesForMention(self):
+        for message in self.currentChatMessages:
+            for item in ["mindseye", "minds eye", "minds-eye"]:
+                if  item in message["msg"].lower():
+                    url = "http://localhost:5000/bot-mention"
+                    data = {"message": True}
+                    print("Detected pilot mentioned bot.")
+                    try:
+                        response = requests.post(url, json=data)
+                        if response.status_code == 204:\
+                            print("Event successfully triggered.")
+                        else:
+                            print(f"Failed to trigger event. Status code: {response.status_code}")
+                    except Exception as e:
+                        print(f"Failed to trigger event. Error: {e}")
+                    
+
     def fetchChatMessages(self): # fetches chat messages from the multiplayer API
         self.currentChatMessages = [
             {**message, "msg": unquote(message["msg"]), "datetime": datetime.now()}
             for message in self.multiplayerAPI.getMessages()
         ]
+        print(self.currentChatMessages)
+        self.checkChatMessagesForMention()
         if self.currentChatMessages:
             db = self.mongoDBClient["OspreyEyes"]
             collection = db["chat_messages"]

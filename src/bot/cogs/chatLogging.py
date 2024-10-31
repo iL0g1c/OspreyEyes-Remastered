@@ -25,6 +25,11 @@ class ChatLogger(commands.Cog):
 
     chatGroup = app_commands.Group(name="chat", description="Commands for logging chat messages.") # sets up command group
 
+    async def automatedSendMessage(self, message):
+        print("Sending message.")
+        self.multiplayerAPI.handshake()
+        self.multiplayerAPI.sendMsg(message)
+
     @chatGroup.command(name="send_chat_message", description="Send a chat message to the geofs chat.")
     async def sendChatMessage(self, interaction: discord.Interaction, message: str): # sends a chat message to geofs chat
         await interaction.response.defer()
