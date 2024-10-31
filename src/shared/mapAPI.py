@@ -1,5 +1,6 @@
 import requests
 import json
+import traceback
 
 ## EXCEPTIONS ##
 class BackendError(Exception):
@@ -45,24 +46,23 @@ class MapAPI:
             )
             response_body = json.loads(response.text)
             userList = []
-            if foos == False:
-                for user in response_body['users']:
+            for user in response_body['users']:
+                if user == None:
+                    continue
+                elif foos == False:
                     if user['cs'] == "Foo" or user['cs'] == '':
                         pass
                     else:
                         userList.append(Player(user))
-            elif foos == True:
-                for user in response_body['users']:
+                elif foos == True:
                     if user['cs'] != "Foo":
                         pass
                     else:
                         userList.append(Player(user))
-            elif foos == None:
-                userList.append(Player(user))
-            
-            
-            else:
-                raise AttributeError('"Foos" attribute must be boolean or NoneType.')
+                elif foos == None:
+                    userList.append(Player(user))
+                else:
+                    raise AttributeError('"Foos" attribute must be boolean or NoneType.')
             if self._utilizeResponseList == True:
                 self._responseList.append(userList)
             return userList
@@ -70,6 +70,7 @@ class MapAPI:
             self.error = True
             print("Unable to connect to GeoFS. Check your connection and restart the application.")
             print(f"Error Code 1: {e}")
+            traceback.print_exc()
             return None
 
     def returnResponseList(self,reset:bool):

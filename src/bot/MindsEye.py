@@ -4,6 +4,8 @@ from discord.ext import commands
 import tracemalloc
 from dotenv import load_dotenv
 import os
+from flask import Flask, request
+from threading import Thread
 
 tracemalloc.start()
 load_dotenv()
@@ -17,6 +19,18 @@ class MindsEyeBot(commands.Bot):
             command_prefix='=',
             intents=intents
         )
+        self.flaskApp = Flask(__name__)
+        self.setup_routes()
+
+    def setup_routes(self):
+        @self.flaskApp.route('/bot-mention', methods=['POST'])
+        def triggerBotResponse():
+            data = request.json
+            chatLogger = self.get_cog("ChatLogger")
+            if chatLogger:
+                self.loop.create_task(chatLogger.automatedSendMessage("No comment."))
+            return '', 204
+
     async def on_ready(self):
         print(f'{self.user} has connected to Discord!')
     
@@ -30,7 +44,10 @@ class MindsEyeBot(commands.Bot):
             print(f"Synced {len(synced)} command(s)")
         except Exception as e:
             print(e)
+        print("Launching Flask server...")
+        Thread(target=self.flaskApp.run, kwargs={"port": 5000}).start()
         print("Connecting to discord...")
+
 
     async def _load_extensions(self) -> None:
         for extension in ("chatLogging", "playerTracking", "mrpTracking",):
