@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import os
 from MindsEye import MindsEyeBot
 from mapAPI import MapAPI
+from paginationEmbed import PaginatedEmbed
 
 class PlayerTracker(commands.Cog):
     def __init__(self, bot):
@@ -38,7 +39,9 @@ class PlayerTracker(commands.Cog):
         await self.addPlayerLocationSnapshot()
         print("Snapshot added.")
 
-    @app_commands.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
+    playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.")
+
+    @playersGroup.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
     async def toggleHeatmapCumulation(self, interaction: discord.Interaction):
         if self.add_snapshot.is_running():
             self.add_snapshot.stop()
@@ -47,13 +50,17 @@ class PlayerTracker(commands.Cog):
             self.add_snapshot.start()
             await interaction.response.send_message("Heatmap cumulation started.")
 
-    @app_commands.command(name="get_online_users", description="Get the online users from the map API.")
+    @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
     async def getOnlineUsers(self, interaction: discord.Interaction):
         online_users = self.mapAPI.getUsers(False)
+        stringifiedUsers = []
         for user in online_users:
-            print(f"airspeed: {user.airspeed}\n userInfo: {user.userInfo}\n coordinates {user.coordinates}\n altitude: {user.altitude}\n verticalSpeed: {user.verticalSpeed}\n aircraft: {user.aircraft}")  
+            stringifiedUsers.append(f"Callsign: {user.userInfo["callsign"]}, Account ID: {user.userInfo["id"]} Latitude: {user.coordinates[0]}, Longitude: {user.coordinates[1]} Aircraft: {user.aircraft["type"]}")
+        embed = PaginatedEmbed(stringifiedUsers, title="Online Users", description="List of online users.")
+        await interaction.response.send_message(embed=embed.embed, view=embed)
 
-    @app_commands.command(name="generate_player_heatmap", description="Generate a heatmap of player activity locations.")
+
+    @playersGroup.command(name="generate_player_heatmap", description="Generate a heatmap of player activity locations.")
     async def heatmap(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
