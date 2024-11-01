@@ -6,10 +6,14 @@ from dotenv import load_dotenv
 import os
 from flask import Flask, request
 from threading import Thread
+from pymongo import MongoClient
 
 tracemalloc.start()
 load_dotenv()
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
+DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
 class MindsEyeBot(commands.Bot):
     def __init__(self, botToken):
@@ -29,6 +33,24 @@ class MindsEyeBot(commands.Bot):
             chatLogger = self.get_cog("ChatLogger")
             if chatLogger:
                 self.loop.create_task(chatLogger.automatedSendMessage("No comment."))
+            return '', 204
+    
+        @self.flaskApp.route('/callsign-change', methods=['POST'])
+        def triggerCallsignChange():
+            data = request.json
+            playerTracker = self.get_cog("ChatLogger")
+            if playerTracker:
+                embed = discord.Embed(
+                    title="Callsign Change",
+                    description=f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}",
+                    color=discord.Color.green()
+                )
+                db = mongoDBClient["OspreyEyes"]
+                collection = db["configurations"]
+                configuration = collection.find_one()
+                if configuration["displayCallsignChanges"]:
+                    channel = self.get_channel(int(configuration["callsignLogChannel"]))
+                    self.loop.create_task(channel.send(embed=embed))
             return '', 204
 
     async def on_ready(self):
@@ -50,7 +72,7 @@ class MindsEyeBot(commands.Bot):
 
 
     async def _load_extensions(self) -> None:
-        for extension in ("chatLogging", "playerTracking", "mrpTracking",):
+        for extension in ("chatLogging", "playerTracking", "mrpTracking", "config",):
             await self.load_extension(f"cogs.{extension}")
 
 bot = MindsEyeBot(BOT_TOKEN)
