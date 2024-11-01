@@ -40,7 +40,7 @@ class DataCollectionLayer():
         for message in self.currentChatMessages:
             for item in ["mindseye", "minds eye", "minds-eye"]:
                 if  item in message["msg"].lower():
-                    url = f"http://{self.config['botFlaskIP']}:5000/bot-mention"
+                    url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/bot-mention"
                     data = {"message": True}
                     print("Detected pilot mentioned bot.")
                     try:
@@ -81,7 +81,7 @@ class DataCollectionLayer():
             existingUser = collection.find_one({"accountID": user.userInfo["id"]})
             if existingUser and existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo["id"]} changed callsign from {existingUser["currentCallsign"]} to {user.userInfo["callsign"]}")
-                url = f"http://{self.config['botFlaskIP']}:5000/callsign-change"
+                url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/callsign-change"
                 requestBody = {
                     "acid": user.userInfo["id"],
                     "newCallsign": user.userInfo["callsign"],
