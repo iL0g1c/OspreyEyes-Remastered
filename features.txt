@@ -1,7 +1,7 @@
 Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
-callsign change tracker 
+[X] callsign change tracker 
 Online player count logger
 Aircraft usage distribution
 New pilots joining
@@ -13,8 +13,9 @@ Targeted account detailed tracking
 MRP force total and detailed activity loggers
 Chat target word detection
 [X] Can talk in geofs chat
-When mentioned the bot responds in chat with "No comment"
+[X] When mentioned the bot responds in chat with "No comment"
 Account association algorithm (separate thread for background calculations)
 Discord username and server link grabber
 Being able to query all data collected by various parameters
 Resolve all warnings and errors
+Compatible server and no server

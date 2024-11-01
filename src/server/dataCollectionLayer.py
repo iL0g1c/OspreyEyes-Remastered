@@ -40,12 +40,11 @@ class DataCollectionLayer():
                     try:
                         response = requests.post(url, json=data)
                         if response.status_code == 204:\
-                            print("Event successfully triggered.")
+                            print("Mention event successfully triggered.")
                         else:
-                            print(f"Failed to trigger event. Status code: {response.status_code}")
+                            print(f"Failed to trigger mention event. Status code: {response.status_code}")
                     except Exception as e:
                         print(f"Failed to trigger event. Error: {e}")
-                    
 
     def fetchChatMessages(self): # fetches chat messages from the multiplayer API
         self.currentChatMessages = [
@@ -68,8 +67,43 @@ class DataCollectionLayer():
         if docs:
             collection.insert_many(docs)
     
-    def fetchOnlineUsers(self): # fetches online users from the map API
-        self.currentOnlineUsers = self.mapAPI.getUsers(False)       
+    def processUsers(self): # fetches online users from the map API
+        self.currentOnlineUsers = self.mapAPI.getUsers(False)
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["users"]
+        for user in self.currentOnlineUsers:
+            existingUser = collection.find_one({"accountID": user.userInfo["id"]})
+            if existingUser and existingUser.get("currentCallsign") != user.userInfo["callsign"]:
+                print(f"Account ID: {user.userInfo["id"]} changed callsign from {existingUser["currentCallsign"]} to {user.userInfo["callsign"]}")
+                url = "http://localhost:5000/callsign-change"
+                requestBody = {
+                    "acid": user.userInfo["id"],
+                    "newCallsign": user.userInfo["callsign"],
+                    "oldCallsign": existingUser["currentCallsign"]
+                }
+                try:
+                    response = requests.post(url, json=requestBody)
+                    if response.status_code == 204:
+                        print("Callsign change event successfully triggered.")
+                    else:
+                        print(f"Failed to trigger callsign change event. Status code: {response.status_code}")
+                except Exception as e:
+                    print(f"Failed to trigger event. Error: {e}")
+                
+
+            collection.update_one(
+                {"accountID": user.userInfo["id"]},
+                {
+                    "$set": {
+                        "currentCallsign": user.userInfo["callsign"],
+                        "lastOnline": datetime.now()
+                    },
+                    "$addToSet": {
+                        "pastCallsigns": user.userInfo["callsign"]
+                    }
+                },
+                upsert=True
+            )
     
     def getConfigurationSettings(self): # gets the configuration settings from the database
         db = self.mongoDBClient["OspreyEyes"]
@@ -88,7 +122,9 @@ def main():
         collection.insert_one({
             "saveChatMessages": False,
             "accumulateHeatMap": False,
-            "fetchOnlineUsers": False
+            "storeUsers": False,
+            "callsignLogChannel": None,
+            "displayCallsignChanges": False
         })
     previousConfiguration = collection.find_one() 
     print("Data collection layer started.")
@@ -105,8 +141,8 @@ def main():
         if configuration["accumulateHeatMap"] and (time.time() - lastSnapshotTime >= 1800):
             lastSnapshotTime = time.time()
             dataCollectionLayer.addPlayerLocationSnapshot()
-        if configuration["fetchOnlineUsers"]:
-            dataCollectionLayer.fetchOnlineUsers()
+        if configuration["storeUsers"]:
+            dataCollectionLayer.processUsers()
         time.sleep(1)
 
 if __name__ == "__main__":
