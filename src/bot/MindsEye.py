@@ -74,7 +74,7 @@ class MindsEyeBot(commands.Bot):
             print(e)
         self.config = self.loadConfig()
         print("Launching Flask server...")
-        Thread(target=self.flaskApp.run, kwargs={"host": self.config["flaskHost"], "port": 5000}).start()
+        Thread(target=self.flaskApp.run, kwargs={"host": self.config["flaskHost"], "port": self.config["flaskPort"]}).start()
         print("Connecting to discord...")
 
 

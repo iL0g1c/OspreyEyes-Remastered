@@ -1,3 +1,4 @@
 {
-    "flaskHost": "127.0.0.1"
+    "flaskHost": "127.0.0.1",
+    "flaskPort": 5001
 }
