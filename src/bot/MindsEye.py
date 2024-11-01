@@ -7,6 +7,7 @@ import os
 from flask import Flask, request
 from threading import Thread
 from pymongo import MongoClient
+import json
 
 tracemalloc.start()
 load_dotenv()
@@ -25,6 +26,11 @@ class MindsEyeBot(commands.Bot):
         )
         self.flaskApp = Flask(__name__)
         self.setup_routes()
+
+    def loadConfig(self):
+        with open("config.json") as f:
+            return json.load(f)
+    
 
     def setup_routes(self):
         @self.flaskApp.route('/bot-mention', methods=['POST'])
@@ -66,8 +72,9 @@ class MindsEyeBot(commands.Bot):
             print(f"Synced {len(synced)} command(s)")
         except Exception as e:
             print(e)
+        self.config = self.loadConfig()
         print("Launching Flask server...")
-        Thread(target=self.flaskApp.run, kwargs={"port": 5000}).start()
+        Thread(target=self.flaskApp.run, kwargs={"host": self.config["flaskHost"], "port": self.config["flaskPort"]}).start()
         print("Connecting to discord...")
 
 

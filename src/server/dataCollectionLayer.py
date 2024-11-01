@@ -7,6 +7,7 @@ from urllib.parse import unquote
 from datetime import datetime
 import numpy as np
 import requests
+import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -26,15 +27,20 @@ class DataCollectionLayer():
         self.mapAPI = mapAPI.MapAPI()
         self.currentChatMessages = []
         self.currentOnlineUsers = []
+        self.config = self.loadConfig()
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config["mongoDBIP"]}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
+
+    def loadConfig(self):
+        with open("config.json") as f:
+            return json.load(f)
 
     def checkChatMessagesForMention(self):
         for message in self.currentChatMessages:
             for item in ["mindseye", "minds eye", "minds-eye"]:
                 if  item in message["msg"].lower():
-                    url = "http://localhost:5000/bot-mention"
+                    url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/bot-mention"
                     data = {"message": True}
                     print("Detected pilot mentioned bot.")
                     try:
@@ -75,7 +81,7 @@ class DataCollectionLayer():
             existingUser = collection.find_one({"accountID": user.userInfo["id"]})
             if existingUser and existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo["id"]} changed callsign from {existingUser["currentCallsign"]} to {user.userInfo["callsign"]}")
-                url = "http://localhost:5000/callsign-change"
+                url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/callsign-change"
                 requestBody = {
                     "acid": user.userInfo["id"],
                     "newCallsign": user.userInfo["callsign"],
