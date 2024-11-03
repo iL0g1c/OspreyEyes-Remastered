@@ -1,5 +1,5 @@
 {
-    "mongoDBIP": "localhost",
+    "mongoDBIP": "66.179.248.17",
     "botFlaskIP": "localhost",
     "botFlaskPort": 5001
 }

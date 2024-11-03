@@ -32,5 +32,43 @@ class Config(commands.Cog):
         await collection.update_one({}, {"$set": {"displayCallsignChanges": newConfiguration}})
         await interaction.response.send_message(f"Set displayCallsignChanges to {newConfiguration}")
 
+    @configGroup.command(name="toggle_user_count_logger", description="Set the channel for callsign change logs.")
+    async def toggleUserCountLogger(self, interaction: discord.Interaction): # toggles the user count logger
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["countUsers"]
+        await collection.update_one({}, {"$set": {"countUsers": newConfiguration}})
+        await interaction.response.send_message(f"Set userCountLogger to {newConfiguration}")
+
+    
+    @configGroup.command(name="toggle_chat_message_logging", description="Toggle the logging of chat messages.")
+    async def toggleChatMessageLogging(self, interaction: discord.Interaction): # toggles the logging of chat messages
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["saveChatMessages"]
+        await collection.update_one({}, {"$set": {"saveChatMessages": newConfiguration}})
+        await interaction.response.send_message(f"Set saveChatMessages to {newConfiguration}")
+
+    @configGroup.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
+    async def toggleHeatmapCumulation(self, interaction: discord.Interaction): # toggles the cumulation of player locations for the heatmap
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["accumulateHeatMap"]
+        await collection.update_one({}, {"$set": {"accumulateHeatMap": newConfiguration}})
+        await interaction.response.send_message(f"Set accumulateHeatMap to {newConfiguration}")
+
+    
+    @configGroup.command(name="toggle_user_tracking", description="Toggle the tracking of pilots on GeoFS.")
+    async def togglePlayerLocationTracking(self, interaction: discord.Interaction): # toggles saving users to the database
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["storeUsers"]
+        await collection.update_one({}, {"$set": {"storeUsers": newConfiguration}})
+        await interaction.response.send_message(f"Set storeUsers to {newConfiguration}")
+
 async def setup(bot: MindsEyeBot):
     await bot.add_cog(Config())

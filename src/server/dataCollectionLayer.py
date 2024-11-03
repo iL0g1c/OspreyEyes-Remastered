@@ -57,7 +57,6 @@ class DataCollectionLayer():
             {**message, "msg": unquote(message["msg"]), "datetime": datetime.now()}
             for message in self.multiplayerAPI.getMessages()
         ]
-        print(self.currentChatMessages)
         self.checkChatMessagesForMention()
         if self.currentChatMessages:
             db = self.mongoDBClient["OspreyEyes"]
@@ -72,13 +71,20 @@ class DataCollectionLayer():
         docs = [{"latitude": lat, "longitude": lon} for lat, lon in zip(newLatitudes, newLongitudes)]
         if docs:
             collection.insert_many(docs)
+
+    def addOnlinePlayerCount(self): # adds the number of online players to the database
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["online_player_count"]
+        collection.insert_one({"count": len(self.currentOnlineUsers), "datetime": datetime.now()})
     
     def processUsers(self): # fetches online users from the map API
-        self.currentOnlineUsers = self.mapAPI.getUsers(False)
+        self.currentOnlineUsers = self.mapAPI.getUsers(True)
         db = self.mongoDBClient["OspreyEyes"]
-        collection = db["users"]
+        userCollection = db["users"]
         for user in self.currentOnlineUsers:
-            existingUser = collection.find_one({"accountID": user.userInfo["id"]})
+            if user.userInfo["callsign"] == "Foo": # skips users without callsigns
+                continue
+            existingUser = userCollection.find_one({"accountID": user.userInfo["id"]})
             if existingUser and existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo["id"]} changed callsign from {existingUser["currentCallsign"]} to {user.userInfo["callsign"]}")
                 url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/callsign-change"
@@ -97,7 +103,7 @@ class DataCollectionLayer():
                     print(f"Failed to trigger event. Error: {e}")
                 
 
-            collection.update_one(
+            userCollection.update_one(
                 {"accountID": user.userInfo["id"]},
                 {
                     "$set": {
@@ -120,6 +126,7 @@ def main():
     print("Starting data collection layer...")
     dataCollectionLayer = DataCollectionLayer()
     lastSnapshotTime = 1800
+    lastUserCountTime = 3600
 
     db = dataCollectionLayer.mongoDBClient["OspreyEyes"]
     collection = db["configurations"]
@@ -130,7 +137,8 @@ def main():
             "accumulateHeatMap": False,
             "storeUsers": False,
             "callsignLogChannel": None,
-            "displayCallsignChanges": False
+            "displayCallsignChanges": False,
+            "countUsers": False
         })
     previousConfiguration = collection.find_one() 
     print("Data collection layer started.")
@@ -147,6 +155,8 @@ def main():
         if configuration["accumulateHeatMap"] and (time.time() - lastSnapshotTime >= 1800):
             lastSnapshotTime = time.time()
             dataCollectionLayer.addPlayerLocationSnapshot()
+        if configuration["countUsers"] and (time.time() - lastUserCountTime >= 3600):
+            dataCollectionLayer.addOnlinePlayerCount()
         if configuration["storeUsers"]:
             dataCollectionLayer.processUsers()
         time.sleep(1)
