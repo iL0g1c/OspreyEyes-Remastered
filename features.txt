@@ -20,5 +20,5 @@ Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
 - user by callsign
-
 configuration file does not use database
+allow not logging new accounts in discord log channel
