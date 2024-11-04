@@ -2,7 +2,7 @@ Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
 [X] callsign change tracker 
-Online player count logger
+[x] Online player count logger
 Aircraft usage distribution
 New pilots joining
 Dog fight detection and tracking 
@@ -17,5 +17,8 @@ Chat target word detection
 Account association algorithm (separate thread for background calculations)
 Discord username and server link grabber
 Being able to query all data collected by various parameters
-Resolve all warnings and errors
-Compatible server and no server
+- player count before/after date
+- user by id
+- user by callsign
+
+configuration file does not use database

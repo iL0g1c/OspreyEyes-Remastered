@@ -45,10 +45,14 @@ class MindsEyeBot(commands.Bot):
         def triggerCallsignChange():
             data = request.json
             playerTracker = self.get_cog("ChatLogger")
+            if data["oldCallsign"]:
+                description = f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}"
+            else:
+                description = f"New Account: \nAcoount ID: {data['acid']}\n Callsign: {data['newCallsign']}"
             if playerTracker:
                 embed = discord.Embed(
                     title="Callsign Change",
-                    description=f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}",
+                    description=description,
                     color=discord.Color.green()
                 )
                 db = mongoDBClient["OspreyEyes"]

@@ -78,16 +78,33 @@ class DataCollectionLayer():
         collection.insert_one({"count": len(self.currentOnlineUsers), "datetime": datetime.now()})
     
     def processUsers(self): # fetches online users from the map API
-        self.currentOnlineUsers = self.mapAPI.getUsers(True)
+        self.currentOnlineUsers = self.mapAPI.getUsers(None)
         db = self.mongoDBClient["OspreyEyes"]
         userCollection = db["users"]
         for user in self.currentOnlineUsers:
             if user.userInfo["callsign"] == "Foo": # skips users without callsigns
                 continue
             existingUser = userCollection.find_one({"accountID": user.userInfo["id"]})
-            if existingUser and existingUser.get("currentCallsign") != user.userInfo["callsign"]:
-                print(f"Account ID: {user.userInfo["id"]} changed callsign from {existingUser["currentCallsign"]} to {user.userInfo["callsign"]}")
-                url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/callsign-change"
+            if existingUser == None: # inserts new users
+                print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
+                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
+                requestBody = {
+                    "acid": user.userInfo["id"],
+                    "newCallsign": user.userInfo["callsign"],
+                    "oldCallsign": None
+                }
+                try:
+                    response = requests.post(url, json=requestBody)
+                    if response.status_code == 204:
+                        print("Callsign change event successfully triggered.")
+                    else:
+                        print(f"Failed to trigger callsign change event. Status code: {response.status_code}")
+                    time.sleep(0.1)
+                except Exception as e:
+                    print(f"Failed to trigger event. Error: {e}")
+            elif existingUser.get("currentCallsign") != user.userInfo["callsign"]:
+                print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
+                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
                 requestBody = {
                     "acid": user.userInfo["id"],
                     "newCallsign": user.userInfo["callsign"],
@@ -99,10 +116,10 @@ class DataCollectionLayer():
                         print("Callsign change event successfully triggered.")
                     else:
                         print(f"Failed to trigger callsign change event. Status code: {response.status_code}")
+                    time.sleep(0.1)
                 except Exception as e:
                     print(f"Failed to trigger event. Error: {e}")
                 
-
             userCollection.update_one(
                 {"accountID": user.userInfo["id"]},
                 {
@@ -116,7 +133,7 @@ class DataCollectionLayer():
                 },
                 upsert=True
             )
-    
+        
     def getConfigurationSettings(self): # gets the configuration settings from the database
         db = self.mongoDBClient["OspreyEyes"]
         collection = db["configurations"]
