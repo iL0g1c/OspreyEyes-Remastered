@@ -16,12 +16,19 @@ class Config(commands.Cog):
     
     configGroup = app_commands.Group(name="config", description="Commands for configuring the bot.") # creates the config commands group
 
-    @configGroup.command(name="set_callsign_log_channel", description="Set the channel for callsign change logs.")
-    async def setCallsignLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for callsign change logs
+    @configGroup.command(name="set_callsign_change_log_channel", description="Set the channel for callsign change logs.")
+    async def setCallsignChangeLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for callsign change logs
         db = self.mongoDBClient["OspreyEyes"]
         collection = db["configurations"]
-        await collection.update_one({}, {"$set": {"callsignLogChannel": channel.id}}, upsert=True)
-        await interaction.response.send_message(f"Set callsignLogChannel to {channel.mention}")
+        await collection.update_one({}, {"$set": {"callsignChangeLogChannel": channel.id}}, upsert=True)
+        await interaction.response.send_message(f"Set callsignChangeLogChannel to {channel.mention}")
+    
+    @configGroup.command(name="set_new_account_log_channel", description="Set the channel for new account logs.")
+    async def setNewAccountLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for new account logs
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        await collection.update_one({}, {"$set": {"newAccountLogChannel": channel.id}}, upsert=True)
+        await interaction.response.send_message(f"Set newAccountLogChannel to {channel.mention}")
 
     @configGroup.command(name="toggle_display_callsign_changes", description="Toggle the discord displaying of callsign changes.")
     async def toggleCallsignChanges(self, interaction: discord.Interaction): # toggles the discord displaying of callsign changes

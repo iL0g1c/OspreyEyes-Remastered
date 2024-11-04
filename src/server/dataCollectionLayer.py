@@ -34,33 +34,46 @@ class DataCollectionLayer():
         mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config["mongoDBIP"]}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
-        print("Starting queue thread...")
-        self.requestsQueue = queue.Queue()
+        print("Starting queue threads...")
+        self.callsignChangeQueue = queue.Queue()
+        self.newAccountQueue = queue.Queue()
         self.maxrequests = 60
-        self.queueThread = threading.Thread(target=self.processQueue)
-        self.queueThread.daemon = True
-        self.queueThread.start()
+        self.callsignChangeWebhookThread = threading.Thread(target=self.callsignChangeProcesser)
+        self.newAccountWebhookThread = threading.Thread(target=self.newAccountProcesser)
+        self.callsignChangeWebhookThread.daemon = True
+        self.newAccountWebhookThread.daemon = True
+        self.callsignChangeWebhookThread.start()
+        self.newAccountWebhookThread.start()
 
-    def processQueue(self):
+    def callsignChangeProcesser(self):
         while True:
-            configurations = self.getConfigurationSettings()
-            if configurations["displayCallsignChanges"]:
-                if not self.requestsQueue.empty():
-                    requestInfo = self.requestsQueue.get()
-                    try:
-                        response = requests.post(requestInfo["url"], json=requestInfo["data"])
-                        if response.status_code == 204:
-                            print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.requestsQueue.qsize()} requests left in the queue.")
-                        else:
-                            print(f"Failed to trigger request. Status code: {response.status_code}")
-                    except Exception as e:
-                        print(f"Failed to trigger request. Error: {e}")
-                        
+            if not self.callsignChangeQueue.empty():
+                requestInfo = self.callsignChangeQueue.get()
+                try:
+                    response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                    if response.status_code == 204:
+                        print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.callsignChangeQueue.qsize()} requests left in the queue.")
+                    else:
+                        print(f"Failed to trigger request. Status code: {response.status_code}")
+                except Exception as e:
+                    print(f"Failed to trigger request. Error: {e}")
+                    
                     time.sleep(30 / self.maxrequests)
-            else:
-                self.requestsQueue.get()
-                print(f"Sent a callsign change webhook to the OspreyEyes bot.")
-
+    
+    def newAccountProcesser(self):
+        while True:
+            if not self.newAccountQueue.empty():
+                requestInfo = self.newAccountQueue.get()
+                try:
+                    response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                    if response.status_code == 204:
+                        print(f"Sent a new account webhook to the OspreyEyes bot. {self.newAccountQueue.qsize()} requests left in the queue.")
+                    else:
+                        print(f"Failed to trigger request. Status code: {response.status_code}")
+                except Exception as e:
+                    print(f"Failed to trigger request. Error: {e}")
+                    
+                    time.sleep(30 / self.maxrequests)
 
     def loadConfig(self):
         with open("config.json") as f:
@@ -118,14 +131,13 @@ class DataCollectionLayer():
             existingUser = userCollection.find_one({"accountID": user.userInfo["id"]})
             if existingUser == None: # inserts new users
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
-                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
+                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/new-account"
                 requestBody = {
                     "acid": user.userInfo["id"],
-                    "newCallsign": user.userInfo["callsign"],
-                    "oldCallsign": None
+                    "callsign": user.userInfo["callsign"]
                 }
                 if configurations["displayNewAccounts"]:
-                    self.requestsQueue.put({"url": url, "data": requestBody})
+                    self.newAccountQueue.put({"url": url, "data": requestBody})
             elif existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
                 url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
@@ -134,8 +146,8 @@ class DataCollectionLayer():
                     "newCallsign": user.userInfo["callsign"],
                     "oldCallsign": existingUser["currentCallsign"]
                 }
-                self.requestsQueue.put({"url": url, "data": requestBody})
-                
+                if configurations["displayCallsignChanges"]:
+                    self.callsignChangeQueue.put({"url": url, "data": requestBody})
             userCollection.update_one(
                 {"accountID": user.userInfo["id"]},
                 {
@@ -168,7 +180,8 @@ def main():
         "saveChatMessages": False,
         "accumulateHeatMap": False,
         "storeUsers": False,
-        "callsignLogChannel": None,
+        "callsignChangeLogChannel": None,
+        "newAccountLogChannel": None,
         "displayCallsignChanges": False,
         "displayNewAccounts": False,
         "countUsers": False,
