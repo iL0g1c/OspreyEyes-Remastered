@@ -8,6 +8,8 @@ from datetime import datetime
 import numpy as np
 import requests
 import json
+import queue
+import threading
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -31,6 +33,34 @@ class DataCollectionLayer():
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config["mongoDBIP"]}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
+
+        print("Starting queue thread...")
+        self.requestsQueue = queue.Queue()
+        self.maxrequests = 60
+        self.queueThread = threading.Thread(target=self.processQueue)
+        self.queueThread.daemon = True
+        self.queueThread.start()
+
+    def processQueue(self):
+        while True:
+            configurations = self.getConfigurationSettings()
+            if configurations["displayCallsignChanges"]:
+                if not self.requestsQueue.empty():
+                    requestInfo = self.requestsQueue.get()
+                    try:
+                        response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                        if response.status_code == 204:
+                            print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.requestsQueue.qsize()} requests left in the queue.")
+                        else:
+                            print(f"Failed to trigger request. Status code: {response.status_code}")
+                    except Exception as e:
+                        print(f"Failed to trigger request. Error: {e}")
+                        
+                    time.sleep(30 / self.maxrequests)
+            else:
+                self.requestsQueue.get()
+                print(f"Sent a callsign change webhook to the OspreyEyes bot.")
+
 
     def loadConfig(self):
         with open("config.json") as f:
@@ -93,15 +123,7 @@ class DataCollectionLayer():
                     "newCallsign": user.userInfo["callsign"],
                     "oldCallsign": None
                 }
-                try:
-                    response = requests.post(url, json=requestBody)
-                    if response.status_code == 204:
-                        print("Callsign change event successfully triggered.")
-                    else:
-                        print(f"Failed to trigger callsign change event. Status code: {response.status_code}")
-                    time.sleep(0.1)
-                except Exception as e:
-                    print(f"Failed to trigger event. Error: {e}")
+                self.requestsQueue.put({"url": url, "data": requestBody})
             elif existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
                 url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
@@ -110,15 +132,7 @@ class DataCollectionLayer():
                     "newCallsign": user.userInfo["callsign"],
                     "oldCallsign": existingUser["currentCallsign"]
                 }
-                try:
-                    response = requests.post(url, json=requestBody)
-                    if response.status_code == 204:
-                        print("Callsign change event successfully triggered.")
-                    else:
-                        print(f"Failed to trigger callsign change event. Status code: {response.status_code}")
-                    time.sleep(0.1)
-                except Exception as e:
-                    print(f"Failed to trigger event. Error: {e}")
+                self.requestsQueue.put({"url": url, "data": requestBody})
                 
             userCollection.update_one(
                 {"accountID": user.userInfo["id"]},

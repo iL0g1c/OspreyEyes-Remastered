@@ -8,6 +8,8 @@ from flask import Flask, request
 from threading import Thread
 from pymongo import MongoClient
 import json
+import asyncio
+import time
 
 tracemalloc.start()
 load_dotenv()
@@ -26,6 +28,8 @@ class MindsEyeBot(commands.Bot):
         )
         self.flaskApp = Flask(__name__)
         self.setup_routes()
+        self.throttleInterval = 1
+        self.lock = asyncio.Lock()
 
     def loadConfig(self):
         with open("config.json") as f:
@@ -58,9 +62,16 @@ class MindsEyeBot(commands.Bot):
                 db = mongoDBClient["OspreyEyes"]
                 collection = db["configurations"]
                 configuration = collection.find_one()
-                if configuration["displayCallsignChanges"]:
-                    channel = self.get_channel(int(configuration["callsignLogChannel"]))
-                    self.loop.create_task(channel.send(embed=embed))
+                channel = self.get_channel(int(configuration["callsignLogChannel"]))
+                async def sendMessage():
+                    db = mongoDBClient["OspreyEyes"]
+                    collection = db["configurations"]
+                    configuration = collection.find_one()
+                    if configuration["displayCallsignChanges"]:
+                        async with self.lock:
+                            await channel.send(embed=embed)
+                            await asyncio.sleep(self.throttleInterval)
+                self.loop.create_task(sendMessage())
             return '', 204
 
     async def on_ready(self):
