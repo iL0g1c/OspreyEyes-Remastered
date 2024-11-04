@@ -48,7 +48,7 @@ class DataCollectionLayer():
                 try:
                     response = requests.post(requestInfo["url"], json=requestInfo["data"])
                     if response.status_code == 204:
-                        print(f"Sent a callsign change webhook to the OspreyEyes bot.\n {self.requestsQueue.qsize()} requests left in the queue.")
+                        print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.requestsQueue.qsize()} requests left in the queue.")
                     else:
                         print(f"Failed to trigger request. Status code: {response.status_code}")
                 except Exception as e:
