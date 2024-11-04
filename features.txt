@@ -27,9 +27,4 @@ bash script that opens all windows
 - open terminal and connect to mongosh
 - run bot
 
-command to display config
-
-TO PICK UP
-=================
-verify callsign change and new account config logic
-move new accounts to seperate route. same channel allowable
+[ ] command to display config

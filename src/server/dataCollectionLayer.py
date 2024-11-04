@@ -1,5 +1,5 @@
 import time
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 import os
 import sys
 from dotenv import load_dotenv
@@ -10,6 +10,7 @@ import requests
 import json
 import queue
 import threading
+import logging
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -22,6 +23,8 @@ class DataCollectionLayer():
         load_dotenv()
         self.sessionID = os.getenv('GEOFS_SESSION_ID')
         self.accountID = os.getenv('GEOFS_ACCOUNT_ID')
+
+        logging.basicConfig(level=logging.INFO)
 
         # initializes APIs
         self.multiplayerAPI = multiplayerAPI.MultiplayerAPI(self.sessionID, self.accountID)
@@ -45,19 +48,22 @@ class DataCollectionLayer():
         self.callsignChangeWebhookThread.start()
         self.newAccountWebhookThread.start()
 
+        print("Starting bot connection sessions...")
+        self.callsignChangeSession = requests.Session()
+        self.newAccountSession = requests.Session()
+
     def callsignChangeProcesser(self):
         while True:
             if not self.callsignChangeQueue.empty():
                 requestInfo = self.callsignChangeQueue.get()
                 try:
-                    response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                    response = self.callsignChangeSession.post(requestInfo["url"], json=requestInfo["data"])
                     if response.status_code == 204:
-                        print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.callsignChangeQueue.qsize()} requests left in the queue.")
+                        print(f"Requests left in callsign change queue: {self.callsignChangeQueue.qsize()}")
                     else:
-                        print(f"Failed to trigger request. Status code: {response.status_code}")
+                        logging.error(f"Failed to trigger request. Status code: {response.status_code}")
                 except Exception as e:
-                    print(f"Failed to trigger request. Error: {e}")
-                    
+                    logging.error(f"Failed to trigger request. Error: {e}")
                     time.sleep(30 / self.maxrequests)
     
     def newAccountProcesser(self):
@@ -65,9 +71,9 @@ class DataCollectionLayer():
             if not self.newAccountQueue.empty():
                 requestInfo = self.newAccountQueue.get()
                 try:
-                    response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                    response = self.newAccountSession.post(requestInfo["url"], json=requestInfo["data"])
                     if response.status_code == 204:
-                        print(f"Sent a new account webhook to the OspreyEyes bot. {self.newAccountQueue.qsize()} requests left in the queue.")
+                        print(f"Requests left in new account queue: {self.newAccountQueue.qsize()}")
                     else:
                         print(f"Failed to trigger request. Status code: {response.status_code}")
                 except Exception as e:
@@ -120,52 +126,89 @@ class DataCollectionLayer():
         collection = db["online_player_count"]
         collection.insert_one({"count": len(self.currentOnlineUsers), "datetime": datetime.now()})
     
-    def processUsers(self): # fetches online users from the map API
+    def processUsers(self):  # fetches online users from the map API
         self.currentOnlineUsers = self.mapAPI.getUsers(None)
         db = self.mongoDBClient["OspreyEyes"]
         userCollection = db["users"]
         configurations = self.getConfigurationSettings()
+        newUsers = []
+        updateOperations = []
+        newAccountWebhooks = []
+        callsignChangeWebhooks = []
+
+        currentAccountIDs = [user.userInfo["id"] for user in self.currentOnlineUsers]
+        existingUsersMap = {
+            user["accountID"]: user
+            for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
+        }
         for user in self.currentOnlineUsers:
-            if user.userInfo["callsign"] == "Foo": # skips users without callsigns
+            if user.userInfo["callsign"] == "Foo":  # skips users without callsigns
                 continue
-            existingUser = userCollection.find_one({"accountID": user.userInfo["id"]})
-            if existingUser == None: # inserts new users
+
+            userInfo = {
+                "accountID": user.userInfo["id"],
+                "currentCallsign": user.userInfo["callsign"],
+                "lastOnline": datetime.now(),
+            }
+
+            if userInfo["accountID"] not in existingUsersMap:
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
-                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/new-account"
-                requestBody = {
-                    "acid": user.userInfo["id"],
-                    "callsign": user.userInfo["callsign"]
-                }
+                newUsers.append(userInfo)
+
                 if configurations["displayNewAccounts"]:
-                    self.newAccountQueue.put({"url": url, "data": requestBody})
-            elif existingUser.get("currentCallsign") != user.userInfo["callsign"]:
-                print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
-                url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
-                requestBody = {
-                    "acid": user.userInfo["id"],
-                    "newCallsign": user.userInfo["callsign"],
-                    "oldCallsign": existingUser["currentCallsign"]
-                }
-                if configurations["displayCallsignChanges"]:
-                    self.callsignChangeQueue.put({"url": url, "data": requestBody})
-            userCollection.update_one(
-                {"accountID": user.userInfo["id"]},
-                {
-                    "$set": {
-                        "currentCallsign": user.userInfo["callsign"],
-                        "lastOnline": datetime.now()
-                    },
-                    "$addToSet": {
-                        "pastCallsigns": user.userInfo["callsign"]
+                    url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/new-account"
+                    requestBody = {
+                        "acid": user.userInfo["id"],
+                        "callsign": user.userInfo["callsign"]
                     }
-                },
-                upsert=True
+                    newAccountWebhooks.append({"url": url, "data": requestBody})
+            else:
+                existingUser = existingUsersMap[userInfo["accountID"]]
+                if existingUser.get("currentCallsign") != user.userInfo["callsign"]:
+                    print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
+                    if configurations["displayCallsignChanges"]:
+                        url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
+                        requestBody = {
+                            "acid": user.userInfo["id"],
+                            "newCallsign": user.userInfo["callsign"],
+                            "oldCallsign": existingUser["currentCallsign"]
+                        }
+                        callsignChangeWebhooks.append({"url": url, "data": requestBody})
+
+            updateOperations.append(
+                UpdateOne(
+                    {"accountID": userInfo["accountID"]},
+                    {
+                        "$set": {
+                            "currentCallsign": userInfo["currentCallsign"],
+                            "lastOnline": datetime.now()
+                        },
+                        "$addToSet": {
+                            "pastCallsigns": userInfo["currentCallsign"]
+                        }
+                    },
+                    upsert=True
+                )
             )
+        if newUsers:
+            userCollection.insert_many(newUsers)
+
+        if updateOperations:
+            result = userCollection.bulk_write(updateOperations)
+
+        for request in newAccountWebhooks:
+            self.newAccountQueue.put(request)
+
+        for request in callsignChangeWebhooks:
+            self.callsignChangeQueue.put(request)
+
         
     def getConfigurationSettings(self): # gets the configuration settings from the database
-        db = self.mongoDBClient["OspreyEyes"]
-        collection = db["configurations"]
-        return collection.find_one()
+        if not hasattr(self, "_cached_config"):
+            db = self.mongoDBClient["OspreyEyes"]
+            collection = db["configurations"]
+            self._cached_config = collection.find_one()
+        return self._cached_config
 
 def main():
     print("Starting data collection layer...")
