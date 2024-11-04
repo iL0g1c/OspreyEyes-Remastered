@@ -62,13 +62,16 @@ class MindsEyeBot(commands.Bot):
                 db = mongoDBClient["OspreyEyes"]
                 collection = db["configurations"]
                 configuration = collection.find_one()
-                if configuration["displayCallsignChanges"]:
-                    channel = self.get_channel(int(configuration["callsignLogChannel"]))
-                    async def sendMessage():
+                channel = self.get_channel(int(configuration["callsignLogChannel"]))
+                async def sendMessage():
+                    db = mongoDBClient["OspreyEyes"]
+                    collection = db["configurations"]
+                    configuration = collection.find_one()
+                    if configuration["displayCallsignChanges"]:
                         async with self.lock:
                             await channel.send(embed=embed)
                             await asyncio.sleep(self.throttleInterval)
-                    self.loop.create_task(sendMessage())
+                self.loop.create_task(sendMessage())
             return '', 204
 
     async def on_ready(self):

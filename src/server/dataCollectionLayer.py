@@ -43,18 +43,24 @@ class DataCollectionLayer():
 
     def processQueue(self):
         while True:
-            if not self.requestsQueue.empty():
-                requestInfo = self.requestsQueue.get()
-                try:
-                    response = requests.post(requestInfo["url"], json=requestInfo["data"])
-                    if response.status_code == 204:
-                        print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.requestsQueue.qsize()} requests left in the queue.")
-                    else:
-                        print(f"Failed to trigger request. Status code: {response.status_code}")
-                except Exception as e:
-                    print(f"Failed to trigger request. Error: {e}")
-                    
-                time.sleep(30 / self.maxrequests)
+            configurations = self.getConfigurationSettings()
+            if configurations["displayCallsignChanges"]:
+                if not self.requestsQueue.empty():
+                    requestInfo = self.requestsQueue.get()
+                    try:
+                        response = requests.post(requestInfo["url"], json=requestInfo["data"])
+                        if response.status_code == 204:
+                            print(f"Sent a callsign change webhook to the OspreyEyes bot. {self.requestsQueue.qsize()} requests left in the queue.")
+                        else:
+                            print(f"Failed to trigger request. Status code: {response.status_code}")
+                    except Exception as e:
+                        print(f"Failed to trigger request. Error: {e}")
+                        
+                    time.sleep(30 / self.maxrequests)
+            else:
+                self.requestsQueue.get()
+                print(f"Sent a callsign change webhook to the OspreyEyes bot.")
+
 
     def loadConfig(self):
         with open("config.json") as f:
