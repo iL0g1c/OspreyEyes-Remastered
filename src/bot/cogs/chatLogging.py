@@ -37,14 +37,5 @@ class ChatLogger(commands.Cog):
         self.multiplayerAPI.sendMsg(message)
         await interaction.followup.send(f"Sent message: {message}")
 
-    @chatGroup.command(name="toggle_chat_message_logging", description="Toggle the logging of chat messages.")
-    async def toggleChatMessageLogging(self, interaction: discord.Interaction): # toggles the logging of chat messages
-        db = self.mongoDBClient["OspreyEyes"]
-        collection = db["configurations"]
-        configuration = await collection.find_one()
-        newConfiguration = not configuration["saveChatMessages"]
-        await collection.update_one({}, {"$set": {"saveChatMessages": newConfiguration}})
-        await interaction.response.send_message(f"Set saveChatMessages to {newConfiguration}")
-
 async def setup(bot: MindsEyeBot):
     await bot.add_cog(ChatLogger(bot))

@@ -28,24 +28,6 @@ class PlayerTracker(commands.Cog):
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
 
-    @playersGroup.command(name="toggle_heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
-    async def toggleHeatmapCumulation(self, interaction: discord.Interaction): # toggles the cumulation of player locations for the heatmap
-        db = self.mongoDBClient["OspreyEyes"]
-        collection = db["configurations"]
-        configuration = await collection.find_one()
-        newConfiguration = not configuration["accumulateHeatMap"]
-        await collection.update_one({}, {"$set": {"accumulateHeatMap": newConfiguration}})
-        await interaction.response.send_message(f"Set accumulateHeatMap to {newConfiguration}")
-    
-    @playersGroup.command(name="toggle_user_tracking", description="Toggle the tracking of pilots on GeoFS.")
-    async def togglePlayerLocationTracking(self, interaction: discord.Interaction): # toggles saving users to the database
-        db = self.mongoDBClient["OspreyEyes"]
-        collection = db["configurations"]
-        configuration = await collection.find_one()
-        newConfiguration = not configuration["storeUsers"]
-        await collection.update_one({}, {"$set": {"storeUsers": newConfiguration}})
-        await interaction.response.send_message(f"Set storeUsers to {newConfiguration}")
-
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
     async def getOnlineUsers(self, interaction: discord.Interaction): # gets the online users from the map API
         stringifiedUsers = []
