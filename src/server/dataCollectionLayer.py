@@ -111,6 +111,7 @@ class DataCollectionLayer():
         self.currentOnlineUsers = self.mapAPI.getUsers(None)
         db = self.mongoDBClient["OspreyEyes"]
         userCollection = db["users"]
+        configurations = self.getConfigurationSettings()
         for user in self.currentOnlineUsers:
             if user.userInfo["callsign"] == "Foo": # skips users without callsigns
                 continue
@@ -123,7 +124,8 @@ class DataCollectionLayer():
                     "newCallsign": user.userInfo["callsign"],
                     "oldCallsign": None
                 }
-                self.requestsQueue.put({"url": url, "data": requestBody})
+                if configurations["displayNewAccounts"]:
+                    self.requestsQueue.put({"url": url, "data": requestBody})
             elif existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                 print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
                 url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
@@ -162,16 +164,38 @@ def main():
     db = dataCollectionLayer.mongoDBClient["OspreyEyes"]
     collection = db["configurations"]
     configuration = collection.find_one()
-    if configuration == None: # initializes the configuration settings if they don't exist
-        collection.insert_one({
-            "saveChatMessages": False,
-            "accumulateHeatMap": False,
-            "storeUsers": False,
-            "callsignLogChannel": None,
-            "displayCallsignChanges": False,
-            "countUsers": False
-        })
-    previousConfiguration = collection.find_one() 
+    defaultConfig = {
+        "saveChatMessages": False,
+        "accumulateHeatMap": False,
+        "storeUsers": False,
+        "callsignLogChannel": None,
+        "displayCallsignChanges": False,
+        "displayNewAccounts": False,
+        "countUsers": False,
+    }
+    if configuration: # checks if the configuration settings exist
+        for key, value in defaultConfig.items(): # checks if the configuration settings are missing
+            if key not in configuration:
+                print("Found a new configuration setting. Adding it to the database.")
+                collection.update_one(
+                    {"_id": configuration["_id"]},
+                    {"$set": {key: value}}
+                )
+                configuration[key] = value
+        keysToRemove = [key for key in configuration if key not in defaultConfig and key != "_id"]
+        if keysToRemove:
+            print("Found old configuration settings. Removing them from the database.")
+            collection.update_one(
+                {"_id": configuration["_id"]},
+                {"$unset": {key: "" for key in keysToRemove}}
+            )
+            for key in keysToRemove:
+                del configuration[key]
+    else:
+        collection.insert_one(defaultConfig)
+        configuration = defaultConfig
+    previousConfiguration = configuration
+
     print("Data collection layer started.")
     while True: # loops every second for api calls
         configuration = collection.find_one()

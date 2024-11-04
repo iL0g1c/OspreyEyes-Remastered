@@ -23,7 +23,7 @@ class Config(commands.Cog):
         await collection.update_one({}, {"$set": {"callsignLogChannel": channel.id}}, upsert=True)
         await interaction.response.send_message(f"Set callsignLogChannel to {channel.mention}")
 
-    @configGroup.command(name="toggle_callsign_changes", description="Toggle the discord displaying of callsign changes.")
+    @configGroup.command(name="toggle_display_callsign_changes", description="Toggle the discord displaying of callsign changes.")
     async def toggleCallsignChanges(self, interaction: discord.Interaction): # toggles the discord displaying of callsign changes
         db = self.mongoDBClient["OspreyEyes"]
         collection = db["configurations"]
@@ -31,6 +31,16 @@ class Config(commands.Cog):
         newConfiguration = not configuration["displayCallsignChanges"]
         await collection.update_one({}, {"$set": {"displayCallsignChanges": newConfiguration}})
         await interaction.response.send_message(f"Set displayCallsignChanges to {newConfiguration}")
+    
+
+    @configGroup.command(name="toggle_display_new_accounts", description="Toggle logging new geofs accounts in the callsign log channel.")
+    async def toggleNewAccounts(self, interaction: discord.Interaction): # toggles logging new geofs accounts in the callsign log channel
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["displayNewAccounts"]
+        await collection.update_one({}, {"$set": {"displayNewAccounts": newConfiguration}})
+        await interaction.response.send_message(f"Set displayNewAccounts to {newConfiguration}")
 
     @configGroup.command(name="toggle_user_count_logger", description="Set the channel for callsign change logs.")
     async def toggleUserCountLogger(self, interaction: discord.Interaction): # toggles the user count logger
