@@ -26,6 +26,8 @@ class DataCollectionLayer():
 
         logging.basicConfig(level=logging.INFO)
 
+        self.lastAircraftDistributionTime = datetime.now()
+
         # initializes APIs
         self.multiplayerAPI = multiplayerAPI.MultiplayerAPI(self.sessionID, self.accountID)
         self.multiplayerAPI.handshake()
@@ -128,13 +130,16 @@ class DataCollectionLayer():
     
     def processUsers(self):  # fetches online users from the map API
         self.currentOnlineUsers = self.mapAPI.getUsers(None)
+
         db = self.mongoDBClient["OspreyEyes"]
         userCollection = db["users"]
         configurations = self.getConfigurationSettings()
+
         newUsers = []
         updateOperations = []
         newAccountWebhooks = []
         callsignChangeWebhooks = []
+        aircraftAmounts = {}
 
         currentAccountIDs = [user.userInfo["id"] for user in self.currentOnlineUsers]
         existingUsersMap = {
@@ -142,6 +147,11 @@ class DataCollectionLayer():
             for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
         }
         for user in self.currentOnlineUsers:
+            if user.aircraft["type"] in aircraftAmounts:
+                aircraftAmounts[user.aircraft["type"]] += 1
+            else:
+                aircraftAmounts[user.aircraft["type"]] = 1
+
             if user.userInfo["callsign"] == "Foo":  # skips users without callsigns
                 continue
 
@@ -202,6 +212,14 @@ class DataCollectionLayer():
         for request in callsignChangeWebhooks:
             self.callsignChangeQueue.put(request)
 
+        if configurations["logAircraftDistributions"]:
+            currentTime = datetime.now()
+            if (currentTime - self.lastAircraftDistributionTime).seconds >= 10:
+                print("Logging aircraft distribution.")
+                aircraftCollection = db["aircraft"]
+                aircraftCollection.insert_one({"aircraft": aircraftAmounts, "datetime": datetime.now()})
+                self.lastAircraftDistributionTime = currentTime
+
         
     def getConfigurationSettings(self): # gets the configuration settings from the database
         if not hasattr(self, "_cached_config"):
@@ -228,6 +246,7 @@ def main():
         "displayCallsignChanges": False,
         "displayNewAccounts": False,
         "countUsers": False,
+        "logAircraftDistributions": False,
     }
     if configuration: # checks if the configuration settings exist
         for key, value in defaultConfig.items(): # checks if the configuration settings are missing

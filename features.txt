@@ -1,3 +1,5 @@
+ULIMIATE GOAL: DETECT FRP (as well as log the crap out of everything)
+
 Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
@@ -27,4 +29,5 @@ bash script that opens all windows
 - open terminal and connect to mongosh
 - run bot
 
+log user aircraft changes
 [ ] command to display config

@@ -86,6 +86,16 @@ class Config(commands.Cog):
         newConfiguration = not configuration["storeUsers"]
         await collection.update_one({}, {"$set": {"storeUsers": newConfiguration}})
         await interaction.response.send_message(f"Set storeUsers to {newConfiguration}")
+    
+    @configGroup.command(name="toggle_aircraft_distribution", description="Toggle the logging of aircraft distributions.")
+    async def toggleAircraftDistributions(self, interaction: discord.Interaction): # toggles the logging of aircraft distributions
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["logAircraftDistributions"]
+        await collection.update_one({}, {"$set": {"logAircraftDistributions": newConfiguration}})
+        await interaction.response.send_message(f"Set logAircraftDistributions to {newConfiguration}")
+
 
 async def setup(bot: MindsEyeBot):
     await bot.add_cog(Config())
