@@ -4,7 +4,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from urllib.parse import unquote
-from datetime import datetime
+from datetime import datetime, timedelta
 import numpy as np
 import requests
 import json
@@ -169,6 +169,48 @@ class DataCollectionLayer():
             user["accountID"]: user["currentAircraft"]
             for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
         }
+
+        # Handle users going offline
+        goingOfflineUsers = list(userCollection.find({
+            "Online": True,
+            "accountID": {"$nin": currentAccountIDs}
+        }))
+        for user in goingOfflineUsers:
+            # Ensure user has been offline long enough
+            if datetime.now() - user["lastOnline"] > timedelta(minutes=0):
+                print(f"Account ID: {user['accountID']} is offline.")
+                event = {
+                    "eventType": "offline",
+                    "timestamp": user["lastOnline"]
+                }
+                # Log before update
+                logging.info(f"Updating accountID {user['accountID']} to offline and adding offline event.")
+                updateOperations.append(
+                    UpdateOne(
+                        {"accountID": user["accountID"]},
+                        {"$set": {"Online": False}, "$push": {"events": event}}
+                    )
+                )
+
+        # Handle users going online
+        goingOnlineUsers = list(userCollection.find({
+            "Online": False,
+            "accountID": {"$in": currentAccountIDs}
+        }))
+        for user in goingOnlineUsers:
+            print(f"Account ID: {user['accountID']} is online.")
+            event = {
+                "eventType": "online",
+                "timestamp": datetime.now()
+            }
+            logging.info(f"Updating accountID {user['accountID']} to online and adding online event.")
+            updateOperations.append(
+                UpdateOne(
+                    {"accountID": user["accountID"]},
+                    {"$set": {"Online": True}, "$push": {"events": event}}
+                )
+            )
+        
         for user in self.currentOnlineUsers:
             event = None
             if user.aircraft["type"] in aircraftAmounts:
@@ -183,6 +225,7 @@ class DataCollectionLayer():
                 "accountID": user.userInfo["id"],
                 "currentCallsign": user.userInfo["callsign"],
                 "currentAircraft": user.aircraft["type"],
+                "Online": True,
                 "lastOnline": datetime.now()
             }
 
