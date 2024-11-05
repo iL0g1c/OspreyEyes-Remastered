@@ -42,17 +42,35 @@ class DataCollectionLayer():
         print("Starting queue threads...")
         self.callsignChangeQueue = queue.Queue()
         self.newAccountQueue = queue.Queue()
+        self.aircraftChangeQueue = queue.Queue()
         self.maxrequests = 60
         self.callsignChangeWebhookThread = threading.Thread(target=self.callsignChangeProcesser)
         self.newAccountWebhookThread = threading.Thread(target=self.newAccountProcesser)
+        self.aircraftChangeWebhookThread = threading.Thread(target=self.aircraftChangeProcesser)
         self.callsignChangeWebhookThread.daemon = True
         self.newAccountWebhookThread.daemon = True
+        self.aircraftChangeWebhookThread.daemon = True
         self.callsignChangeWebhookThread.start()
         self.newAccountWebhookThread.start()
+        self.aircraftChangeWebhookThread.start()
 
         print("Starting bot connection sessions...")
         self.callsignChangeSession = requests.Session()
         self.newAccountSession = requests.Session()
+
+    def aircraftChangeProcesser(self):
+        while True:
+            if not self.aircraftChangeQueue.empty():
+                requestInfo = self.aircraftChangeQueue.get()
+                try:
+                    response = self.callsignChangeSession.post(requestInfo["url"], json=requestInfo["data"])
+                    if response.status_code == 204:
+                        print(f"Requests left in aircraft change queue: {self.aircraftChangeQueue.qsize()}")
+                    else:
+                        logging.error(f"Failed to trigger request. Status code: {response.status_code}")
+                except Exception as e:
+                    logging.error(f"Failed to trigger request. Error: {e}")
+                    time.sleep(30 / self.maxrequests)
 
     def callsignChangeProcesser(self):
         while True:
@@ -139,11 +157,16 @@ class DataCollectionLayer():
         updateOperations = []
         newAccountWebhooks = []
         callsignChangeWebhooks = []
+        aircraftChangeWebhooks = []
         aircraftAmounts = {}
 
         currentAccountIDs = [user.userInfo["id"] for user in self.currentOnlineUsers]
         existingUsersMap = {
             user["accountID"]: user
+            for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
+        }
+        existingAircraftMap = {
+            user["accountID"]: user["currentAircraft"]
             for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
         }
         for user in self.currentOnlineUsers:
@@ -155,15 +178,16 @@ class DataCollectionLayer():
             if user.userInfo["callsign"] == "Foo":  # skips users without callsigns
                 continue
 
-            userInfo = {
+            userParameters = {
                 "accountID": user.userInfo["id"],
                 "currentCallsign": user.userInfo["callsign"],
-                "lastOnline": datetime.now(),
+                "currentAircraft": user.aircraft["type"],
+                "lastOnline": datetime.now()
             }
 
-            if userInfo["accountID"] not in existingUsersMap:
+            if userParameters["accountID"] not in existingUsersMap:
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
-                newUsers.append(userInfo)
+                newUsers.append(userParameters)
 
                 if configurations["displayNewAccounts"]:
                     url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/new-account"
@@ -173,7 +197,18 @@ class DataCollectionLayer():
                     }
                     newAccountWebhooks.append({"url": url, "data": requestBody})
             else:
-                existingUser = existingUsersMap[userInfo["accountID"]]
+                if configurations["logAircraftChanges"]:
+                    if user.aircraft["type"] not in existingUsersMap[userParameters["accountID"]]["currentAircraft"]:
+                        print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existingAircraftMap[userParameters['accountID']]} New Aircraft: {userParameters['currentAircraft']}")
+                        url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/aircraft-change"
+                        requestBody = {
+                            "callsign": user.userInfo["callsign"],
+                            "newAircraft": userParameters["currentAircraft"],
+                            "oldAircraft": existingAircraftMap[userParameters["accountID"]]
+                        }
+                        aircraftChangeWebhooks.append({"url": url, "data": requestBody})
+
+                existingUser = existingUsersMap[userParameters["accountID"]]
                 if existingUser.get("currentCallsign") != user.userInfo["callsign"]:
                     print(f"Account ID: {user.userInfo['id']} changed callsign from {existingUser['currentCallsign']} to {user.userInfo['callsign']}")
                     if configurations["displayCallsignChanges"]:
@@ -187,14 +222,15 @@ class DataCollectionLayer():
 
             updateOperations.append(
                 UpdateOne(
-                    {"accountID": userInfo["accountID"]},
+                    {"accountID": userParameters["accountID"]},
                     {
                         "$set": {
-                            "currentCallsign": userInfo["currentCallsign"],
-                            "lastOnline": datetime.now()
+                            "currentCallsign": userParameters["currentCallsign"],
+                            "lastOnline": datetime.now(),
+                            "currentAircraft": userParameters["currentAircraft"]
                         },
                         "$addToSet": {
-                            "pastCallsigns": userInfo["currentCallsign"]
+                            "pastCallsigns": userParameters["currentCallsign"]
                         }
                     },
                     upsert=True
@@ -211,6 +247,9 @@ class DataCollectionLayer():
 
         for request in callsignChangeWebhooks:
             self.callsignChangeQueue.put(request)
+        
+        for request in aircraftChangeWebhooks:
+            self.aircraftChangeQueue.put(request)
 
         if configurations["logAircraftDistributions"]:
             currentTime = datetime.now()
@@ -243,10 +282,12 @@ def main():
         "storeUsers": False,
         "callsignChangeLogChannel": None,
         "newAccountLogChannel": None,
+        "aircraftChangeLogChannel": None,
         "displayCallsignChanges": False,
         "displayNewAccounts": False,
         "countUsers": False,
         "logAircraftDistributions": False,
+        "logAircraftChanges": False,
     }
     if configuration: # checks if the configuration settings exist
         for key, value in defaultConfig.items(): # checks if the configuration settings are missing
