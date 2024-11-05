@@ -162,6 +162,12 @@ class DataCollectionLayer():
         R = 6371
         return c * R
     
+    def get_force_identifiers(self): # gets the force identifiers from the database
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["forces"]
+        forces = collection.find()
+        return [force["identifier"] for force in forces]
+    
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
 
@@ -176,6 +182,9 @@ class DataCollectionLayer():
         aircraft_change_webhooks = []
         aircraft_amounts = {}
 
+        force_identifiers = self.get_force_identifiers()
+        force_patrol_events = {}
+
         current_account_ids = [user.userInfo["id"] for user in self.current_online_users]
         existing_users_map = {
             user["accountID"]: user
@@ -185,6 +194,9 @@ class DataCollectionLayer():
             user["accountID"]: user["currentAircraft"]
             for user in user_collection.find({"accountID": {"$in": current_account_ids}})
         }
+
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        force_collection = db["forces"]
 
         # Handle users going offline
         going_offline_users = list(user_collection.find({
@@ -200,13 +212,19 @@ class DataCollectionLayer():
                     "timestamp": user["lastOnline"]
                 }
                 # Log before update
-                logging.info(f"Updating accountID {user['accountID']} to offline and adding offline event.")
                 update_operations.append(
                     UpdateOne(
                         {"accountID": user["accountID"]},
                         {"$set": {"Online": False, "lastOnline": datetime.now()}, "$push": {"events": events}}
                     )
                 )
+
+                for force in force_identifiers:
+                    if force in user["currentCallsign"]:
+                        force_collection.update_one(
+                            {"identifier": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
+                            {"$set": {"patrols.$.end_time": datetime.now() - timedelta(minutes=1)}}
+                        )
 
         # Handle users going online
         going_online_users = list(user_collection.find({
@@ -219,13 +237,27 @@ class DataCollectionLayer():
                 "eventType": "online",
                 "timestamp": datetime.now()
             }
-            logging.info(f"Updating accountID {user['accountID']} to online and adding online event.")
             update_operations.append(
                 UpdateOne(
                     {"accountID": user["accountID"]},
                     {"$set": {"Online": True}, "$push": {"events": event}}
                 )
             )
+
+            # get air force aligned pilot patrol logs
+            for force in force_identifiers:
+                if force in user.userInfo["callsign"]:
+                    force_event = {
+                        "accountID": user_parameters["accountID"],
+                        "callsign": user.userInfo["callsign"],
+                        "start_time": datetime.now(),
+                        "end_time": None
+                    }
+                    force_collection.update_one(
+                        {"identifier": force},
+                        {"$push": {"patrols": force_event}}
+                    )
+                    
 
         for user in self.current_online_users:
             pending_events = []
@@ -247,6 +279,7 @@ class DataCollectionLayer():
             }
 
             if user_parameters["accountID"] not in existing_users_map:
+                # new pilots
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
                 user_parameters["events"] = []
                 new_users.append(user_parameters)
@@ -258,8 +291,9 @@ class DataCollectionLayer():
                         "callsign": user.userInfo["callsign"]
                     }
                     new_account_webhooks.append({"url": url, "data": request_body})
-            else:
-                distance = self.calculate_aircraft_change(
+            else: # existing pilots
+                # check for teleportation
+                distance = self.calculate_aircraft_change( 
                     existing_users_map[user_parameters["accountID"]]["lastPosition"][0],
                     existing_users_map[user_parameters["accountID"]]["lastPosition"][1],
                     user_parameters["lastPosition"][0],
@@ -277,7 +311,7 @@ class DataCollectionLayer():
                         "distance": distance
                     }
                     pending_events.append(teleportation_event)
-                if configurations["logAircraftChanges"]:
+                if configurations["logAircraftChanges"]: # detects aircraft type changes
                     if user.aircraft["type"] not in existing_users_map[user_parameters["accountID"]]["currentAircraft"]:
                         print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existing_aircraft_map[user_parameters['accountID']]} New Aircraft: {user_parameters['currentAircraft']}")
                         aircraft_change_event = {
@@ -296,6 +330,7 @@ class DataCollectionLayer():
                         aircraft_change_webhooks.append({"url": url, "data": request_body})
 
                 existing_user = existing_users_map[user_parameters["accountID"]]
+                # check for callsign changes
                 if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
                     print(f"Account ID: {user.userInfo['id']} changed callsign from {existing_user['currentCallsign']} to {user.userInfo['callsign']}")
                     callsign_change_event = {

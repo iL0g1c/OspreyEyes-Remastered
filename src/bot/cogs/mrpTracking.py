@@ -42,6 +42,17 @@ class MRPTracker(commands.Cog):
             forceList.append(f"Identifier: {force['identifier']}, Name: {force['name']}")
         embed = PaginatedEmbed(forceList, title="Forces", description="List of forces.")
         await interaction.response.send_message(embed=embed.embed, view=embed)
+
+    @app_commands.command(name="list_force_patrols", description="List all patrols for a force.")
+    async def listForcePatrols(self, interaction: discord.Interaction, identifier: str):
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["patrols"]
+        patrols = await collection.find({"force": identifier}).to_list(length=None)
+        patrolList = []
+        for patrol in patrols:
+            patrolList.append(f"Identifier: {patrol['identifier']}, Name: {patrol['name']}")
+        embed = PaginatedEmbed(patrolList, title="Patrols", description="List of patrols.")
+        await interaction.response.send_message(embed=embed.embed, view=embed)
         
 
 async def setup(bot: MindsEyeBot):
