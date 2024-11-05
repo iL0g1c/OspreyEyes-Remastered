@@ -9,7 +9,7 @@ class BackendError(Exception):
 ## USER CLASSES ##
 
 class Player:
-    def __init__ (self,userobj):
+    def __init__ (self,userobj, aircrafCodes):
         #add grounded
         self.airspeed = userobj['st']['as']
         self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
@@ -17,8 +17,6 @@ class Player:
         self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
         self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
         try:
-            with open("../../data/aircraftcodes.json", "r") as reader:
-                aircrafCodes = json.load(reader)
             self.aircraft = {
                 'type':aircrafCodes[str(userobj['ac'])]["name"],
                 'id':userobj['ac']
@@ -31,6 +29,8 @@ class Player:
 ## MAIN CLASS ##
 class MapAPI:
     def __init__(self):
+        with open("../../data/aircraftcodes.json", "r") as reader:
+            self.aircrafCodes = json.load(reader)
         self._responseList = []
         self._utilizeResponseList = True
         self.error = False
@@ -53,16 +53,17 @@ class MapAPI:
                     if user['cs'] == "Foo" or user['cs'] == '':
                         pass
                     else:
-                        userList.append(Player(user))
+                        userList.append(Player(user, self.aircrafCodes))
                 elif foos == True:
                     if user['cs'] != "Foo":
                         pass
                     else:
-                        userList.append(Player(user))
+                        userList.append(Player(user, self.aircrafCodes))
                 elif foos == None:
-                    userList.append(Player(user))
+                    userList.append(Player(user, self.aircrafCodes))
                 else:
                     raise AttributeError('"Foos" attribute must be boolean or NoneType.')
+                
             if self._utilizeResponseList == True:
                 self._responseList.append(userList)
             return userList
