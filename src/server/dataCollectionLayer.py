@@ -36,7 +36,7 @@ class DataCollectionLayer():
         self.currentOnlineUsers = []
         self.config = self.loadConfig()
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config["mongoDBIP"]}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config['mongoDBIP']}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
         print("Starting queue threads...")
@@ -109,7 +109,7 @@ class DataCollectionLayer():
         for message in self.currentChatMessages:
             for item in ["mindseye", "minds eye", "minds-eye"]:
                 if  item in message["msg"].lower():
-                    url = f"http://{self.config['botFlaskIP']}:{self.config["botFlaskPort"]}/bot-mention"
+                    url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/bot-mention"
                     data = {"message": True}
                     print("Detected pilot mentioned bot.")
                     try:
@@ -170,6 +170,7 @@ class DataCollectionLayer():
             for user in userCollection.find({"accountID": {"$in": currentAccountIDs}})
         }
         for user in self.currentOnlineUsers:
+            event = None
             if user.aircraft["type"] in aircraftAmounts:
                 aircraftAmounts[user.aircraft["type"]] += 1
             else:
@@ -187,6 +188,7 @@ class DataCollectionLayer():
 
             if userParameters["accountID"] not in existingUsersMap:
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
+                userParameters["events"] = []
                 newUsers.append(userParameters)
 
                 if configurations["displayNewAccounts"]:
@@ -200,6 +202,12 @@ class DataCollectionLayer():
                 if configurations["logAircraftChanges"]:
                     if user.aircraft["type"] not in existingUsersMap[userParameters["accountID"]]["currentAircraft"]:
                         print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existingAircraftMap[userParameters['accountID']]} New Aircraft: {userParameters['currentAircraft']}")
+                        event = {
+                            "eventType": "aircraftChange",
+                            "timestamp": datetime.now(),
+                            "newAircraft": userParameters["currentAircraft"],
+                            "oldAircraft": existingAircraftMap[userParameters["accountID"]],
+                        }
                         url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/aircraft-change"
                         requestBody = {
                             "callsign": user.userInfo["callsign"],
@@ -220,19 +228,23 @@ class DataCollectionLayer():
                         }
                         callsignChangeWebhooks.append({"url": url, "data": requestBody})
 
+            updateData = {
+                "$set": {
+                    "currentCallsign": userParameters["currentCallsign"],
+                    "currentAircraft": userParameters["currentAircraft"],
+                    "lastOnline": userParameters["lastOnline"]
+                },
+                "$addToSet": {
+                    "pastCallsigns": userParameters["currentCallsign"]
+                }
+            }
+            if event:
+                updateData["$push"] = {"events": event}
+
             updateOperations.append(
                 UpdateOne(
                     {"accountID": userParameters["accountID"]},
-                    {
-                        "$set": {
-                            "currentCallsign": userParameters["currentCallsign"],
-                            "lastOnline": datetime.now(),
-                            "currentAircraft": userParameters["currentAircraft"]
-                        },
-                        "$addToSet": {
-                            "pastCallsigns": userParameters["currentCallsign"]
-                        }
-                    },
+                    updateData,
                     upsert=True
                 )
             )

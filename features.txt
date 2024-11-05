@@ -9,14 +9,15 @@ Multiple terminals with scrolling text
 [ ] Wait for a few days of aircraft data to test timespans
 [x] New pilots joining
 [x] log user aircraft changes
+[ ] log user teleportation
 [x] command to display config
 [x] Can talk in geofs chat
 [x] When mentioned the bot responds in chat with "No comment"
 Dog fight detection and tracking 
 Targeted account detailed tracking
-- flight path tracking 
-- account activity
-- alt account identification
+[ ]- flight path tracking 
+[ ]- account activity
+[ ]- alt account identification
 MRP force total and detailed activity loggers
 Chat target word detection
 Account association algorithm (separate thread for background calculations)
