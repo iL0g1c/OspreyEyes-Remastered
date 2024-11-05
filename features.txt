@@ -1,23 +1,35 @@
+ULIMIATE GOAL: DETECT FRP (as well as log the crap out of everything)
+
 Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
-[X] callsign change tracker 
+[x] callsign change tracker 
 [x] Online player count logger
-Aircraft usage distribution
-New pilots joining
+[x] Aircraft usage distribution
+[ ] Wait for a few days of aircraft data to test timespans
+[x] New pilots joining
+[x] log user aircraft changes
+[x] log user teleportation
+[x] command to display config
+[x] Can talk in geofs chat
+[x] When mentioned the bot responds in chat with "No comment"
+[ ] optimize server startup time / add logging
 Dog fight detection and tracking 
 Targeted account detailed tracking
-- flight path tracking 
-- account activity
-- alt account identification
+[ ]- flight path tracking 
+[x]- account activity
+[ ]- alt account identification
+[x] fix aircraft distribution so that it averages
 MRP force total and detailed activity loggers
 Chat target word detection
-[X] Can talk in geofs chat
-[X] When mentioned the bot responds in chat with "No comment"
 Account association algorithm (separate thread for background calculations)
 Discord username and server link grabber
 Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
 - user by callsign
-[X] allow not logging new accounts in discord log channel
+
+
+BUGS
+====================
+can't send message

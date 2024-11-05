@@ -1,428 +1,1122 @@
 {
-    "1": {
-      "name": "Piper Cub"
-    },
-    "2": {
-      "name": "Cessna 172"
-    },
-    "3": {
-      "name": "Alphajet PAF"
-    },
-    "4": {
-      "name": "Boeing 737-700"
-    },
-    "5": {
-      "name": "Embraer Phenom 100"
-    },
-    "6": {
-      "name": "de Havilland DHC6 Twin Otter"
-    },
-    "7": {
-      "name": " F-16 Fighting Falcon"
-    },
-    "8": {
-      "name": "Pitts Special S1"
-    },
-    "9": {
-      "name": "Eurocopter EC135"
-    },
-    "10": {
-      "name": "Airbus A380"
-    },
-    "11": {
-      "name": "Alisport Silent 2 Electro"
-    },
-    "12": {
-      "name": "Pilatus PC-7 Mk-I"
-    },
-    "13": {
-      "name": "de Havilland Canada DHC-2 Beaver"
-    },
-    "14": {
-      "name": "Colomban MC-15 Cri-cri"
-    },
-    "15": {
-      "name": "Lockheed P-38 Lightning F-5B"
-    },
-    "16": {
-      "name": "Douglas DC-3"
-    },
-    "17": {
-      "name": "McDonnell Douglas MD-11"
-    },
-    "18": {
-      "name": "Sukhoi Su-35"
-    },
-    "20": {
-      "name": "Concorde"
-    },
-    "21": {
-      "name": "Zlin Z-50"
-    },
-    "22": {
-      "name": "Cessna 152"
-    },
-    "23": {
-      "name": "Piper PA-28 161 Warrior II"
-    },
-    "26": {
-      "name": "Antonov An-140"
-    },
-    "40": {
-      "name": "Evektor Sportstar"
-    },
-    "41": {
-      "name": "szd-48-3 Jantar"
-    },
-    "50": {
-      "name": "Paraglider"
-    },
-    "51": {
-      "name": "Major Tom (hot air balloon)"
-    },
-    "52": {
-      "name": "Hughes 269a/TH-55 Osage"
-    },
-    "53": {
-      "name": "Goat Airchair"
-    },
-    "235": {
-      "name": "Boeing 787-8"
-    },
-    "236": {
-      "name": "Embraer E190"
-    },
-    "237": {
-      "name": "Boeing 767-300ER"
-    },
-    "238": {
-      "name": "Boeing 757-200"
-    },
-    "239": {
-      "name": "Airbus A350-900"
-    },
-    "240": {
-      "name": "Boeing 777-300ER"
-    },
-    "242": {
-      "name": "Airbus A321neo"
-    },
-    "244": {
-      "name": "Airbus A330-300"
-    },
-    "247": {
-      "name": "Bombardier Dash 8 Q400"
-    },
-    "252": {
-      "name": "Boeing 747-8 Freighter"
-    },
-    "1000": {
-      "name": "Unkown"
-    },
-    "1001": {
-      "name": "Boeing 73x"
-    },
-    "1002": {
-      "name": "Boeing 74x"
-    },
-    "1003": {
-      "name": "Boeing 75x"
-    },
-    "1004": {
-      "name": "Boeing 76x"
-    },
-    "1005": {
-      "name": "Boeing 77x"
-    },
-    "1006": {
-      "name": "Boeing 78x"
-    },
-    "1007": {
-      "name": "Airbus A31x"
-    },
-    "1008": {
-      "name": "Airbus A32x"
-    },
-    "1009": {
-      "name": "Airbus A33x"
-    },
-    "1010": {
-      "name": "Airbus A34x"
-    },
-    "1011": {
-      "name": "Airbus A35x"
-    },
-    "1012": {
-      "name": "Airbus A380"
-    },
-    "1013": {
-      "name": "ATR42"
-    },
-    "1014": {
-      "name": "BAE146"
-    },
-    "1015": {
-      "name": "CRJ 700"
-    },
-    "1016": {
-      "name": "CRJ 900"
-    },
-    "1017": {
-      "name": "Embraer 170"
-    },
-    "1018": {
-      "name": "Embraer 190"
-    },
-    "1019": {
-      "name": "Piper PA-28"
-    },
-    "1020": {
-      "name": "Dash 8"
-    },
-    "1021": {
-      "name": "Cessna Citation"
-    },
-    "1022": {
-      "name": "Cessna"
-    },
-    "1023": {
-      "name": "MD11"
-    },
-    "1024": {
-      "name": "Mirage 2000"
-    },
-    "1025": {
-      "name": "Helicopter"
-    },
-    "1026": {
-      "name": "Cirrus SR22"
-    },
-    "1027": {
-      "name": "Ground Vehicle"
-    },
-    "1069": {
-      "name": "Cirrus SR22 GTS Turbo"
-    },
-    "2003": {
-      "name": "Boeing 737-800"
-    },
-    "2004": {
-      "name": "CRJ-900"
-    },
-    "2153": {
-      "name": "Airbus A340-600"
-    },
-    "2310": {
-      "name": "A-10C Thunderbolt II"
-    },
-    "2364": {
-      "name": "Lockheed SR-71A Blackbird"
-    },
-    "2386": {
-      "name": "Boeing 787-9 Dreamliner"
-    },
-    "2395": {
-      "name": "BAe 146-300/Avro RJ100"
-    },
-    "2418": {
-      "name": "ATR 72-600 (HOP!)"
-    },
-    "2420": {
-      "name": "ATR 72-600 (Silver)"
-    },
-    "2426": {
-      "name": "ATR 72-600 (UTair)"
-    },
-    "2461": {
-      "name": "Cirrus Vision Jet/SF50 G2"
-    },
-    "2556": {
-      "name": "Northrop Grumman B-2 Spirit"
-    },
-    "2581": {
-      "name": "F-14B Tomcat "
-    },
-    "2700": {
-      "name": "Embraer ERJ-195AR (Breeze)"
-    },
-    "2706": {
-      "name": "Bombardier CRJ 200"
-    },
-    "2726": {
-      "name": "Scaled 339 \"SpaceShipTwo\""
-    },
-    "2750": {
-      "name": "Caproni Stipa"
-    },
-    "2752": {
-      "name": "Scaled 348 \"WhiteKnightTwo\""
-    },
-    "2769": {
-      "name": "Boeing 737 Max 8 (TUI)"
-    },
-    "2772": {
-      "name": "Boeing 737 Max 8 (SpiceJet)"
-    },
-    "2786": {
-      "name": "Grumman JF2-5 Duck"
-    },
-    "2788": {
-      "name": "Antonov An-225 Mriya"
-    },
-    "2806": {
-      "name": "Sikorsky S-97 Raider"
-    },
-    "2808": {
-      "name": "Supermarine Spitfire Mk XIV"
-    },
-    "2840": {
-      "name": "Bell UH-1H Iroquois"
-    },
-    "2843": {
-      "name": "A220-300 (Air Tanzania)"
-    },
-    "2844": {
-      "name": "Falcon 9"
-    },
-    "2852": {
-      "name": "Rozi�re Balloon"
-    },
-    "2856": {
-      "name": "Airbus A400M Atlas"
-    },
-    "2857": {
-      "name": "F-22 Raptor"
-    },
-    "2864": {
-      "name": "AgustaWestland AW609"
-    },
-    "2865": {
-      "name": "Airbus a320neo(Air India)"
-    },
-    "2870": {
-      "name": "Airbus a320neo (Flynas)"
-    },
-    "2871": {
-      "name": "Airbus a320neo (Iberia)"
-    },
-    "2878": {
-      "name": "Airbus A319 (Air China)"
-    },
-    "2879": {
-      "name": "Airbus A319 (Finnair) "
-    },
-    "2892": {
-      "name": "SAAB 340"
-    },
-    "2899": {
-      "name": "A220-300 (Swiss)"
-    },
-    "2943": {
-      "name": "Embraer EMB120 Brasillia "
-    },
-    "2948": {
-      "name": "(JAaMDG) North American XB-70 Valkyrie"
-    },
-    "2951": {
-      "name": "Dassault nEUROn "
-    },
-    "2953": {
-      "name": "ARCHANGEL (limited)"
-    },
-    "2968": {
-      "name": "Windward Performance Perlan II"
-    },
-    "2973": {
-      "name": "Airbus A350-1000 XWB"
-    },
-    "2976": {
-      "name": "Pilatus PC12"
-    },
-    "2988": {
-      "name": "(TBSG, GeoAD) North American X-15"
-    },
-    "2989": {
-      "name": "MQ9B Reaper"
-    },
-    "3011": {
-      "name": "Boeing 737 Max 8 (Norwegian)"
-    },
-    "3036": {
-      "name": "Embraer E195-E2"
-    },
-    "3049": {
-      "name": "Lockheed Martin P-791 (LMH-1)"
-    },
-    "3054": {
-      "name": "Boeing 737-800 [Spice9]"
-    },
-    "3109": {
-      "name": "Pilatus PC24"
-    },
-    "3140": {
-      "name": "Airbus A319 (United)"
-    },
-    "3179": {
-      "name": "Boeing 787-10 Dreamliner (British Airways)"
-    },
-    "3180": {
-      "name": "Boeing 787-10 Dreamliner (Etihad)"
-    },
-    "3289": {
-      "name": "HAL-Dornier 228-100"
-    },
-    "3292": {
-      "name": "Boeing p8I Neptune"
-    },
-    "3307": {
-      "name": "Bombardier CRJ-700"
-    },
-    "3341": {
-      "name": "Embraer ERJ-170"
-    },
-    "3460": {
-      "name": "Grumman E-2C Hawkeye"
-    },
-    "3534": {
-      "name": "airbus a320-214(Easyjet)"
-    },
-    "3575": {
-      "name": " Boeing 787-9[Spice9]"
-    },
-    "3591": {
-      "name": "F-15C Eagle"
-    },
-    "3617": {
-      "name": "Dassault Mirage 2000-5"
-    },
-    "4017": {
-      "name": "Embraer ERJ145LR (by Spice 9) &"
-    },
-    "4090": {
-      "name": "Robinson R-44"
-    },
-    "4140": {
-      "name": "Boeing 737-200"
-    },
-    "4172": {
-      "name": "HAL LCA Tejas mk1 (IOC)"
-    },
-    "4197": {
-      "name": "Robinson R22"
-    },
-    "4251": {
-      "name": "Chance Vought F4U-1D Corsair"
-    },
-    "4390": {
-      "name": "Piper PA-28 Floatplane"
-    },
-    "4398": {
-      "name": "Britten-Norman BN-2 Islander (Loganair)"
-    },
-    "4401": {
-      "name": "Britten-Norman BN-2 Islander (St. Barth Commuter)"
-    },
-    "4402": {
-      "name": "Boeing 777 Freighter"
-    }
+  "1": {
+      "name": "Piper Cub",
+      "dir": "|models|aircraft|premium|cub|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/cub/"
+  },
+  "2": {
+      "name": "Cessna 172",
+      "dir": "|models|aircraft|premium|cessna_172|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/cessna_172/"
+  },
+  "3": {
+      "name": "Alphajet PAF",
+      "dir": "|models|aircraft|premium|alphajet_paf|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/alphajet_paf/"
+  },
+  "4": {
+      "name": "Boeing 737-700",
+      "dir": "|models|aircraft|premium|737_700|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/737_700/"
+  },
+  "5": {
+      "name": "Embraer Phenom 100",
+      "dir": "|models|aircraft|premium|phenom_100|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/phenom_100/"
+  },
+  "6": {
+      "name": "de Havilland DHC6 Twin Otter",
+      "dir": "|models|aircraft|premium|dhc6|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/dhc6/"
+  },
+  "7": {
+      "name": " F-16 Fighting Falcon",
+      "dir": "|models|aircraft|premium|f16|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/f16/"
+  },
+  "8": {
+      "name": "Pitts Special S1",
+      "dir": "|models|aircraft|premium|pitts|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/pitts/"
+  },
+  "9": {
+      "name": "Eurocopter EC135",
+      "dir": "|models|aircraft|premium|ec135|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/ec135/"
+  },
+  "10": {
+      "name": "Airbus A380",
+      "dir": "|models|aircraft|premium|a380|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/a380/"
+  },
+  "11": {
+      "name": "Alisport Silent 2 Electro",
+      "dir": "|models|aircraft|premium|silent2|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/silent2/"
+  },
+  "12": {
+      "name": "Pilatus PC-7 Mk-I",
+      "dir": "|models|aircraft|premium|pilatus|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/pilatus/"
+  },
+  "13": {
+      "name": "de Havilland Canada DHC-2 Beaver",
+      "dir": "|models|aircraft|premium|dhc2|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/dhc2/"
+  },
+  "14": {
+      "name": "Colomban MC-15 Cri-cri",
+      "dir": "|models|aircraft|premium|cricri|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/cricri/"
+  },
+  "15": {
+      "name": "Lockheed P-38 Lightning F-5B",
+      "dir": "|models|aircraft|premium|p38|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/p38/"
+  },
+  "16": {
+      "name": "Douglas DC-3",
+      "dir": "|models|aircraft|premium|dc3|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/dc3/"
+  },
+  "18": {
+      "name": "Sukhoi Su-35",
+      "dir": "|models|aircraft|premium|su35|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/su35/"
+  },
+  "20": {
+      "name": "Concorde",
+      "dir": "|models|aircraft|premium|concorde|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/concorde/"
+  },
+  "21": {
+      "name": "Zlin Z-50",
+      "dir": "|models|aircraft|zlin|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/zlin/"
+  },
+  "22": {
+      "name": "Cessna 152",
+      "dir": "|models|aircraft|cessna|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/cessna/"
+  },
+  "23": {
+      "name": "Piper PA-28 161 Warrior II Aerobility",
+      "dir": "|models|aircraft|premium|pa28|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/pa28/"
+  },
+  "24": {
+      "name": "Airbus A350",
+      "dir": "|models|aircraft|premium|a350|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/a350/"
+  },
+  "25": {
+      "name": "Boeing 777-300ER",
+      "dir": "|models|aircraft|premium|777_300|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/777_300/"
+  },
+  "26": {
+      "name": "Antonov An-140",
+      "dir": "|models|aircraft|AN140|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/AN140/"
+  },
+  "27": {
+      "name": "Boeing F/A-18F Super Hornet",
+      "dir": "|models|aircraft|premium|fa18|",
+      "multiplayerFiles": "multiplayer.glb,multiplayer-low.glb",
+      "community": 0,
+      "path": "/models/aircraft/premium/fa18/"
+  },
+  "31": {
+      "name": "Potez 25",
+      "dir": "|models|aircraft|premium|potez25|",
+      "multiplayerFiles": "multiplayer.glb,multiplayer-low.glb",
+      "community": 0,
+      "path": "/models/aircraft/premium/potez25/"
+  },
+  "40": {
+      "name": "Evektor Sportstar",
+      "dir": "|models|aircraft|sportstar|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/sportstar/"
+  },
+  "41": {
+      "name": "szd-48-3 Jantar",
+      "dir": "|models|aircraft|jantar|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/jantar/"
+  },
+  "50": {
+      "name": "Paraglider",
+      "dir": "|models|aircraft|paraglider|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/paraglider/"
+  },
+  "51": {
+      "name": "Major Tom (hot air balloon)",
+      "dir": "|models|aircraft|premium|majortom|",
+      "multiplayerFiles": "multiplayer.glb,multiplayer-low.glb",
+      "community": 0,
+      "path": "/models/aircraft/premium/majortom/"
+  },
+  "52": {
+      "name": "Hughes 269a/TH-55 Osage",
+      "dir": "|models|aircraft|hughes|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/hughes/"
+  },
+  "53": {
+      "name": "Goat Airchair",
+      "dir": "|models|aircraft|goat|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/goat/"
+  },
+  "102": {
+      "name": "Citroen 2CV",
+      "dir": "|models|aircraft|premium|2cv|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/premium/2cv/"
+  },
+  "235": {
+      "name": "Boeing 787-8",
+      "dir": "|backend|aircraft|repository|GXD01E_126645_235|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GXD01E_126645_235/"
+  },
+  "236": {
+      "name": "Embraer E190",
+      "dir": "|backend|aircraft|repository|GXD02RZ_126645_236|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GXD02RZ_126645_236/"
+  },
+  "237": {
+      "name": "Boeing 767-300ER",
+      "dir": "|backend|aircraft|repository|GXD03FI_126645_237|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GXD03FI_126645_237/"
+  },
+  "238": {
+      "name": "Boeing 757-200",
+      "dir": "|backend|aircraft|repository|GXD04N_126645_238|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GXD04N_126645_238/"
+  },
+  "239": {
+      "name": "Airbus A350-900",
+      "dir": "|backend|aircraft|repository|GXD05OQ_166617_239|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GXD05OQ_166617_239/"
+  },
+  "240": {
+      "name": "Boeing 777-300ER",
+      "dir": "|backend|aircraft|repository|Boeing 777-300ER_933_240|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 777-300ER_933_240/"
+  },
+  "242": {
+      "name": "Airbus A321neo",
+      "dir": "|backend|aircraft|repository|D02_933_242|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/D02_933_242/"
+  },
+  "244": {
+      "name": "Airbus A330-300",
+      "dir": "|backend|aircraft|repository|A02_166635_244|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/A02_166635_244/"
+  },
+  "247": {
+      "name": "Bombardier Dash 8 Q400",
+      "dir": "|backend|aircraft|repository|E01_166635_247|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/E01_166635_247/"
+  },
+  "252": {
+      "name": "Boeing 747-8 Freighter",
+      "dir": "|backend|aircraft|repository|A03_166635_252|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/A03_166635_252/"
+  },
+  "1000": {
+      "name": "Unkown",
+      "dir": "|models|aircraft|generics|787|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/787/"
+  },
+  "1001": {
+      "name": "Boeing 73x",
+      "dir": "|models|aircraft|generics|73x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/73x/"
+  },
+  "1002": {
+      "name": "Boeing 74x",
+      "dir": "|models|aircraft|generics|74x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/74x/"
+  },
+  "1003": {
+      "name": "Boeing 75x",
+      "dir": "|models|aircraft|generics|75x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/75x/"
+  },
+  "1004": {
+      "name": "Boeing 76x",
+      "dir": "|models|aircraft|generics|76x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/76x/"
+  },
+  "1005": {
+      "name": "Boeing 77x",
+      "dir": "|models|aircraft|generics|77x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/77x/"
+  },
+  "1006": {
+      "name": "Boeing 78x",
+      "dir": "|models|aircraft|generics|78x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/78x/"
+  },
+  "1007": {
+      "name": "Airbus A31x",
+      "dir": "|models|aircraft|generics|a31x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a31x/"
+  },
+  "1008": {
+      "name": "Airbus A32x",
+      "dir": "|models|aircraft|generics|a32x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a32x/"
+  },
+  "1009": {
+      "name": "Airbus A33x",
+      "dir": "|models|aircraft|generics|a33x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a33x/"
+  },
+  "1010": {
+      "name": "Airbus A34x",
+      "dir": "|models|aircraft|generics|a34x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a34x/"
+  },
+  "1011": {
+      "name": "Airbus A35x",
+      "dir": "|models|aircraft|generics|a35x|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a35x/"
+  },
+  "1012": {
+      "name": "Airbus A380",
+      "dir": "|models|aircraft|generics|a380|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/a380/"
+  },
+  "1013": {
+      "name": "ATR42",
+      "dir": "|models|aircraft|generics|atr42|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/atr42/"
+  },
+  "1014": {
+      "name": "BAE146",
+      "dir": "|models|aircraft|generics|bae146|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/bae146/"
+  },
+  "1015": {
+      "name": "CRJ 700",
+      "dir": "|models|aircraft|generics|crj700|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/crj700/"
+  },
+  "1016": {
+      "name": "CRJ 900",
+      "dir": "|models|aircraft|generics|crj900|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/crj900/"
+  },
+  "1017": {
+      "name": "Embraer 170",
+      "dir": "|models|aircraft|generics|e170|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/e170/"
+  },
+  "1018": {
+      "name": "Embraer 190",
+      "dir": "|models|aircraft|generics|e190|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/e190/"
+  },
+  "1019": {
+      "name": "Piper PA-28",
+      "dir": "|models|aircraft|generics|pa28|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/pa28/"
+  },
+  "1020": {
+      "name": "Dash 8",
+      "dir": "|models|aircraft|generics|dh8|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/dh8/"
+  },
+  "1021": {
+      "name": "Cessna Citation",
+      "dir": "|models|aircraft|generics|c25a|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/c25a/"
+  },
+  "1022": {
+      "name": "Cessna",
+      "dir": "|models|aircraft|generics|c182|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/c182/"
+  },
+  "1023": {
+      "name": "MD11",
+      "dir": "|models|aircraft|generics|md11|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/md11/"
+  },
+  "1024": {
+      "name": "Mirage 2000",
+      "dir": "|models|aircraft|generics|mirage2000|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/mirage2000/"
+  },
+  "1025": {
+      "name": "Helicopter",
+      "dir": "|models|aircraft|generics|heli|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/heli/"
+  },
+  "1026": {
+      "name": "Cirrus SR22",
+      "dir": "|models|aircraft|generics|sr22|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/aircraft/generics/sr22/"
+  },
+  "1027": {
+      "name": "Ground Vehicle",
+      "dir": "|models|objects|vehicles|truck|",
+      "multiplayerFiles": "",
+      "community": 0,
+      "path": "/models/objects/vehicles/truck/"
+  },
+  "1069": {
+      "name": "Cirrus SR22 GTS Turbo",
+      "dir": "|backend|aircraft|repository|E02_166635_1069|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/E02_166635_1069/"
+  },
+  "2000": {
+      "name": "Retro 172",
+      "dir": "|models|aircraft|retro|c172|",
+      "multiplayerFiles": "multiplayer.gltf,multiplayer-low.gltf",
+      "community": 0,
+      "path": "/models/aircraft/retro/c172/"
+  },
+  "2003": {
+      "name": "Boeing 737-800",
+      "dir": "|backend|aircraft|repository|Boeing 737-800_187219_1003|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 737-800_187219_1003/"
+  },
+  "2004": {
+      "name": "CRJ-900",
+      "dir": "|backend|aircraft|repository|CRJ-900_187219_1004|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/CRJ-900_187219_1004/"
+  },
+  "2153": {
+      "name": "Airbus A340-600",
+      "dir": "|backend|aircraft|repository|G5_166635_2153|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/G5_166635_2153/"
+  },
+  "2310": {
+      "name": "A-10C Thunderbolt II",
+      "dir": "|backend|aircraft|repository|A10 II Warthog_310810_2310|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/A10 II Warthog_310810_2310/"
+  },
+  "2364": {
+      "name": "Lockheed SR-71A Blackbird",
+      "dir": "|backend|aircraft|repository|B-1_241731_2364|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/B-1_241731_2364/"
+  },
+  "2386": {
+      "name": "Boeing 787-9 Dreamliner",
+      "dir": "|backend|aircraft|repository|G8_166635_2386|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/G8_166635_2386/"
+  },
+  "2395": {
+      "name": "BAe 146-300/Avro RJ100",
+      "dir": "|backend|aircraft|repository|_310810_2395|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_310810_2395/"
+  },
+  "2418": {
+      "name": "ATR 72-600 (HOP!)",
+      "dir": "|backend|aircraft|repository|New P-Series_267286_2418|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/New P-Series_267286_2418/"
+  },
+  "2420": {
+      "name": "ATR 72-600 (Silver)",
+      "dir": "|backend|aircraft|repository|ATR 72-600 (SAS)_267286_2420|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/ATR 72-600 (SAS)_267286_2420/"
+  },
+  "2426": {
+      "name": "ATR 72-600 (UTair)",
+      "dir": "|backend|aircraft|repository|ATR 72-500 (UTair)_267286_2426|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/ATR 72-500 (UTair)_267286_2426/"
+  },
+  "2461": {
+      "name": "Cirrus Vision Jet/SF50 G2",
+      "dir": "|backend|aircraft|repository|GA-1_310810_2461|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/GA-1_310810_2461/"
+  },
+  "2556": {
+      "name": "Northrop Grumman B-2 Spirit",
+      "dir": "|backend|aircraft|repository|_260077_2556|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_260077_2556/"
+  },
+  "2581": {
+      "name": "F-14B Tomcat ",
+      "dir": "|backend|aircraft|repository|MA-2_310810_2581|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/MA-2_310810_2581/"
+  },
+  "2700": {
+      "name": "Embraer ERJ-195AR (Breeze)",
+      "dir": "|backend|aircraft|repository|_228942_2700|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_228942_2700/"
+  },
+  "2706": {
+      "name": "Bombardier CRJ 200",
+      "dir": "|backend|aircraft|repository|Bomabardier CRJ 200_388316_2706|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Bomabardier CRJ 200_388316_2706/"
+  },
+  "2726": {
+      "name": "Scaled 339 \"SpaceShipTwo\"",
+      "dir": "|backend|aircraft|repository|P140_267286_2726|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/P140_267286_2726/"
+  },
+  "2750": {
+      "name": "Caproni Stipa",
+      "dir": "|backend|aircraft|repository|Caproni Stipa_358831_2750|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Caproni Stipa_358831_2750/"
+  },
+  "2752": {
+      "name": "Scaled 348 \"WhiteKnightTwo\"",
+      "dir": "|backend|aircraft|repository|P141_267286_2752|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/P141_267286_2752/"
+  },
+  "2769": {
+      "name": "Boeing 737 Max 8 (TUI)",
+      "dir": "|backend|aircraft|repository|EL AL 737-900_427352_2769|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/EL AL 737-900_427352_2769/"
+  },
+  "2772": {
+      "name": "Boeing 737 Max 8 (SpiceJet)",
+      "dir": "|backend|aircraft|repository|SpiceJet 737-900_427352_2772|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/SpiceJet 737-900_427352_2772/"
+  },
+  "2786": {
+      "name": "Grumman JF2-5 Duck",
+      "dir": "|backend|aircraft|repository|starship_358831_2786|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/starship_358831_2786/"
+  },
+  "2788": {
+      "name": "Antonov An-225 Mriya",
+      "dir": "|backend|aircraft|repository|An-225 2.0_260077_2788|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/An-225 2.0_260077_2788/"
+  },
+  "2806": {
+      "name": "Sikorsky S-97 Raider",
+      "dir": "|backend|aircraft|repository|M150V_267286_2806|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/M150V_267286_2806/"
+  },
+  "2808": {
+      "name": "Supermarine Spitfire Mk XIV",
+      "dir": "|backend|aircraft|repository|HA-1_310810_2808|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/HA-1_310810_2808/"
+  },
+  "2840": {
+      "name": "Bell UH-1H Iroquois",
+      "dir": "|backend|aircraft|repository|UH-1D_286491_2840|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/UH-1D_286491_2840/"
+  },
+  "2843": {
+      "name": "Airbus A220-300 (Air Tanzania)",
+      "dir": "|backend|aircraft|repository|a220-300_230250_2843|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/a220-300_230250_2843/"
+  },
+  "2844": {
+      "name": "Falcon 9",
+      "dir": "|backend|aircraft|repository|Falcon 9_358831_2844|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Falcon 9_358831_2844/"
+  },
+  "2852": {
+      "name": "Rozière Balloon",
+      "dir": "|backend|aircraft|repository|A140_267286_2852|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/A140_267286_2852/"
+  },
+  "2856": {
+      "name": "Airbus a330-200",
+      "dir": "|backend|aircraft|repository|Airbus A400M Atlas_388316_2856|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Airbus A400M Atlas_388316_2856/"
+  },
+  "2857": {
+      "name": "F-22 Raptor",
+      "dir": "|backend|aircraft|repository|F22 Test_285706_2857|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/F22 Test_285706_2857/"
+  },
+  "2864": {
+      "name": "AgustaWestland AW609",
+      "dir": "|backend|aircraft|repository|M200V_267286_2864|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/M200V_267286_2864/"
+  },
+  "2865": {
+      "name": "Airbus a320neo(Air India)",
+      "dir": "|backend|aircraft|repository|airbus a320-214 (Indigo)_427352_2865|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/airbus a320-214 (Indigo)_427352_2865/"
+  },
+  "2870": {
+      "name": "Airbus a320neo (Flynas)",
+      "dir": "|backend|aircraft|repository|airbus a320-214 (Eurowings)_427352_2870|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/airbus a320-214 (Eurowings)_427352_2870/"
+  },
+  "2871": {
+      "name": "Airbus a320neo (Iberia)",
+      "dir": "|backend|aircraft|repository|airbus a320-214 (Easyjet)_427352_2871|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/airbus a320-214 (Easyjet)_427352_2871/"
+  },
+  "2878": {
+      "name": "Airbus A319 (Air China)",
+      "dir": "|backend|aircraft|repository|Saudi Airbus A319_230250_2878|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Saudi Airbus A319_230250_2878/"
+  },
+  "2879": {
+      "name": "Airbus A319 (Finnair) ",
+      "dir": "|backend|aircraft|repository|Philpians a319_230250_2879|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Philpians a319_230250_2879/"
+  },
+  "2892": {
+      "name": "SAAB 340",
+      "dir": "|backend|aircraft|repository|SAAB 340_427352_2892|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/SAAB 340_427352_2892/"
+  },
+  "2899": {
+      "name": "Airbus A220-300 (Swiss)",
+      "dir": "|backend|aircraft|repository|Air Baltic  A220_230250_2899|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Air Baltic  A220_230250_2899/"
+  },
+  "2943": {
+      "name": "Embraer EMB120 Brasillia ",
+      "dir": "|backend|aircraft|repository|AW609_230250_2943|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/AW609_230250_2943/"
+  },
+  "2948": {
+      "name": "(JAaMDG) North American XB-70 Valkyrie",
+      "dir": "|backend|aircraft|repository|(JAaMDG) North American XB-70 Valkyrie_321805_2948|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/(JAaMDG) North American XB-70 Valkyrie_321805_2948/"
+  },
+  "2951": {
+      "name": "Airbus a340-300",
+      "dir": "|backend|aircraft|repository|Dassault nEUROn UCAV_388316_2951|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Dassault nEUROn UCAV_388316_2951/"
+  },
+  "2953": {
+      "name": "Space Shuttle Atlantis",
+      "dir": "|backend|aircraft|repository|P180_267286_2953|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/P180_267286_2953/"
+  },
+  "2968": {
+      "name": "Windward Performance Perlan II",
+      "dir": "|backend|aircraft|repository|A150_267286_2968|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/A150_267286_2968/"
+  },
+  "2973": {
+      "name": "Airbus A350-1000 XWB",
+      "dir": "|backend|aircraft|repository|_260077_2973|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_260077_2973/"
+  },
+  "2976": {
+      "name": "Pilatus PC12",
+      "dir": "|backend|aircraft|repository|Pilatus PC12_230250_2976|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Pilatus PC12_230250_2976/"
+  },
+  "2988": {
+      "name": "(TBSG, GeoAD) North American X-15",
+      "dir": "|backend|aircraft|repository|(TBSG, GeoAD) North American X-15_321805_2988|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/(TBSG, GeoAD) North American X-15_321805_2988/"
+  },
+  "2989": {
+      "name": "MQ9B Reaper",
+      "dir": "|backend|aircraft|repository|MQ9B Reaper_388316_2989|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/MQ9B Reaper_388316_2989/"
+  },
+  "3011": {
+      "name": "Boeing 737 Max 8 (Norwegian)",
+      "dir": "|backend|aircraft|repository|737max_427352_3011|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/737max_427352_3011/"
+  },
+  "3036": {
+      "name": "Embraer E195-E2",
+      "dir": "|backend|aircraft|repository|Binter E195-E2_230250_3036|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Binter E195-E2_230250_3036/"
+  },
+  "3049": {
+      "name": "Lockheed Martin P-791 (LMH-1)",
+      "dir": "|backend|aircraft|repository|P200_267286_3049|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/P200_267286_3049/"
+  },
+  "3054": {
+      "name": "Boeing 737-800 [Spice9]",
+      "dir": "|backend|aircraft|repository|Boeing 737Max 8 (TUI)_427352_3054|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 737Max 8 (TUI)_427352_3054/"
+  },
+  "3109": {
+      "name": "Pilatus PC24",
+      "dir": "|backend|aircraft|repository|PC24_230250_3109|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/PC24_230250_3109/"
+  },
+  "3140": {
+      "name": "Airbus A319 (United)",
+      "dir": "|backend|aircraft|repository|Lufthansa A319-111_230250_3140|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Lufthansa A319-111_230250_3140/"
+  },
+  "3179": {
+      "name": "Boeing 787-10 Dreamliner (British Airways)",
+      "dir": "|backend|aircraft|repository|Boeing 787-10 Dreamliner (British Airways)_427352_3179|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 787-10 Dreamliner (British Airways)_427352_3179/"
+  },
+  "3180": {
+      "name": "Boeing 787-10 Dreamliner (Etihad)",
+      "dir": "|backend|aircraft|repository|Boeing 787-10 Dreamliner (Etihad)_427352_3180|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 787-10 Dreamliner (Etihad)_427352_3180/"
+  },
+  "3211": {
+      "name": "UTVA75",
+      "dir": "|backend|aircraft|repository|Air France A220_230250_3211|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Air France A220_230250_3211/"
+  },
+  "3289": {
+      "name": "Dornier 228-200",
+      "dir": "|backend|aircraft|repository|HAL-Dornier 228-100_427352_3289|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/HAL-Dornier 228-100_427352_3289/"
+  },
+  "3292": {
+      "name": "Boeing p8I Neptune",
+      "dir": "|backend|aircraft|repository|Boeing p8I Neptune_427352_3292|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing p8I Neptune_427352_3292/"
+  },
+  "3307": {
+      "name": "Bombardier CRJ-700",
+      "dir": "|backend|aircraft|repository|CRJ-700_450602_3307|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/CRJ-700_450602_3307/"
+  },
+  "3341": {
+      "name": "Embraer ERJ-170",
+      "dir": "|backend|aircraft|repository|ERJ-170 2_450602_3341|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/ERJ-170 2_450602_3341/"
+  },
+  "3436": {
+      "name": "Dornier do228-100 (Coast Gaurd)",
+      "dir": "|backend|aircraft|repository|a3test_427352_3436|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/a3test_427352_3436/"
+  },
+  "3460": {
+      "name": "Grumman E-2C Hawkeye",
+      "dir": "|backend|aircraft|repository|Grumman E-2 Hawkeye_286491_3460|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Grumman E-2 Hawkeye_286491_3460/"
+  },
+  "3534": {
+      "name": "airbus a320-214(Easyjet)",
+      "dir": "|backend|aircraft|repository|airbus a320-214(Sri Lankan)_427352_3534|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/airbus a320-214(Sri Lankan)_427352_3534/"
+  },
+  "3575": {
+      "name": " Boeing 787-9[Spice9]",
+      "dir": "|backend|aircraft|repository|Boeing 787-10 Dreamliner (ANA)_427352_3575|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 787-10 Dreamliner (ANA)_427352_3575/"
+  },
+  "3591": {
+      "name": "F-15C Eagle",
+      "dir": "|backend|aircraft|repository|F-15C_450602_3591|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/F-15C_450602_3591/"
+  },
+  "3617": {
+      "name": "Dassault Mirage 2000-5",
+      "dir": "|backend|aircraft|repository|Dassault Mirage 2000-5_286491_3617|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Dassault Mirage 2000-5_286491_3617/"
+  },
+  "4017": {
+      "name": "Embraer ERJ145LR (by Spice 9) &",
+      "dir": "|backend|aircraft|repository|ERJ145AR_230250_4017|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/ERJ145AR_230250_4017/"
+  },
+  "4090": {
+      "name": "Robinson R-44",
+      "dir": "|backend|aircraft|repository|Robinson R44_402407_4090|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Robinson R44_402407_4090/"
+  },
+  "4140": {
+      "name": "Boeing 737-200",
+      "dir": "|backend|aircraft|repository|737-200_450602_4140|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/737-200_450602_4140/"
+  },
+  "4197": {
+      "name": "Robinson R22",
+      "dir": "|backend|aircraft|repository|Robinson R22_402407_4197|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Robinson R22_402407_4197/"
+  },
+  "4251": {
+      "name": "Chance Vought F4U-1D Corsair",
+      "dir": "|backend|aircraft|repository|M125_267286_4251|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/M125_267286_4251/"
+  },
+  "4341": {
+      "name": "Spirit of St louis",
+      "dir": "|backend|aircraft|repository|Spirit of St louis_358831_4341|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Spirit of St louis_358831_4341/"
+  },
+  "4390": {
+      "name": "Piper PA-28 Floatplane",
+      "dir": "|backend|aircraft|repository|_365507_4390|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_365507_4390/"
+  },
+  "4398": {
+      "name": "Britten-Norman BN-2 Islander (Loganair)",
+      "dir": "|backend|aircraft|repository|_365507_4398|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_365507_4398/"
+  },
+  "4401": {
+      "name": "Britten-Norman BN-2 Islander (St. Barth Commuter)",
+      "dir": "|backend|aircraft|repository|_365507_4401|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_365507_4401/"
+  },
+  "4402": {
+      "name": "Boeing 777 Freighter",
+      "dir": "|backend|aircraft|repository|G9_166635_4402|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/G9_166635_4402/"
+  },
+  "4409": {
+      "name": "Zenith Stol CH701",
+      "dir": "|backend|aircraft|repository|_365507_4409|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_365507_4409/"
+  },
+  "4596": {
+      "name": "Vans RV6",
+      "dir": "|backend|aircraft|repository|_365507_4596|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_365507_4596/"
+  },
+  "4631": {
+      "name": "Airbus A330-900neo (Virgin Atlantic)",
+      "dir": "|backend|aircraft|repository|a33x backup_230250_4631|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/a33x backup_230250_4631/"
+  },
+  "4646": {
+      "name": "Airbus a321neo (spice9)",
+      "dir": "|backend|aircraft|repository|a320 2023_427352_4646|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/a320 2023_427352_4646/"
+  },
+  "4743": {
+      "name": "Boeing 757-300",
+      "dir": "|backend|aircraft|repository|757-300_230250_4743|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/757-300_230250_4743/"
+  },
+  "4745": {
+      "name": "Boeing 757-300wl",
+      "dir": "|backend|aircraft|repository|Beoing 757-300wl_230250_4745|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Beoing 757-300wl_230250_4745/"
+  },
+  "4764": {
+      "name": "Boeing 767-400",
+      "dir": "|backend|aircraft|repository|Boeing 767-400_230250_4764|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Boeing 767-400_230250_4764/"
+  },
+  "4949": {
+      "name": "Goodyear Blimp",
+      "dir": "|backend|aircraft|repository|_241731_4949|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/_241731_4949/"
+  },
+  "5061": {
+      "name": "Sonex-B Kit (Jabiru 3300)",
+      "dir": "|backend|aircraft|repository|Sonex-B Kit_945960_5061|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Sonex-B Kit_945960_5061/"
+  },
+  "5073": {
+      "name": "Bombardier Learjet 45 XR",
+      "dir": "|backend|aircraft|repository|Bombardier Learjet 45 XR_427352_5073|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Bombardier Learjet 45 XR_427352_5073/"
+  },
+  "5086": {
+      "name": "Airbus a321-211 ",
+      "dir": "|backend|aircraft|repository|Airbus a321-211 _427352_5086|",
+      "multiplayerFiles": "",
+      "community": 1,
+      "path": "/backend/aircraft/repository/Airbus a321-211 _427352_5086/"
   }
+}
