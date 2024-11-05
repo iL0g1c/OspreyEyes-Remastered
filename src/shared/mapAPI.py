@@ -20,7 +20,7 @@ class Player:
             with open("../../data/aircraftcodes.json", "r") as reader:
                 aircrafCodes = json.load(reader)
             self.aircraft = {
-                'type':aircrafCodes[str(userobj['ac'])],
+                'type':aircrafCodes[str(userobj['ac'])]["name"],
                 'id':userobj['ac']
             }
         except KeyError:

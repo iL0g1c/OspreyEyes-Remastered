@@ -30,11 +30,12 @@ class MindsEyeBot(commands.Bot):
         self.setup_routes()
         self.throttleInterval = 1
         self.lock = asyncio.Lock()
+        self.newAccountTasks = []
+        self.callsignChangeTasks = []
 
     def loadConfig(self):
         with open("config.json") as f:
             return json.load(f)
-    
 
     def setup_routes(self):
         @self.flaskApp.route('/bot-mention', methods=['POST'])
@@ -44,34 +45,59 @@ class MindsEyeBot(commands.Bot):
             if chatLogger:
                 self.loop.create_task(chatLogger.automatedSendMessage("No comment."))
             return '', 204
+        
+        @self.flaskApp.route('/new-account', methods=['POST'])
+        def triggerNewAccount():
+            data = request.json
+            db = mongoDBClient["OspreyEyes"]
+            collection = db["configurations"]
+            configuration = collection.find_one()
+            if configuration["newAccountLogChannel"] == None:
+                return 'New account log channel is not set.', 500
+            if configuration["displayNewAccounts"] == False:
+                for task in self.newAccountTasks:
+                    task.cancel()
+                self.newAccountTasks = [task for task in self.newAccountTasks if not task.cancelled()]
+            channel = self.get_channel(int(configuration["newAccountLogChannel"]))
+            async def sendMessage(embed, channel):
+                async with self.lock:
+                    await channel.send(embed=embed)
+                    await asyncio.sleep(self.throttleInterval)
+            embed = discord.Embed(
+                title="New Account",
+                description=f"Acoount ID: {data['acid']}\n Callsign: {data['callsign']}",
+                color=discord.Color.green()
+            )
+            if configuration["displayNewAccounts"]:
+                task = self.loop.create_task(sendMessage(embed, channel))
+                self.newAccountTasks.append(task)
+            return '', 204
     
         @self.flaskApp.route('/callsign-change', methods=['POST'])
         def triggerCallsignChange():
             data = request.json
-            playerTracker = self.get_cog("ChatLogger")
-            if data["oldCallsign"]:
-                description = f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}"
-            else:
-                description = f"New Account: \nAcoount ID: {data['acid']}\n Callsign: {data['newCallsign']}"
-            if playerTracker:
-                embed = discord.Embed(
-                    title="Callsign Change",
-                    description=description,
-                    color=discord.Color.green()
-                )
-                db = mongoDBClient["OspreyEyes"]
-                collection = db["configurations"]
-                configuration = collection.find_one()
-                channel = self.get_channel(int(configuration["callsignLogChannel"]))
-                async def sendMessage():
-                    db = mongoDBClient["OspreyEyes"]
-                    collection = db["configurations"]
-                    configuration = collection.find_one()
-                    if configuration["displayCallsignChanges"]:
-                        async with self.lock:
-                            await channel.send(embed=embed)
-                            await asyncio.sleep(self.throttleInterval)
-                self.loop.create_task(sendMessage())
+            db = mongoDBClient["OspreyEyes"]
+            collection = db["configurations"]
+            configuration = collection.find_one()
+            if configuration["callsignChangeLogChannel"] == None:
+                return 'Callsign change log channel is not set.', 500
+            if configuration["displayCallsignChanges"] == False:
+                for task in self.callsignChangeTasks:
+                    task.cancel()
+                self.callsignChangeTasks = [task for task in self.callsignChangeTasks if not task.cancelled()]
+            channel = self.get_channel(int(configuration["callsignChangeLogChannel"]))
+            async def sendMessage(embed, channel):
+                async with self.lock:
+                    await channel.send(embed=embed)
+                    await asyncio.sleep(self.throttleInterval)
+            embed = discord.Embed(
+                title="Callsign Change",
+                description=f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}",
+                color=discord.Color.green()
+            )
+            if configuration["displayCallsignChanges"]:
+                task = self.loop.create_task(sendMessage(embed, channel))
+                self.callsignChangeTasks.append(task)
             return '', 204
 
     async def on_ready(self):
@@ -110,7 +136,6 @@ async def ping(interaction: discord.Interaction):
     embed = discord.Embed(title="Pong!", description=f"Latency: {delay}ms", color=discord.Color.green())
     await interaction.response.send_message(embed=embed)
 
-        
 def main():
     bot.run(BOT_TOKEN)
 
