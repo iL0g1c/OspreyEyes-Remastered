@@ -5,8 +5,9 @@ Multiple terminals with scrolling text
 [x] chat logger
 [X] callsign change tracker 
 [x] Online player count logger
-[ ] Aircraft usage distribution
-New pilots joining
+[X] Aircraft usage distribution
+[ ] Wait for a few days of aircraft data to test timespans
+[ ] New pilots joining
 Dog fight detection and tracking 
 Targeted account detailed tracking
 - flight path tracking 
@@ -30,4 +31,4 @@ bash script that opens all windows
 - run bot
 
 log user aircraft changes
-[ ] command to display config
+[X] command to display config

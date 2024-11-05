@@ -10,6 +10,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 import os
 import sys
+from datetime import datetime
+from collections import defaultdict
 from MindsEye import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
 
@@ -75,6 +77,54 @@ class PlayerTracker(commands.Cog):
 
         await interaction.followup.send(file=discord.File(buf, "heatmap.png"))
         buf.close()
+
+    @playersGroup.command(name="get_aircraft_distributions", description="Get the distribution of aircraft types in relation to a specific date.")
+    @app_commands.choices(time_span=[
+        app_commands.Choice(name="before", value="before"),
+        app_commands.Choice(name="after", value="after"),
+        app_commands.Choice(name="on", value="on"),
+        app_commands.Choice(name="between", value="between"),
+        app_commands.Choice(name="all", value="all"),
+    ])
+    async def getAircraftDistribution(self, interaction: discord.Interaction, time_span: app_commands.Choice[str], day: int, month: int, year: int):
+        await interaction.response.defer()
+        # validate parameters
+        if not time_span.value == "all":
+            try:
+                targetDate = datetime(year, month, day)
+            except ValueError:
+                await interaction.response.send_message("Invalid date.")
+                return
+
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["aircraft"]
+
+        # filter the documents based on the time span
+        if time_span.value == "before":
+            documents = collection.find({"datetime": {"$lt": targetDate}})
+        elif time_span.value == "after":
+            documents = collection.find({"datetime": {"$gt": targetDate}})
+        elif time_span.value == "on":
+            documents = collection.find({"datetime": targetDate})
+        elif time_span.value == "between":
+            documents = collection.find({"datetime": {"$gte": targetDate, "$lt": targetDate + datetime.timedelta(days=1)}})
+        elif time_span.value == "all":
+            documents = collection.find()
+
+        aircraftTotals = defaultdict(int)
+
+        # calculate the totals
+        async for document in documents:
+            for aircraft, count in document["aircraft"].items():
+                aircraftTotals[aircraft] += count
+        aircraftTotals = dict(aircraftTotals)
+
+
+        # sort the totals
+        sortedTotals = sorted(aircraftTotals.items(), key=lambda x: x[1], reverse=True)
+        aircraftTotals = [f"**{aircraft}:** {count}" for aircraft, count in sortedTotals]
+        embed = PaginatedEmbed(aircraftTotals, title="Aircraft Distributions")
+        await interaction.followup.send(embed=embed.embed, view=embed)
 
 async def setup(bot: MindsEyeBot):
     await bot.add_cog(PlayerTracker(bot))
