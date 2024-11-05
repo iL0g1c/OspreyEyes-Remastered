@@ -374,21 +374,21 @@ def main():
     last_user_count_time = 3600
 
     db = data_collection_layer.mongo_db_client[data_collection_layer.DATABASE_NAME]
-    print(1)
     collection = db["configurations"]
     configuration = collection.find_one()
     DEFAULT_CONFIG = {
-        "saveChatMessages": False,
-        "accumulateHeatMap": False,
-        "storeUsers": False,
+        "saveChatMessages": True,
+        "accumulateHeatMap": True,
+        "storeUsers": True,
         "callsignChangeLogChannel": None,
         "newAccountLogChannel": None,
         "aircraftChangeLogChannel": None,
-        "displayCallsignChanges": False,
-        "displayNewAccounts": False,
-        "countUsers": False,
-        "logAircraftDistributions": False,
-        "logAircraftChanges": False,
+        "displayCallsignChanges": True,
+        "displayNewAccounts": True,
+        "countUsers": True,
+        "logAircraftDistributions": True,
+        "logAircraftChanges": True,
+        "logMRPActivity": True,
     }
     if configuration: # checks if the configuration settings exist
         for key, value in DEFAULT_CONFIG.items(): # checks if the configuration settings are missing
