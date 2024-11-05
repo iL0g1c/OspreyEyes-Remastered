@@ -177,7 +177,7 @@ class DataCollectionLayer():
         }))
         for user in goingOfflineUsers:
             # Ensure user has been offline long enough
-            if datetime.now() - user["lastOnline"] > timedelta(minutes=0):
+            if datetime.now() - user["lastOnline"] > timedelta(minutes=1):
                 print(f"Account ID: {user['accountID']} is offline.")
                 event = {
                     "eventType": "offline",
@@ -308,7 +308,7 @@ class DataCollectionLayer():
 
         if configurations["logAircraftDistributions"]:
             currentTime = datetime.now()
-            if (currentTime - self.lastAircraftDistributionTime).seconds >= 10:
+            if (currentTime - self.lastAircraftDistributionTime).seconds >= 3600:
                 print("Logging aircraft distribution.")
                 aircraftCollection = db["aircraft"]
                 aircraftCollection.insert_one({"aircraft": aircraftAmounts, "datetime": datetime.now()})
