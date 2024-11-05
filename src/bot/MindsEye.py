@@ -15,7 +15,7 @@ tracemalloc.start()
 load_dotenv()
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-mongodbURI = "mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
 mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
 class MindsEyeBot(commands.Bot):
@@ -28,10 +28,11 @@ class MindsEyeBot(commands.Bot):
         )
         self.flaskApp = Flask(__name__)
         self.setup_routes()
-        self.throttleInterval = 1
+        self.throttleInterval = 0.2
         self.lock = asyncio.Lock()
         self.newAccountTasks = []
         self.callsignChangeTasks = []
+        self.aircraftChangeTasks = []
 
     def loadConfig(self):
         with open("config.json") as f:
@@ -44,6 +45,33 @@ class MindsEyeBot(commands.Bot):
             chatLogger = self.get_cog("ChatLogger")
             if chatLogger:
                 self.loop.create_task(chatLogger.automatedSendMessage("No comment."))
+            return '', 204
+        
+        @self.flaskApp.route('/aircraft-change', methods=['POST'])
+        def triggerAircraftChange():
+            data = request.json
+            db = mongoDBClient["OspreyEyes"]
+            collection = db["configurations"]
+            configuration = collection.find_one()
+            if configuration["aircraftChangeLogChannel"] == None:
+                return 'Aircraft change log channel is not set.', 500
+            if configuration["logAircraftDistributions"] == False:
+                for task in self.aircraftChangeTasks:
+                    task.cancel()
+                self.aircraftChangeTasks = [task for task in self.aircraftChangeTasks if not task.cancelled()]
+            channel = self.get_channel(int(configuration["aircraftChangeLogChannel"]))
+            async def sendMessage(embed, channel):
+                async with self.lock:
+                    await channel.send(embed=embed)
+                    await asyncio.sleep(self.throttleInterval)
+            embed = discord.Embed(
+                title="Aircraft Change",
+                description=f"Callsign: {data['callsign']}\n Old Aircraft: {data['oldAircraft']}\n New Aircraft: {data['newAircraft']}",
+                color=discord.Color.green()
+            )
+            if configuration["logAircraftChanges"]:
+                task = self.loop.create_task(sendMessage(embed, channel))
+                self.aircraftChangeTasks.append(task)
             return '', 204
         
         @self.flaskApp.route('/new-account', methods=['POST'])

@@ -105,6 +105,15 @@ class Config(commands.Cog):
         await collection.update_one({}, {"$set": {"logAircraftDistributions": newConfiguration}})
         await interaction.response.send_message(f"Set logAircraftDistributions to {newConfiguration}")
 
+    @toggleGroup.command(name="aircraft_change_logging", description="Toggle the logging of aircraft changes.")
+    async def toggleAircraftChangeLogging(self, interaction: discord.Interaction): # toggles the logging of aircraft changes
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        newConfiguration = not configuration["logAircraftChanges"]
+        await collection.update_one({}, {"$set": {"logAircraftChanges": newConfiguration}})
+        await interaction.response.send_message(f"Set logAircraftChanges to {newConfiguration}")
+
     setGroup = app_commands.Group(name="set", description="Set various bot parameters.") # creates the set commands group
     configGroup.add_command(setGroup) # adds the set commands group to the config commands group
 
@@ -121,6 +130,13 @@ class Config(commands.Cog):
         collection = db["configurations"]
         await collection.update_one({}, {"$set": {"newAccountLogChannel": channel.id}}, upsert=True)
         await interaction.response.send_message(f"Set newAccountLogChannel to {channel.mention}")
+
+    @setGroup.command(name="aircraft_change_log_channel", description="Set the channel logging when a pilot changes their aircraft")
+    async def setAircraftChangeLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for aircraft change logs
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        await collection.update_one({}, {"$set": {"aircraftChangeLogChannel": channel.id}}, upsert=True)
+        await interaction.response.send_message(f"Set aircraftChangeLogChannel to {channel.mention}")
 
 async def setup(bot: MindsEyeBot):
     await bot.add_cog(Config())
