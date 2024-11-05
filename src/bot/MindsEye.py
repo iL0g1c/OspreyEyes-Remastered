@@ -44,7 +44,7 @@ class MindsEyeBot(commands.Bot):
             data = request.json
             chatLogger = self.get_cog("ChatLogger")
             if chatLogger:
-                self.loop.create_task(chatLogger.automatedSendMessage("No comment."))
+                self.loop.create_task(chatLogger.automatedSendMessage("Nothing can hide from the all seeing eye."))
             return '', 204
         
         @self.flaskApp.route('/aircraft-change', methods=['POST'])

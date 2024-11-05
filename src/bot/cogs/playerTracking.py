@@ -112,18 +112,20 @@ class PlayerTracker(commands.Cog):
             documents = collection.find()
 
         aircraftTotals = defaultdict(int)
+        aircraftCounts = defaultdict(int)
 
         # calculate the totals
         async for document in documents:
             for aircraft, count in document["aircraft"].items():
                 aircraftTotals[aircraft] += count
-        aircraftTotals = dict(aircraftTotals)
+                aircraftCounts[aircraft] += 1
+        aircraftAverages = {aircraft: (aircraftTotals[aircraft] / aircraftCounts[aircraft]) for aircraft in aircraftTotals}
 
 
         # sort the totals
-        sortedTotals = sorted(aircraftTotals.items(), key=lambda x: x[1], reverse=True)
-        aircraftTotals = [f"**{aircraft}:** {count}" for aircraft, count in sortedTotals]
-        embed = PaginatedEmbed(aircraftTotals, title="Aircraft Distributions")
+        sortedAverages = sorted(aircraftAverages.items(), key=lambda x: x[1], reverse=True)
+        aircraftAverages = [f"**{aircraft}:** {count}" for aircraft, count in sortedAverages]
+        embed = PaginatedEmbed(aircraftAverages, title="Aircraft Distributions")
         await interaction.followup.send(embed=embed.embed, view=embed)
 
 async def setup(bot: MindsEyeBot):
