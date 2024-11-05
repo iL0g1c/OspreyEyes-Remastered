@@ -1,6 +1,7 @@
 import requests
 import json
 import traceback
+import time
 
 ## EXCEPTIONS ##
 class BackendError(Exception):
@@ -34,45 +35,55 @@ class MapAPI:
         self._responseList = []
         self._utilizeResponseList = True
         self.error = False
-    def getUsers(self,foos):
-        self.error = False
-        try:
-            response = requests.post(
-                "https://mps.geo-fs.com/map",
-                json = {
-                    "id":"",
-                    "gid": None
-                }
-            )
-            response_body = json.loads(response.text)
-            userList = []
-            for user in response_body['users']:
-                if user == None:
-                    continue
-                elif foos == False:
-                    if user['cs'] == "Foo" or user['cs'] == '':
-                        pass
-                    else:
+    def getUsers(self,foos, max_retries=10, backoff_factor=2):
+        attempt = 0
+        while attempt <= max_retries:
+            self.error = False
+            try:
+                response = requests.post(
+                    "https://mps.geo-fs.com/map",
+                    json = {
+                        "id":"",
+                        "gid": None
+                    }
+                )
+                response.raise_for_status()
+                response_body = response.json()
+
+                userList = []
+                for user in response_body['users']:
+                    if user == None:
+                        continue
+                    elif foos == False:
+                        if user['cs'] == "Foo" or user['cs'] == '':
+                            pass
+                        else:
+                            userList.append(Player(user, self.aircrafCodes))
+                    elif foos == True:
+                        if user['cs'] != "Foo":
+                            pass
+                        else:
+                            userList.append(Player(user, self.aircrafCodes))
+                    elif foos == None:
                         userList.append(Player(user, self.aircrafCodes))
-                elif foos == True:
-                    if user['cs'] != "Foo":
-                        pass
                     else:
-                        userList.append(Player(user, self.aircrafCodes))
-                elif foos == None:
-                    userList.append(Player(user, self.aircrafCodes))
+                        raise AttributeError('"Foos" attribute must be boolean or NoneType.')
+                    
+                if self._utilizeResponseList:
+                    self._responseList.append(userList)
+                return userList
+            except (requests.RequestException, json.JSONDecodeError) as e:
+                self.error = True
+                print(f"Error on attempt {attempt + 1}: Unable to connect to GeoFS. Error: {e}")
+                traceback.print_exc()
+                attempt += 1
+                if attempt <= max_retries:
+                    wait_time = backoff_factor ** attempt
+                    print(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
                 else:
-                    raise AttributeError('"Foos" attribute must be boolean or NoneType.')
-                
-            if self._utilizeResponseList == True:
-                self._responseList.append(userList)
-            return userList
-        except Exception as e:
-            self.error = True
-            print("Unable to connect to GeoFS. Check your connection and restart the application.")
-            print(f"Error Code 1: {e}")
-            traceback.print_exc()
-            return None
+                    print("Max retries reached. Please check your connection and restart the application.")
+                    return None
 
     def returnResponseList(self,reset:bool):
         if reset == True:

@@ -162,7 +162,6 @@ class DataCollectionLayer():
         return c * R
     
     def process_users(self):  # fetches online users from the map API
-        print(1)
         self.current_online_users = self.map_api.getUsers(None)
 
         db = self.mongo_db_client["OspreyEyes"]
@@ -335,7 +334,7 @@ class DataCollectionLayer():
                     upsert=True
                 )
             )
-            
+
         if new_users:
             user_collection.insert_many(new_users)
 
