@@ -13,12 +13,13 @@ Multiple terminals with scrolling text
 [x] command to display config
 [x] Can talk in geofs chat
 [x] When mentioned the bot responds in chat with "No comment"
+[ ] Fix server startup time
 Dog fight detection and tracking 
 Targeted account detailed tracking
 [ ]- flight path tracking 
 [x]- account activity
 [ ]- alt account identification
-[ ] fix aircraft distribution so that it averages
+[x] fix aircraft distribution so that it averages
 MRP force total and detailed activity loggers
 Chat target word detection
 Account association algorithm (separate thread for background calculations)

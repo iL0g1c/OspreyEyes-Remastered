@@ -11,6 +11,7 @@ import json
 import queue
 import threading
 import logging
+import math
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -146,6 +147,20 @@ class DataCollectionLayer():
         collection = db["online_player_count"]
         collection.insert_one({"count": len(self.current_online_users), "datetime": datetime.now()})
     
+    def calculate_aircraft_change(self, old_lat, old_lon, new_lat, new_lon): # calculates the distance between the old and new pilot position
+        # convert points to radians
+        lon1, lat1, lon2, lat2 = map(math.radians, [old_lon, old_lat, new_lon, new_lat])
+
+        # harversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+        # radius of earth
+        R = 6371
+        return c * R
+    
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
 
@@ -179,7 +194,7 @@ class DataCollectionLayer():
             # Ensure user has been offline long enough
             if datetime.now() - user["lastOnline"] > timedelta(minutes=1):
                 print(f"Account ID: {user['accountID']} is offline.")
-                event = {
+                events = {
                     "eventType": "offline",
                     "timestamp": user["lastOnline"]
                 }
@@ -188,7 +203,7 @@ class DataCollectionLayer():
                 update_operations.append(
                     UpdateOne(
                         {"accountID": user["accountID"]},
-                        {"$set": {"Online": False}, "$push": {"events": event}}
+                        {"$set": {"Online": False, "lastOnline": datetime.now()}, "$push": {"events": events}}
                     )
                 )
 
@@ -212,7 +227,7 @@ class DataCollectionLayer():
             )
         
         for user in self.current_online_users:
-            event = None
+            pending_events = []
             if user.aircraft["type"] in aircraft_amounts:
                 aircraft_amounts[user.aircraft["type"]] += 1
             else:
@@ -226,7 +241,8 @@ class DataCollectionLayer():
                 "currentCallsign": user.userInfo["callsign"],
                 "currentAircraft": user.aircraft["type"],
                 "Online": True,
-                "lastOnline": datetime.now()
+                "lastOnline": datetime.now(),
+                "lastPosition": user.coordinates,
             }
 
             if user_parameters["accountID"] not in existing_users_map:
@@ -242,15 +258,34 @@ class DataCollectionLayer():
                     }
                     new_account_webhooks.append({"url": url, "data": request_body})
             else:
+                distance = self.calculate_aircraft_change(
+                    existing_users_map[user_parameters["accountID"]]["lastPosition"][0],
+                    existing_users_map[user_parameters["accountID"]]["lastPosition"][1],
+                    user_parameters["lastPosition"][0],
+                    user_parameters["lastPosition"][1]
+                )
+                if distance >= 50:
+                    print(f"Account ID: {user.userInfo['id']} teleported {distance} km.")
+                    teleportation_event = {
+                        "eventType": "teleportation",
+                        "oldLatittude": existing_users_map[user_parameters["accountID"]]["lastPosition"][0],
+                        "oldLongitude": existing_users_map[user_parameters["accountID"]]["lastPosition"][1],
+                        "newLatitude": user_parameters["lastPosition"][0],
+                        "newLongitude": user_parameters["lastPosition"][1],
+                        "timestamp": datetime.now(),
+                        "distance": distance
+                    }
+                    pending_events.append(teleportation_event)
                 if configurations["logAircraftChanges"]:
                     if user.aircraft["type"] not in existing_users_map[user_parameters["accountID"]]["currentAircraft"]:
                         print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existing_aircraft_map[user_parameters['accountID']]} New Aircraft: {user_parameters['currentAircraft']}")
-                        event = {
+                        aircraft_change_event = {
                             "eventType": "aircraftChange",
                             "timestamp": datetime.now(),
                             "newAircraft": user_parameters["currentAircraft"],
                             "oldAircraft": existing_aircraft_map[user_parameters["accountID"]],
                         }
+                        pending_events.append(aircraft_change_event)
                         url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/aircraft-change"
                         request_body = {
                             "callsign": user.userInfo["callsign"],
@@ -262,6 +297,13 @@ class DataCollectionLayer():
                 existing_user = existing_users_map[user_parameters["accountID"]]
                 if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
                     print(f"Account ID: {user.userInfo['id']} changed callsign from {existing_user['currentCallsign']} to {user.userInfo['callsign']}")
+                    callsign_change_event = {
+                        "eventType": "callsignChange",
+                        "timestamp": datetime.now(),
+                        "newCallsign": user.userInfo["callsign"],
+                        "oldCallsign": existing_user["currentCallsign"]
+                    }
+                    pending_events.append(callsign_change_event)
                     if configurations["displayCallsignChanges"]:
                         url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/callsign-change"
                         request_body = {
@@ -275,13 +317,14 @@ class DataCollectionLayer():
                 "$set": {
                     "currentCallsign": user_parameters["currentCallsign"],
                     "currentAircraft": user_parameters["currentAircraft"],
-                    "lastOnline": user_parameters["lastOnline"]
+                    "lastOnline": user_parameters["lastOnline"],
+                    "lastPosition": user_parameters["lastPosition"]
                 },
                 "$addToSet": {
                     "pastCallsigns": user_parameters["currentCallsign"]
                 }
             }
-            if event:
+            for event in pending_events:
                 update_data["$push"] = {"events": event}
 
             update_operations.append(
