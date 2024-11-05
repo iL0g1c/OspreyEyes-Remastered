@@ -225,7 +225,7 @@ class DataCollectionLayer():
                     {"$set": {"Online": True}, "$push": {"events": event}}
                 )
             )
-        
+
         for user in self.current_online_users:
             pending_events = []
             if user.aircraft["type"] in aircraft_amounts:
@@ -334,6 +334,7 @@ class DataCollectionLayer():
                     upsert=True
                 )
             )
+
         if new_users:
             user_collection.insert_many(new_users)
 
@@ -418,7 +419,7 @@ def main():
             if previous_configuration[key] != configuration[key]:
                 print(f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
-
+        
         if configuration["saveChatMessages"]:
             data_collection_layer.fetch_chat_messages()
         if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
