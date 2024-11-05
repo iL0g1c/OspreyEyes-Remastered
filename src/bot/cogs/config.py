@@ -16,6 +16,28 @@ class Config(commands.Cog):
     
     configGroup = app_commands.Group(name="config", description="Commands for configuring the bot.") # creates the config commands group
     
+    @configGroup.command(name="display_configs", description="Display the current bot configurations.")
+    async def displayConfigs(self, interaction: discord.Interaction):
+        db = self.mongoDBClient["OspreyEyes"]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        embed = discord.Embed(
+            title="Current Configurations", 
+            description=(
+                f"Display Callsign Changes: {configuration['displayCallsignChanges']}\n" +
+                f"Display New Accounts: {configuration['displayNewAccounts']}\n" +
+                f"User Count Logger: {configuration['countUsers']}\n" +
+                f"Chat Message Logging: {configuration['saveChatMessages']}\n" +
+                f"Heatmap Cumulation: {configuration['accumulateHeatMap']}\n" +
+                f"User Tracking: {configuration['storeUsers']}\n" +
+                f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
+                f"Callsign Change Log Channel: <#{configuration['callsignChangeLogChannel']}>\n" +
+                f"New Account Log Channel: <#{configuration['newAccountLogChannel']}>"
+            ),
+            color=discord.Color.greyple()
+        )
+        await interaction.response.send_message(embed=embed)
+
     toggleGroup = app_commands.Group(name="toggle", description="Toggle various bot features.")
     configGroup.add_command(toggleGroup)
 
