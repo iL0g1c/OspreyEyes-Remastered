@@ -24,8 +24,9 @@ class PlayerTracker(commands.Cog):
         load_dotenv()
         self.bot = bot
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        DATABASE_NAME = os.getenv('DATABASE_NAME')
         self.mapAPI = mapAPI.MapAPI()
-        mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
@@ -43,7 +44,7 @@ class PlayerTracker(commands.Cog):
     async def heatmap(self, interaction: discord.Interaction): # generates a heatmap of player activity locations
         await interaction.response.defer()
 
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["player_locations"]
         cursor = collection.find()
         # get the latitudes and longitudes from the database
@@ -96,7 +97,7 @@ class PlayerTracker(commands.Cog):
                 await interaction.response.send_message("Invalid date.")
                 return
 
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["aircraft"]
 
         # filter the documents based on the time span

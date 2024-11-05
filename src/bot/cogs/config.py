@@ -10,7 +10,8 @@ class Config(commands.Cog):
     def __init__(self):
         load_dotenv()
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        self.DATABASE_NAME = os.getenv('DATABASE_NAME')
+        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
     
@@ -18,7 +19,7 @@ class Config(commands.Cog):
     
     @configGroup.command(name="display_configs", description="Display the current bot configurations.")
     async def displayConfigs(self, interaction: discord.Interaction):
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         embed = discord.Embed(
@@ -32,7 +33,9 @@ class Config(commands.Cog):
                 f"User Tracking: {configuration['storeUsers']}\n" +
                 f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
                 f"Callsign Change Log Channel: <#{configuration['callsignChangeLogChannel']}>\n" +
-                f"New Account Log Channel: <#{configuration['newAccountLogChannel']}>"
+                f"New Account Log Channel: <#{configuration['newAccountLogChannel']}>\n" +
+                f"Aircraft Change Log Channel: <#{configuration['aircraftChangeLogChannel']}>\n" + 
+                f"Aircraft Change Logging: {configuration['logAircraftChanges']}"
             ),
             color=discord.Color.greyple()
         )
@@ -43,7 +46,7 @@ class Config(commands.Cog):
 
     @toggleGroup.command(name="display_callsign_changes", description="Toggle the discord displaying of callsign changes.")
     async def toggleCallsignChanges(self, interaction: discord.Interaction): # toggles the discord displaying of callsign changes
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["displayCallsignChanges"]
@@ -52,7 +55,7 @@ class Config(commands.Cog):
     
     @toggleGroup.command(name="display_new_accounts", description="Toggle logging new geofs accounts in the callsign log channel.")
     async def toggleNewAccounts(self, interaction: discord.Interaction): # toggles logging new geofs accounts in the callsign log channel
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["displayNewAccounts"]
@@ -61,7 +64,7 @@ class Config(commands.Cog):
 
     @toggleGroup.command(name="user_count_logger", description="Set the channel for callsign change logs.")
     async def toggleUserCountLogger(self, interaction: discord.Interaction): # toggles the user count logger
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["countUsers"]
@@ -70,7 +73,7 @@ class Config(commands.Cog):
 
     @toggleGroup.command(name="chat_message_logging", description="Toggle the logging of chat messages.")
     async def toggleChatMessageLogging(self, interaction: discord.Interaction): # toggles the logging of chat messages
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["saveChatMessages"]
@@ -79,7 +82,7 @@ class Config(commands.Cog):
 
     @toggleGroup.command(name="heatmap_cumulation", description="Toggle the cumulation of player locations for the heatmap.")
     async def toggleHeatmapCumulation(self, interaction: discord.Interaction): # toggles the cumulation of player locations for the heatmap
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["accumulateHeatMap"]
@@ -89,7 +92,7 @@ class Config(commands.Cog):
     
     @toggleGroup.command(name="user_tracking", description="Toggle the tracking of pilots on GeoFS.")
     async def togglePlayerLocationTracking(self, interaction: discord.Interaction): # toggles saving users to the database
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["storeUsers"]
@@ -98,7 +101,7 @@ class Config(commands.Cog):
     
     @toggleGroup.command(name="aircraft_distribution", description="Toggle the logging of aircraft distributions.")
     async def toggleAircraftDistributions(self, interaction: discord.Interaction): # toggles the logging of aircraft distributions
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["logAircraftDistributions"]
@@ -107,7 +110,7 @@ class Config(commands.Cog):
 
     @toggleGroup.command(name="aircraft_change_logging", description="Toggle the logging of aircraft changes.")
     async def toggleAircraftChangeLogging(self, interaction: discord.Interaction): # toggles the logging of aircraft changes
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         configuration = await collection.find_one()
         newConfiguration = not configuration["logAircraftChanges"]
@@ -119,21 +122,21 @@ class Config(commands.Cog):
 
     @setGroup.command(name="callsign_change_log_channel", description="Set the channel for callsign change logs.")
     async def setCallsignChangeLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for callsign change logs
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         await collection.update_one({}, {"$set": {"callsignChangeLogChannel": channel.id}}, upsert=True)
         await interaction.response.send_message(f"Set callsignChangeLogChannel to {channel.mention}")
     
     @setGroup.command(name="new_account_log_channel", description="Set the channel for new account logs.")
     async def setNewAccountLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for new account logs
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         await collection.update_one({}, {"$set": {"newAccountLogChannel": channel.id}}, upsert=True)
         await interaction.response.send_message(f"Set newAccountLogChannel to {channel.mention}")
 
     @setGroup.command(name="aircraft_change_log_channel", description="Set the channel logging when a pilot changes their aircraft")
     async def setAircraftChangeLogChannel(self, interaction: discord.Interaction, channel: discord.TextChannel): # sets the channel for aircraft change logs
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["configurations"]
         await collection.update_one({}, {"$set": {"aircraftChangeLogChannel": channel.id}}, upsert=True)
         await interaction.response.send_message(f"Set aircraftChangeLogChannel to {channel.mention}")

@@ -24,6 +24,7 @@ class DataCollectionLayer():
         load_dotenv()
         self.SESSION_ID = os.getenv('GEOFS_SESSION_ID')
         self.ACCOUTN_ID = os.getenv('GEOFS_ACCOUNT_ID')
+        self.DATABASE_NAME = os.getenv('DATABASE_NAME')
 
         logging.basicConfig(level=logging.INFO)
 
@@ -129,12 +130,12 @@ class DataCollectionLayer():
         ]
         self.check_chat_messages_for_mention()
         if self.current_chat_messages:
-            db = self.mongo_db_client["OspreyEyes"]
+            db = self.mongo_db_client[self.DATABASE_NAME]
             collection = db["chat_messages"]
             collection.insert_many(self.current_chat_messages)
 
     def add_player_location_snapshot(self): # adds a snapshot of player locations to the database
-        db = self.mongo_db_client["OspreyEyes"]
+        db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["player_locations"]
         new_latitudes = np.array([user.coordinates[0] for user in self.current_online_users])
         new_longitudes = np.array([user.coordinates[1] for user in self.current_online_users])
@@ -143,7 +144,7 @@ class DataCollectionLayer():
             collection.insert_many(docs)
 
     def add_online_player_count(self): # adds the number of online players to the database
-        db = self.mongo_db_client["OspreyEyes"]
+        db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["online_player_count"]
         collection.insert_one({"count": len(self.current_online_users), "datetime": datetime.now()})
     
@@ -164,7 +165,7 @@ class DataCollectionLayer():
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
 
-        db = self.mongo_db_client["OspreyEyes"]
+        db = self.mongo_db_client[self.DATABASE_NAME]
         user_collection = db["users"]
         configurations = self.getConfigurationSettings()
 
@@ -361,7 +362,7 @@ class DataCollectionLayer():
         
     def getConfigurationSettings(self): # gets the configuration settings from the database
         if not hasattr(self, "_cached_config"):
-            db = self.mongo_db_client["OspreyEyes"]
+            db = self.mongo_db_client[self.DATABASE_NAME]
             collection = db["configurations"]
             self._cached_config = collection.find_one()
         return self._cached_config
@@ -372,7 +373,8 @@ def main():
     last_snapshot_time = 1800
     last_user_count_time = 3600
 
-    db = data_collection_layer.mongo_db_client["OspreyEyes"]
+    db = data_collection_layer.mongo_db_client[data_collection_layer.DATABASE_NAME]
+    print(1)
     collection = db["configurations"]
     configuration = collection.find_one()
     DEFAULT_CONFIG = {

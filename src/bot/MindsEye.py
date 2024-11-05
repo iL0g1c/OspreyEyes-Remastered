@@ -26,6 +26,7 @@ class MindsEyeBot(commands.Bot):
             command_prefix='=',
             intents=intents
         )
+        self.DATBASE_NAME = os.getenv('DATABASE_NAME')
         self.flaskApp = Flask(__name__)
         self.setup_routes()
         self.throttleInterval = 0.2
@@ -50,7 +51,7 @@ class MindsEyeBot(commands.Bot):
         @self.flaskApp.route('/aircraft-change', methods=['POST'])
         def triggerAircraftChange():
             data = request.json
-            db = mongoDBClient["OspreyEyes"]
+            db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
             if configuration["aircraftChangeLogChannel"] == None:
@@ -77,7 +78,7 @@ class MindsEyeBot(commands.Bot):
         @self.flaskApp.route('/new-account', methods=['POST'])
         def triggerNewAccount():
             data = request.json
-            db = mongoDBClient["OspreyEyes"]
+            db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
             if configuration["newAccountLogChannel"] == None:
@@ -104,7 +105,7 @@ class MindsEyeBot(commands.Bot):
         @self.flaskApp.route('/callsign-change', methods=['POST'])
         def triggerCallsignChange():
             data = request.json
-            db = mongoDBClient["OspreyEyes"]
+            db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
             if configuration["callsignChangeLogChannel"] == None:
