@@ -12,6 +12,7 @@ import queue
 import threading
 import logging
 import math
+import re
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -162,29 +163,39 @@ class DataCollectionLayer():
         R = 6371
         return c * R
     
-    def get_force_identifiers(self): # gets the force identifiers from the database
+    def get_force_callsign_filters(self): # gets the force callsign_filters from the database
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
         forces = collection.find()
-        return [force["identifier"] for force in forces]
+        return [force["callsign_filter"] for force in forces]
 
-    def get_airforce_aligned_pilots(self, user, force_identifiers): # gets the air force aligned pilots from the database
+    def update_airforce_patrol_logs(self, going_online, user, force_callsign_filters):
         db = self.mongo_db_client[self.DATABASE_NAME]
         force_collection = db["forces"]
-        
-        # get air force aligned pilot patrol logs
-        for force in force_identifiers:
-            if force in user["currentCallsign"]:
-                force_event = {
-                    "accountID": user["accountID"],
-                    "callsign": user["currentCallsign"],
-                    "start_time": datetime.now(),
-                    "end_time": None
-                }
-                force_collection.update_one(
-                    {"identifier": force},
-                    {"$push": {"patrols": force_event}}
-                )
+
+        for force in force_callsign_filters:
+            regex_pattern = force.replace('[', r'\[').replace(']', r'\]').replace('X', '.')
+
+            regex = re.compile(r".*" + regex_pattern + r".*", re.IGNORECASE)
+            if regex.search(user["currentCallsign"]):
+                if going_online:
+                    print(f"Account ID: {user['accountID']} is patrolling for force {force}.")
+                    force_event = {
+                        "accountID": user["accountID"],
+                        "callsign": user["currentCallsign"],
+                        "start_time": datetime.now(),
+                        "end_time": None
+                    }
+                    force_collection.update_one(
+                        {"callsign_filter": force},
+                        {"$push": {"patrols": force_event}}
+                    )
+                else:
+                    print(f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
+                    force_collection.update_one(
+                        {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
+                        {"$set": {"patrols.$.end_time": datetime.now()}}
+                    )
 
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
@@ -200,7 +211,7 @@ class DataCollectionLayer():
         aircraft_change_webhooks = []
         aircraft_amounts = {}
 
-        force_identifiers = self.get_force_identifiers()
+        force_callsign_filters = self.get_force_callsign_filters()
         force_patrol_events = {}
 
         current_account_ids = [user.userInfo["id"] for user in self.current_online_users]
@@ -237,12 +248,14 @@ class DataCollectionLayer():
                     )
                 )
 
-                for force in force_identifiers:
+                for force in force_callsign_filters:
                     if force in user["currentCallsign"]:
                         force_collection.update_one(
-                            {"identifier": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
+                            {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
                             {"$set": {"patrols.$.end_time": datetime.now() - timedelta(minutes=1)}}
                         )
+
+                self.update_airforce_patrol_logs(False, user, force_callsign_filters)
 
         # Handle users going online
         going_online_users = list(user_collection.find({
@@ -261,7 +274,7 @@ class DataCollectionLayer():
                     {"$set": {"Online": True}, "$push": {"events": event}}
                 )
             )
-            self.get_airforce_aligned_pilots(user, force_identifiers)    
+            self.update_airforce_patrol_logs(True, user, force_callsign_filters)    
 
         for user in self.current_online_users:
             pending_events = []
@@ -296,7 +309,7 @@ class DataCollectionLayer():
                     }
                     new_account_webhooks.append({"url": url, "data": request_body})
 
-                self.get_airforce_aligned_pilots(user_parameters, force_identifiers)
+                self.update_airforce_patrol_logs(True, user_parameters, force_callsign_filters)
             else: # existing pilots
                 # check for teleportation
                 distance = self.calculate_aircraft_change( 

@@ -20,18 +20,18 @@ class MRPTracker(commands.Cog):
     mrp_group = app_commands.Group(name="mrp", description="Commands for the MRP tracker.")
 
     @mrp_group.command(name="add_force", description="Add a force to the MRP tracker.")
-    async def addForce(self, interaction: discord.Interaction, identifier: str, name: str):
+    async def addForce(self, interaction: discord.Interaction, name: str, callsign_filter: str):
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
-        await collection.insert_one({"identifier": identifier, "name": name, "patrols": []})
-        await interaction.response.send_message(f"Force {name} added with identifier {identifier}")
+        await collection.insert_one({"callsign_filter": callsign_filter, "name": name, "patrols": []})
+        await interaction.response.send_message(f"Force {name} added with callsign_filter {callsign_filter}")
     
     @mrp_group.command(name="remove_force", description="Remove a force from the MRP tracker.")
-    async def removeForce(self, interaction: discord.Interaction, identifier: str):
+    async def removeForce(self, interaction: discord.Interaction, name: str):
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
-        await collection.delete_one({"identifier": identifier})
-        await interaction.response.send_message(f"Force with identifier {identifier} removed.")
+        await collection.delete_one({"name": name})
+        await interaction.response.send_message(f"Force with name {name} removed.")
     
     @mrp_group.command(name="get_forces", description="Get all forces in the MRP tracker.")
     async def getForces(self, interaction: discord.Interaction):
@@ -40,20 +40,29 @@ class MRPTracker(commands.Cog):
         forces = await collection.find().to_list(length=None)
         forceList = []
         for force in forces:
-            forceList.append(f"Identifier: {force['identifier']}, Name: {force['name']}")
+            forceList.append(f"Name: {force['name']}, Callsign Filter: {force['callsign_filter']}")
         embed = PaginatedEmbed(forceList, title="Forces", description="List of forces.")
         await interaction.response.send_message(embed=embed.embed, view=embed)
 
     @mrp_group.command(name="list_force_patrols", description="List all patrols for a force.")
-    async def listForcePatrols(self, interaction: discord.Interaction, identifier: str):
+    async def listForcePatrols(self, interaction: discord.Interaction, name: str):
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
-        force = await collection.find_one({"identifier": identifier})
+        force = await collection.find_one({"name": name})
         patrolList = []
         for patrol in force["patrols"]:
             patrolList.append(f"Callsign: {patrol['callsign']}, Start Time: {patrol['start_time']}, End Time: {patrol['end_time']}")
         embed = PaginatedEmbed(patrolList, title="Patrols", description="List of patrols.")
         await interaction.response.send_message(embed=embed.embed, view=embed)
+
+    @mrp_group.command(name="change_callsign_filter", description="Change the callsign_filter of a force.")
+    async def changeCallsignFilter(self, interaction: discord.Interaction, name: str, new_callsign_filter: str):
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["forces"]
+        await collection.update_one({"name": name}, {"$set": {"callsign_filter": new_callsign_filter}})
+        await interaction.response.send_message(f"Force {name} callsign_filter changed to {new_callsign_filter}")
+
+
 
     @mrp_group.command(name="get_total_patrol_hours", description="Get the total patrol hours for a force.")
     @app_commands.choices(time_span=[
@@ -62,7 +71,7 @@ class MRPTracker(commands.Cog):
         app_commands.Choice(name="on", value="on"),
         app_commands.Choice(name="all", value="all"),
     ])
-    async def get_total_patrol_hours(self, interaction: discord.Interaction, identifier: str, time_span: app_commands.Choice[str], day: int, month: int, year: int):
+    async def get_total_patrol_hours(self, interaction: discord.Interaction, name: str, time_span: app_commands.Choice[str], day: int, month: int, year: int):
         await interaction.response.defer()
         if not time_span.value == "all":
             try:
@@ -73,8 +82,7 @@ class MRPTracker(commands.Cog):
             
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
-        print(identifier)
-        force = await collection.find_one({"identifier": identifier})
+        force = await collection.find_one({"name": name})
         total_hours = 0
         for patrol in force["patrols"]:
             if patrol["end_time"] != None:
