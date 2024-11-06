@@ -21,10 +21,11 @@ Multiple terminals with scrolling text
     [x]- account activity
     [ ]- alt account identification
 [x] fix aircraft distribution so that it averages
-[ ] MRP force total and detailed activity loggers
+[X] MRP force total and detailed activity loggers
 [ ] Chat target word detection
 [ ] Account association algorithm (separate thread for background calculations)
 [ ] Discord username and server link grabber
+[ ] rebrand bot to osprey eyes
 Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
@@ -33,3 +34,21 @@ Being able to query all data collected by various parameters
 
 BUGS
 ====================
+
+IMPROVEMENTS
+====================
+remove fake airforce users from force patrol logs
+
+
+STOPING POINT
+====================
+Fix regex expression
+
+
+SOLUTIONS TO DATBASE PROBLEMS
+=============================
+dataCollectionLayer.py main loop time increase
+optimize cpu heavy methods
+optimize database callsign
+use threadpool instead of multiple threads
+batch send webhooks

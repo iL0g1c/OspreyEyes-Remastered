@@ -26,6 +26,7 @@ numpy==2.1.2
 packaging==24.1
 pillow==11.0.0
 propcache==0.2.0
+psutil==6.1.0
 pymongo==4.9.2
 pyparsing==3.2.0
 pyproj==3.7.0

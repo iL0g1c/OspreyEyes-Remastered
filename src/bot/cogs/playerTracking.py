@@ -84,7 +84,6 @@ class PlayerTracker(commands.Cog):
         app_commands.Choice(name="before", value="before"),
         app_commands.Choice(name="after", value="after"),
         app_commands.Choice(name="on", value="on"),
-        app_commands.Choice(name="between", value="between"),
         app_commands.Choice(name="all", value="all"),
     ])
     async def getAircraftDistribution(self, interaction: discord.Interaction, time_span: app_commands.Choice[str], day: int, month: int, year: int):
@@ -107,8 +106,6 @@ class PlayerTracker(commands.Cog):
             documents = collection.find({"datetime": {"$gt": targetDate}})
         elif time_span.value == "on":
             documents = collection.find({"datetime": targetDate})
-        elif time_span.value == "between":
-            documents = collection.find({"datetime": {"$gte": targetDate, "$lt": targetDate + datetime.timedelta(days=1)}})
         elif time_span.value == "all":
             documents = collection.find()
 

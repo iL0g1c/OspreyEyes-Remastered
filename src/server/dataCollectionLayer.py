@@ -12,6 +12,7 @@ import queue
 import threading
 import logging
 import math
+import re
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
@@ -162,6 +163,40 @@ class DataCollectionLayer():
         R = 6371
         return c * R
     
+    def get_force_callsign_filters(self): # gets the force callsign_filters from the database
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["forces"]
+        forces = collection.find()
+        return [force["callsign_filter"] for force in forces]
+
+    def update_airforce_patrol_logs(self, going_online, user, force_callsign_filters):
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        force_collection = db["forces"]
+
+        for force in force_callsign_filters:
+            regex_pattern = force.replace('[', r'\[').replace(']', r'\]').replace('X', '.')
+
+            regex = re.compile(r".*" + regex_pattern + r".*", re.IGNORECASE)
+            if regex.search(user["currentCallsign"]):
+                if going_online:
+                    print(f"Account ID: {user['accountID']} is patrolling for force {force}.")
+                    force_event = {
+                        "accountID": user["accountID"],
+                        "callsign": user["currentCallsign"],
+                        "start_time": datetime.now(),
+                        "end_time": None
+                    }
+                    force_collection.update_one(
+                        {"callsign_filter": force},
+                        {"$push": {"patrols": force_event}}
+                    )
+                else:
+                    print(f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
+                    force_collection.update_one(
+                        {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
+                        {"$set": {"patrols.$.end_time": datetime.now()}}
+                    )
+
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
 
@@ -176,6 +211,9 @@ class DataCollectionLayer():
         aircraft_change_webhooks = []
         aircraft_amounts = {}
 
+        force_callsign_filters = self.get_force_callsign_filters()
+        force_patrol_events = {}
+
         current_account_ids = [user.userInfo["id"] for user in self.current_online_users]
         existing_users_map = {
             user["accountID"]: user
@@ -185,6 +223,9 @@ class DataCollectionLayer():
             user["accountID"]: user["currentAircraft"]
             for user in user_collection.find({"accountID": {"$in": current_account_ids}})
         }
+
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        force_collection = db["forces"]
 
         # Handle users going offline
         going_offline_users = list(user_collection.find({
@@ -200,13 +241,21 @@ class DataCollectionLayer():
                     "timestamp": user["lastOnline"]
                 }
                 # Log before update
-                logging.info(f"Updating accountID {user['accountID']} to offline and adding offline event.")
                 update_operations.append(
                     UpdateOne(
                         {"accountID": user["accountID"]},
                         {"$set": {"Online": False, "lastOnline": datetime.now()}, "$push": {"events": events}}
                     )
                 )
+
+                for force in force_callsign_filters:
+                    if force in user["currentCallsign"]:
+                        force_collection.update_one(
+                            {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
+                            {"$set": {"patrols.$.end_time": datetime.now() - timedelta(minutes=1)}}
+                        )
+
+                self.update_airforce_patrol_logs(False, user, force_callsign_filters)
 
         # Handle users going online
         going_online_users = list(user_collection.find({
@@ -219,13 +268,13 @@ class DataCollectionLayer():
                 "eventType": "online",
                 "timestamp": datetime.now()
             }
-            logging.info(f"Updating accountID {user['accountID']} to online and adding online event.")
             update_operations.append(
                 UpdateOne(
                     {"accountID": user["accountID"]},
                     {"$set": {"Online": True}, "$push": {"events": event}}
                 )
             )
+            self.update_airforce_patrol_logs(True, user, force_callsign_filters)    
 
         for user in self.current_online_users:
             pending_events = []
@@ -247,6 +296,7 @@ class DataCollectionLayer():
             }
 
             if user_parameters["accountID"] not in existing_users_map:
+                # new pilots
                 print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
                 user_parameters["events"] = []
                 new_users.append(user_parameters)
@@ -258,8 +308,11 @@ class DataCollectionLayer():
                         "callsign": user.userInfo["callsign"]
                     }
                     new_account_webhooks.append({"url": url, "data": request_body})
-            else:
-                distance = self.calculate_aircraft_change(
+
+                self.update_airforce_patrol_logs(True, user_parameters, force_callsign_filters)
+            else: # existing pilots
+                # check for teleportation
+                distance = self.calculate_aircraft_change( 
                     existing_users_map[user_parameters["accountID"]]["lastPosition"][0],
                     existing_users_map[user_parameters["accountID"]]["lastPosition"][1],
                     user_parameters["lastPosition"][0],
@@ -277,7 +330,7 @@ class DataCollectionLayer():
                         "distance": distance
                     }
                     pending_events.append(teleportation_event)
-                if configurations["logAircraftChanges"]:
+                if configurations["logAircraftChanges"]: # detects aircraft type changes
                     if user.aircraft["type"] not in existing_users_map[user_parameters["accountID"]]["currentAircraft"]:
                         print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existing_aircraft_map[user_parameters['accountID']]} New Aircraft: {user_parameters['currentAircraft']}")
                         aircraft_change_event = {
@@ -296,6 +349,7 @@ class DataCollectionLayer():
                         aircraft_change_webhooks.append({"url": url, "data": request_body})
 
                 existing_user = existing_users_map[user_parameters["accountID"]]
+                # check for callsign changes
                 if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
                     print(f"Account ID: {user.userInfo['id']} changed callsign from {existing_user['currentCallsign']} to {user.userInfo['callsign']}")
                     callsign_change_event = {
@@ -374,21 +428,21 @@ def main():
     last_user_count_time = 3600
 
     db = data_collection_layer.mongo_db_client[data_collection_layer.DATABASE_NAME]
-    print(1)
     collection = db["configurations"]
     configuration = collection.find_one()
     DEFAULT_CONFIG = {
-        "saveChatMessages": False,
-        "accumulateHeatMap": False,
-        "storeUsers": False,
+        "saveChatMessages": True,
+        "accumulateHeatMap": True,
+        "storeUsers": True,
         "callsignChangeLogChannel": None,
         "newAccountLogChannel": None,
         "aircraftChangeLogChannel": None,
-        "displayCallsignChanges": False,
-        "displayNewAccounts": False,
-        "countUsers": False,
-        "logAircraftDistributions": False,
-        "logAircraftChanges": False,
+        "displayCallsignChanges": True,
+        "displayNewAccounts": True,
+        "countUsers": True,
+        "logAircraftDistributions": True,
+        "logAircraftChanges": True,
+        "logMRPActivity": True,
     }
     if configuration: # checks if the configuration settings exist
         for key, value in DEFAULT_CONFIG.items(): # checks if the configuration settings are missing
