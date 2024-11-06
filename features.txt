@@ -35,15 +35,6 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 
-
-
-
-STEPS
-identify pilot as being in the force
-accumulate pilots flight time into force collection
-- patrol field: list of patrols
-    - account id
-    - callsign
-    - start time
-    - end time
-mrp command that totals all patrols by date.
+IMPROVEMENTS
+====================
+remove fake airforce users from force patrol logs

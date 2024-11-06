@@ -174,7 +174,6 @@ class DataCollectionLayer():
         
         # get air force aligned pilot patrol logs
         for force in force_identifiers:
-            print(force in user["currentCallsign"])
             if force in user["currentCallsign"]:
                 force_event = {
                     "accountID": user["accountID"],
