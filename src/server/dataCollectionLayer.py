@@ -167,7 +167,26 @@ class DataCollectionLayer():
         collection = db["forces"]
         forces = collection.find()
         return [force["identifier"] for force in forces]
-    
+
+    def get_airforce_aligned_pilots(self, user, force_identifiers): # gets the air force aligned pilots from the database
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        force_collection = db["forces"]
+        
+        # get air force aligned pilot patrol logs
+        for force in force_identifiers:
+            print(force in user["currentCallsign"])
+            if force in user["currentCallsign"]:
+                force_event = {
+                    "accountID": user["accountID"],
+                    "callsign": user["currentCallsign"],
+                    "start_time": datetime.now(),
+                    "end_time": None
+                }
+                force_collection.update_one(
+                    {"identifier": force},
+                    {"$push": {"patrols": force_event}}
+                )
+
     def process_users(self):  # fetches online users from the map API
         self.current_online_users = self.map_api.getUsers(None)
 
@@ -243,21 +262,7 @@ class DataCollectionLayer():
                     {"$set": {"Online": True}, "$push": {"events": event}}
                 )
             )
-
-            # get air force aligned pilot patrol logs
-            for force in force_identifiers:
-                if force in user.userInfo["callsign"]:
-                    force_event = {
-                        "accountID": user_parameters["accountID"],
-                        "callsign": user.userInfo["callsign"],
-                        "start_time": datetime.now(),
-                        "end_time": None
-                    }
-                    force_collection.update_one(
-                        {"identifier": force},
-                        {"$push": {"patrols": force_event}}
-                    )
-                    
+            self.get_airforce_aligned_pilots(user, force_identifiers)    
 
         for user in self.current_online_users:
             pending_events = []
@@ -291,6 +296,8 @@ class DataCollectionLayer():
                         "callsign": user.userInfo["callsign"]
                     }
                     new_account_webhooks.append({"url": url, "data": request_body})
+
+                self.get_airforce_aligned_pilots(user_parameters, force_identifiers)
             else: # existing pilots
                 # check for teleportation
                 distance = self.calculate_aircraft_change( 

@@ -22,7 +22,7 @@ class MRPTracker(commands.Cog):
     async def addForce(self, interaction: discord.Interaction, identifier: str, name: str):
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
-        await collection.insert_one({"identifier": identifier, "name": name})
+        await collection.insert_one({"identifier": identifier, "name": name, "patrols": []})
         await interaction.response.send_message(f"Force {name} added with identifier {identifier}")
     
     @app_commands.command(name="remove_force", description="Remove a force from the MRP tracker.")

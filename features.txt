@@ -25,6 +25,7 @@ Multiple terminals with scrolling text
 [ ] Chat target word detection
 [ ] Account association algorithm (separate thread for background calculations)
 [ ] Discord username and server link grabber
+[ ] rebrand bot to osprey eyes
 Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
