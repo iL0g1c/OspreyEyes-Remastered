@@ -21,13 +21,18 @@ from shared import multiplayerAPI, mapAPI
 
 class DataCollectionLayer():
     def __init__(self):
+        # sets up logger
+        self.logger = logging.getLogger("SERVER")
+        self.logger.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.DEBUG)
+        self.logger.addHandler(console_handler)
+
         # gets envs
         load_dotenv()
         self.SESSION_ID = os.getenv('GEOFS_SESSION_ID')
         self.ACCOUTN_ID = os.getenv('GEOFS_ACCOUNT_ID')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
-
-        logging.basicConfig(level=logging.INFO)
 
         self.last_aircraft_distribution_time = datetime.now()
 
@@ -42,7 +47,7 @@ class DataCollectionLayer():
         MONGODB_URI = f"mongodb://adminUser:{DATABASE_TOKEN}@{self.config['mongoDBIP']}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongo_db_client = MongoClient(MONGODB_URI) # sets up database client
 
-        print("Starting queue threads...")
+        self.logger.log(20, "Starting queue threads...")
         self.callsign_change_queue = queue.Queue()
         self.new_account_queue = queue.Queue()
         self.aircraft_change_queue = queue.Queue()
@@ -57,52 +62,105 @@ class DataCollectionLayer():
         self.new_account_webhook_thread.start()
         self.aircraft_change_webhook_thread.start()
 
-        print("Starting bot connection sessions...")
+        self.logger.log(20, "Starting bot connection sessions...")
+        self.aircraft_change_session = requests.Session()
         self.callsign_change_session = requests.Session()
         self.new_account_session = requests.Session()
 
-    def aircraft_change_processor(self):
+    def aircraft_change_processor(self, batch_size=50, batch_interval=0.02, timeout=5):
+        batch = []
+        last_send_time = time.time()
         while True:
-            if not self.aircraft_change_queue.empty():
-                request_info = self.aircraft_change_queue.get()
-                try:
-                    response = self.callsign_change_session.post(request_info["url"], json=request_info["data"])
-                    if response.status_code == 204:
-                        print(f"Requests left in aircraft change queue: {self.aircraft_change_queue.qsize()}")
-                    else:
-                        logging.error(f"Failed to trigger request. Status code: {response.status_code}")
-                except Exception as e:
-                    logging.error(f"Failed to trigger request. Error: {e}")
-                    time.sleep(30 / self.MAX_REQUESTS)
+            try:
+                if not self.aircraft_change_queue.empty():
+                    request_info = self.aircraft_change_queue.get()
+                    batch.append(request_info)
+                if len(batch) >= batch_size or (time.time() - last_send_time) >= timeout:
+                    if batch:
+                        print(batch)
+                        self.logger.log(10, f"Batch size: {len(batch)}")
+                        try:
+                            batch_data = [req["data"] for req in batch]
+                            response = self.aircraft_change_session.post(
+                                batch[0]["url"],
+                                json=batch_data
+                            )
+                            if response.status_code == 204:
+                                self.logger.log(20, f"Requests left in queue: {self.aircraft_change_queue.qsize()}")
+                            else:
+                                self.logger.log(30, f"Batch send failed. Status code: {response.status_code}")
+                        except Exception as e:
+                            self.logger.log(40, f"Batch send failed. Error: {e}")
+                        finally:
+                            batch.clear()
+                            last_send_time = time.time()
+                time.sleep(batch_interval)
+            except Exception as e:
+                self.logger.log(40, f"Error processing callsign change queue: {e}")
+                time.sleep(30 / self.MAX_REQUESTS)
 
-    def callsign_change_processor(self):
+    def callsign_change_processor(self, batch_size=50, batch_interval=0.02, timeout=5):
+        batch = []
+        last_send_time = time.time()
         while True:
-            if not self.callsign_change_queue.empty():
-                request_info = self.callsign_change_queue.get()
-                try:
-                    response = self.callsign_change_session.post(request_info["url"], json=request_info["data"])
-                    if response.status_code == 204:
-                        print(f"Requests left in callsign change queue: {self.callsign_change_queue.qsize()}")
-                    else:
-                        logging.error(f"Failed to trigger request. Status code: {response.status_code}")
-                except Exception as e:
-                    logging.error(f"Failed to trigger request. Error: {e}")
-                    time.sleep(30 / self.MAX_REQUESTS)
+            try:
+                if not self.callsign_change_queue.empty():
+                    request_info = self.callsign_change_queue.get()
+                    batch.append(request_info)
+                
+                if len(batch) >= batch_size or (time.time() - last_send_time) >= timeout:
+                    if batch:
+                        try:
+                            batch_data = [req["data"] for req in batch]
+                            response = self.callsign_change_session.post(
+                                batch[0]["url"],
+                                json=batch_data
+                            )
+                            if response.status_code == 204:
+                                self.logger.log(20, f"Requests left in queue: {self.callsign_change_queue.qsize()}")
+                            else:
+                                self.logger.log(30, f"Batch send failed. Status code: {response.status_code}")
+                        except Exception as e:
+                            self.logger.log(40, f"Batch send failed. Error: {e}")
+                        finally:
+                            batch.clear()
+                            last_send_time = time.time()
+                time.sleep(batch_interval)
+            except Exception as e:
+                self.logger.log(40, f"Error processing callsign change queue: {e}")
+                time.sleep(30 / self.MAX_REQUESTS)
+        
     
-    def new_account_processor(self):
+    def new_account_processor(self, batch_size=50, batch_interval=0.02, timeout=5):
+        batch = []
+        last_send_time = time.time()
         while True:
-            if not self.new_account_queue.empty():
-                request_info = self.new_account_queue.get()
-                try:
-                    response = self.new_account_session.post(request_info["url"], json=request_info["data"])
-                    if response.status_code == 204:
-                        print(f"Requests left in new account queue: {self.new_account_queue.qsize()}")
-                    else:
-                        print(f"Failed to trigger request. Status code: {response.status_code}")
-                except Exception as e:
-                    print(f"Failed to trigger request. Error: {e}")
-                    
-                    time.sleep(30 / self.MAX_REQUESTS)
+            try:
+                if not self.new_account_queue.empty():
+                    request_info = self.new_account_queue.get()
+                    batch.append(request_info)
+                
+                if len(batch) >= batch_size or (time.time() - last_send_time) >= timeout:
+                    if batch:
+                        try:
+                            batch_data = [req["data"] for req in batch]
+                            response = self.new_account_session.post(
+                                batch[0]["url"],
+                                json=batch_data
+                            )
+                            if response.status_code == 204:
+                                self.logger.log(20, f"Requests left in queue: {self.new_account_queue.qsize()}")
+                            else:
+                                self.logger.log(30, f"Batch send failed. Status code: {response.status_code}")
+                        except Exception as e:
+                            self.logger.log(40, f"Batch send failed. Error: {e}")
+                        finally:
+                            batch.clear()
+                            last_send_time = time.time()
+                time.sleep(batch_interval)
+            except Exception as e:
+                self.logger.log(40, f"Error processing new account queue: {e}")
+                time.sleep(30 / self.MAX_REQUESTS)
 
     def load_config(self):
         with open("config.json") as f:
@@ -114,15 +172,15 @@ class DataCollectionLayer():
                 if  item in message["msg"].lower():
                     url = f"http://{self.config['botFlaskIP']}:{self.config['botFlaskPort']}/bot-mention"
                     data = {"message": True}
-                    print("Detected pilot mentioned bot.")
+                    self.logger.log(20, "Detected pilot mentioned bot.")
                     try:
                         response = requests.post(url, json=data)
                         if response.status_code == 204:\
-                            print("Mention event successfully triggered.")
+                            self.logger.log(10, "Mention event successfully triggered.")
                         else:
-                            print(f"Failed to trigger mention event. Status code: {response.status_code}")
+                            self.logger.log(30, f"Failed to trigger mention event. Status code: {response.status_code}")
                     except Exception as e:
-                        print(f"Failed to trigger event. Error: {e}")
+                        self.logger.log(40, f"Failed to trigger event. Error: {e}")
 
     def fetch_chat_messages(self): # fetches chat messages from the multiplayer API
         self.current_chat_messages = [
@@ -179,7 +237,7 @@ class DataCollectionLayer():
             regex = re.compile(r".*" + regex_pattern + r".*", re.IGNORECASE)
             if regex.search(user["currentCallsign"]):
                 if going_online:
-                    print(f"Account ID: {user['accountID']} is patrolling for force {force}.")
+                    self.logger.log(20, f"Account ID: {user['accountID']} is patrolling for force {force}.")
                     force_event = {
                         "accountID": user["accountID"],
                         "callsign": user["currentCallsign"],
@@ -191,7 +249,7 @@ class DataCollectionLayer():
                         {"$push": {"patrols": force_event}}
                     )
                 else:
-                    print(f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
+                    self.logger.log(20, f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
                     force_collection.update_one(
                         {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
                         {"$set": {"patrols.$.end_time": datetime.now()}}
@@ -235,7 +293,7 @@ class DataCollectionLayer():
         for user in going_offline_users:
             # Ensure user has been offline long enough
             if datetime.now() - user["lastOnline"] > timedelta(minutes=1):
-                print(f"Account ID: {user['accountID']} is offline.")
+                self.logger.log(20, f"Account ID: {user['accountID']} is offline.")
                 events = {
                     "eventType": "offline",
                     "timestamp": user["lastOnline"]
@@ -263,7 +321,7 @@ class DataCollectionLayer():
             "accountID": {"$in": current_account_ids}
         }))
         for user in going_online_users:
-            print(f"Account ID: {user['accountID']} is online.")
+            self.logger.log(20, f"Account ID: {user['accountID']} is online.")
             event = {
                 "eventType": "online",
                 "timestamp": datetime.now()
@@ -297,7 +355,7 @@ class DataCollectionLayer():
 
             if user_parameters["accountID"] not in existing_users_map:
                 # new pilots
-                print(f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
+                self.logger.log(20, f"New account detected: Account ID: {user.userInfo['id']}, Callsign: {user.userInfo['callsign']}")
                 user_parameters["events"] = []
                 new_users.append(user_parameters)
 
@@ -319,7 +377,7 @@ class DataCollectionLayer():
                     user_parameters["lastPosition"][1]
                 )
                 if distance >= 50:
-                    print(f"Account ID: {user.userInfo['id']} teleported {distance} km.")
+                    self.logger.log(20, f"Account ID: {user.userInfo['id']} teleported {distance} km.")
                     teleportation_event = {
                         "eventType": "teleportation",
                         "oldLatittude": existing_users_map[user_parameters["accountID"]]["lastPosition"][0],
@@ -332,7 +390,7 @@ class DataCollectionLayer():
                     pending_events.append(teleportation_event)
                 if configurations["logAircraftChanges"]: # detects aircraft type changes
                     if user.aircraft["type"] not in existing_users_map[user_parameters["accountID"]]["currentAircraft"]:
-                        print(f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existing_aircraft_map[user_parameters['accountID']]} New Aircraft: {user_parameters['currentAircraft']}")
+                        self.logger.log(20, f"Aircraft change detected: Callsign: {user.userInfo['callsign']}, Account ID: {user.userInfo['id']}, Old Aircraft: {existing_aircraft_map[user_parameters['accountID']]} New Aircraft: {user_parameters['currentAircraft']}")
                         aircraft_change_event = {
                             "eventType": "aircraftChange",
                             "timestamp": datetime.now(),
@@ -351,7 +409,7 @@ class DataCollectionLayer():
                 existing_user = existing_users_map[user_parameters["accountID"]]
                 # check for callsign changes
                 if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
-                    print(f"Account ID: {user.userInfo['id']} changed callsign from {existing_user['currentCallsign']} to {user.userInfo['callsign']}")
+                    self.logger.log(20, f"Account ID: {user.userInfo['id']} changed callsign from {existing_user['currentCallsign']} to {user.userInfo['callsign']}")
                     callsign_change_event = {
                         "eventType": "callsignChange",
                         "timestamp": datetime.now(),
@@ -408,7 +466,7 @@ class DataCollectionLayer():
         if configurations["logAircraftDistributions"]:
             current_time = datetime.now()
             if (current_time - self.last_aircraft_distribution_time).seconds >= 3600:
-                print("Logging aircraft distribution.")
+                self.logger.log(20, "Logging aircraft distribution.")
                 aircraft_collection = db["aircraft"]
                 aircraft_collection.insert_one({"aircraft": aircraft_amounts, "datetime": datetime.now()})
                 self.last_aircraft_distribution_time = current_time
@@ -422,8 +480,8 @@ class DataCollectionLayer():
         return self._cached_config
 
 def main():
-    print("Starting data collection layer...")
     data_collection_layer = DataCollectionLayer()
+    data_collection_layer.logger.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
     last_user_count_time = 3600
 
@@ -447,7 +505,7 @@ def main():
     if configuration: # checks if the configuration settings exist
         for key, value in DEFAULT_CONFIG.items(): # checks if the configuration settings are missing
             if key not in configuration:
-                print("Found a new configuration setting. Adding it to the database.")
+                data_collection_layer.logger.log(20, "Found a new configuration setting. Adding it to the database.")
                 collection.update_one(
                     {"_id": configuration["_id"]},
                     {"$set": {key: value}}
@@ -455,7 +513,7 @@ def main():
                 configuration[key] = value
         keys_to_remove = [key for key in configuration if key not in DEFAULT_CONFIG and key != "_id"]
         if keys_to_remove:
-            print("Found old configuration settings. Removing them from the database.")
+            data_collection_layer.logger.log(20, "Found old configuration settings. Removing them from the database.")
             collection.update_one(
                 {"_id": configuration["_id"]},
                 {"$unset": {key: "" for key in keys_to_remove}}
@@ -467,13 +525,13 @@ def main():
         configuration = DEFAULT_CONFIG
     previous_configuration = configuration
 
-    print("Data collection layer started.")
+    data_collection_layer.logger.log(20, "Data collection layer started.")
     while True: # loops every second for api calls
         configuration = collection.find_one()
 
         for key in previous_configuration: # checks if the configuration settings have changed
             if previous_configuration[key] != configuration[key]:
-                print(f"Configuration setting {key} changed to {configuration[key]}")
+                data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
         
         if configuration["saveChatMessages"]:
