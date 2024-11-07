@@ -77,8 +77,6 @@ class DataCollectionLayer():
                     batch.append(request_info)
                 if len(batch) >= batch_size or (time.time() - last_send_time) >= timeout:
                     if batch:
-                        print(batch)
-                        self.logger.log(10, f"Batch size: {len(batch)}")
                         try:
                             batch_data = [req["data"] for req in batch]
                             response = self.aircraft_change_session.post(
@@ -175,10 +173,6 @@ class DataCollectionLayer():
                     self.logger.log(20, "Detected pilot mentioned bot.")
                     try:
                         response = requests.post(url, json=data)
-                        if response.status_code == 204:\
-                            self.logger.log(10, "Mention event successfully triggered.")
-                        else:
-                            self.logger.log(30, f"Failed to trigger mention event. Status code: {response.status_code}")
                     except Exception as e:
                         self.logger.log(40, f"Failed to trigger event. Error: {e}")
 

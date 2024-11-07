@@ -22,7 +22,6 @@ class ChatLogger(commands.Cog):
     chatGroup = app_commands.Group(name="chat", description="Commands for logging chat messages.") # sets up command group
 
     async def automatedSendMessage(self, message):
-        print("Sending message.")
         self.multiplayerAPI.handshake()
         self.multiplayerAPI.sendMsg(message)
 
