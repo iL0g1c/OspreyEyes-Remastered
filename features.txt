@@ -34,6 +34,8 @@ Being able to query all data collected by various parameters
 
 BUGS
 ====================
+config might not get updated
+playercount delay is wrong
 
 
 SOLUTIONS TO DATBASE PROBLEMS
