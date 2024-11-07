@@ -3,9 +3,9 @@ module.exports = {
       {
         name: "OspreyEyesBackground",
         script: "dataCollectionLayer.py", // Replace with your bot's main script
-        interpreter: "python3",
+        interpreter: "../../venv/bin/python",
         env: {
-          PYTHONPATH: "../../venv/bin/python"
+
         },
       },
     ],
