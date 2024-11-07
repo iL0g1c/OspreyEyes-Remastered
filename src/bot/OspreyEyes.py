@@ -9,14 +9,13 @@ from threading import Thread
 from pymongo import MongoClient
 import json
 import asyncio
-import time
 import logging
 import sys
 
-tracemalloc.start()
 load_dotenv()
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
 mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
 mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
@@ -31,134 +30,20 @@ class MindsEyeBot(commands.Bot):
 
         intents = discord.Intents.default()
         intents.message_content = True
-        super().__init__(
-            command_prefix='=',
-            intents=intents
-        )
-        self.DATBASE_NAME = os.getenv('DATABASE_NAME')
+        super().__init__(command_prefix='=', intents=intents)
+
         self.flaskApp = Flask(__name__)
-        self.setup_routes()
         self.throttleInterval = 0.2
+        self.task_queue = asyncio.Queue()
+
         self.lock = asyncio.Lock()
-        self.newAccountTasks = []
-        self.callsignChangeTasks = []
-        self.aircraftChangeTasks = []
+        self.config = self.load_config()
+        self.setup_routes()
 
-    def loadConfig(self):
-        with open("config.json") as f:
-            return json.load(f)
+        self.loop.create_task(self.process_tasks())
 
-    def setup_routes(self):
-        @self.flaskApp.route('/bot-mention', methods=['POST'])
-        def triggerBotResponse():
-            data = request.json
-            chatLogger = self.get_cog("ChatLogger")
-            if chatLogger:
-                self.loop.create_task(chatLogger.automatedSendMessage("Nothing can hide from the all seeing eye."))
-            return '', 204
-        
-        @self.flaskApp.route('/aircraft-change', methods=['POST'])
-        def triggerAircraftChange():
-            data = request.json
-            if not isinstance(data, list):
-                return 'Invalid data format. Expected a list.', 400
-            db = mongoDBClient[self.DATBASE_NAME]
-            collection = db["configurations"]
-            configuration = collection.find_one()
-            if configuration["aircraftChangeLogChannel"] == None:
-                return 'Aircraft change log channel is not set.', 500
-
-            channel = self.get_channel(int(configuration["aircraftChangeLogChannel"]))
-            async def sendMessages(channel, embeds):
-                async with self.lock:
-                    for embed in embeds:
-                        await channel.send(embed=embed)
-                        await asyncio.sleep(self.throttleInterval)
-            embeds = []
-            for change_data in data:
-                embed = discord.Embed(
-                    title="Aircraft Change",
-                    description=f"Callsign: {change_data['callsign']}\n Old Aircraft: {change_data['oldAircraft']}\n New Aircraft: {change_data['newAircraft']}",
-                    color=discord.Color.green()
-                )
-                embeds.append(embed)
-
-            task = self.loop.create_task(sendMessages(channel, embeds))
-            self.aircraftChangeTasks.append(task)
-            return '', 204
-        
-        @self.flaskApp.route('/new-account', methods=['POST'])
-        def triggerNewAccount():
-            data = request.json
-            if not isinstance(data, list):
-                return 'Invalid data format. Expected a list.', 400
-            
-            db = mongoDBClient[self.DATBASE_NAME]
-            collection = db["configurations"]
-            configuration = collection.find_one()
-            if configuration["newAccountLogChannel"] == None:
-                return 'New account log channel is not set.', 500
-            if configuration["displayNewAccounts"] == False:
-                for task in self.newAccountTasks:
-                    task.cancel()
-                self.newAccountTasks = [task for task in self.newAccountTasks if not task.cancelled()]
-            channel = self.get_channel(int(configuration["newAccountLogChannel"]))
-
-            async def sendMessages(channel, embeds):
-                async with self.lock:
-                    for embed in embeds:
-                        await channel.send(embed=embed)
-                        await asyncio.sleep(self.throttleInterval)
-
-            embeds = []
-            for account_data in data:
-                embed = discord.Embed(
-                    title="New Account",
-                    description=f"Acoount ID: {account_data['acid']}\n Callsign: {account_data['callsign']}",
-                    color=discord.Color.green()
-                )
-                embeds.append(embed)
-
-
-            if configuration["displayNewAccounts"]:
-                task = self.loop.create_task(sendMessages(channel, embeds))
-                self.newAccountTasks.append(task)
-            return '', 204
-    
-        @self.flaskApp.route('/callsign-change', methods=['POST'])
-        def triggerCallsignChange():
-            data = request.json
-            if not isinstance(data, list):
-                return 'Invalid data format. Expected a list.', 400
-
-            db = mongoDBClient[self.DATBASE_NAME]
-            collection = db["configurations"]
-            configuration = collection.find_one()
-            if configuration["callsignChangeLogChannel"] == None:
-                return 'Callsign change log channel is not set.', 500
-            if configuration["displayCallsignChanges"] == False:
-                for task in self.callsignChangeTasks:
-                    task.cancel()
-                self.callsignChangeTasks = [task for task in self.callsignChangeTasks if not task.cancelled()]
-            channel = self.get_channel(int(configuration["callsignChangeLogChannel"]))
-            async def sendMessages(channel, embeds):
-                async with self.lock:
-                    for embed in embeds:
-                        await channel.send(embed=embed)
-                        await asyncio.sleep(self.throttleInterval)
-            embeds = []
-            for change_data in data:
-                embed = discord.Embed(
-                    title="Callsign Change",
-                    description=f"Acoount ID: {change_data['acid']}\n Old Callsign: {change_data['oldCallsign']}\n New Callsign: {change_data['newCallsign']}",
-                    color=discord.Color.green()
-                )
-                embeds.append(embed)
-            if configuration["displayCallsignChanges"]:
-                task = self.loop.create_task(sendMessages(channel, embeds))
-                self.callsignChangeTasks.append(task)
-            return '', 204
-            
+    def load_config(self):
+        return mongoDBClient[DATABASE_NAME]["configurations"].find_one()
 
     async def on_ready(self):
         self.logger.log(20, f'{self.user} has connected to Discord!')
@@ -173,11 +58,120 @@ class MindsEyeBot(commands.Bot):
             self.logger.log(20, f"Synced {len(synced)} command(s)")
         except Exception as e:
             self.logger.log(40, f"Exception while syncing commands. Error: {e}")
-        self.config = self.loadConfig()
+
         self.logger.log(20, "Launching Flask server...")
-        Thread(target=self.flaskApp.run, kwargs={"host": self.config["flaskHost"], "port": self.config["flaskPort"]}).start()
+        Thread(target=self.flaskApp.run, kwargs={"host": "127.0.0.1", "port": 5001}).start()
         self.logger.log(20, "Connecting to discord...")
 
+    def setup_routes(self):
+        @self.flaskApp.route("/bot-mention", methods=["POST"])
+        def bot_mention(self):
+            self.loop.create_task(self.get_cog("chatLogging").automatedSendMessage("Nothing can hide from the all seeing eye."))
+            return "", 204
+        @self.flaskApp.route("/aircraft-change", methods=["POST"])
+        def aircraft_change(self):
+            data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
+            
+            channel = self.get_channel_config("aircraft-change")
+            if not channel:
+                return 'Aircraft change log channel is not set.', 500
+            
+            if not self.config["displayAircraftChanges"]:
+                self.clear_tasks("aircraft-change")
+                return "", 204
+
+            embeds = [
+                discord.Embed(
+                    title="Aircraft Change",
+                    description=f"Callsign: {change_data['callsign']}\n Old Aircraft: {change_data['oldAircraft']}\n New Aircraft: {change_data['newAircraft']}",
+                    color=discord.Color.green()
+                )
+                for change_data in data
+            ]
+            task = self.loop.create_task(self.send_embeds(channel, embeds))
+            self.add_task("aircraft-change", task)
+            return "", 204
+    
+        @self.flaskApp.route("/new-account", methods=["POST"])
+        def new_account(self):
+            data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
+            
+            channel = self.get_channel_config("new-account")
+            if not channel:
+                return 'New account log channel is not set.', 500
+            
+            if not self.config["displayNewAccounts"]:
+                self.clear_tasks("new-account")
+                return "", 204
+            
+            embeds = [
+                discord.Embed(
+                    title="New Account",
+                    description=f"Acoount ID: {account_data['acid']}\n Callsign: {account_data['callsign']}",
+                    color=discord.Color.green()
+                )
+                for account_data in data
+            ]
+            task = self.loop.create_task(self.send_embeds(channel, embeds))
+            self.add_task("new-account", task)
+            return "", 204
+    
+        @self.flaskApp.route("/callsign-change", methods=["POST"])
+        def callsign_change(self):
+            data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
+            
+            channel = self.get_channel_config("callsign-change")
+            if not channel:
+                return 'Callsign change log channel is not set.', 500
+            
+            if not self.config["displayCallsignChanges"]:
+                self.clear_tasks("callsign-change")
+                return "", 204
+            
+            embeds = [
+                discord.Embed(
+                    title="Callsign Change",
+                    description=f"Acoount ID: {callsign_data['acid']}\n Old Callsign: {callsign_data['oldCallsign']}\n New Callsign: {callsign_data['newCallsign']}",
+                    color=discord.Color.green()
+                )
+                for callsign_data in data
+            ]
+            task = self.loop.create_task(self.send_embeds(channel, embeds))
+            self.add_task("callsign-change", task)
+            return "", 204
+        
+    
+    async def send_embeds(self, channel, embeds):
+        channel_id = self.config.get("log")
+        async with self.lock:
+            for embed in embeds:
+                await channel.send(embed=embed)
+                await asyncio.sleep(self.throttleInterval)
+
+    def get_channel_config(self, event_type):
+        if event_type == "aircraft-change":
+            return self.get_channel(self.config["aircraftChangeLogChannel"])
+        elif event_type == "new-account":
+            return self.get_channel(self.config["newAccountLogChannel"])
+        elif event_type == "callsign-change":
+            return self.get_channel(self.config["callsignChangeLogChannel"])
+        else:
+            self.logger.log(40, f"Invalid event type: {event_type}")
+    
+    def add_task(self, task_type, task):
+        self.task_lists[task_type].append(task)
+        self.task_lists[task_type] = [t for t in self.task_lists[task_type] if not t.done()]
+
+    def clear_tasks(self, task_type):
+        for task in self.task_lists[task_type]:
+            task.cancel()
+        self.task_lists[task_type] = []
 
     async def _load_extensions(self) -> None:
         for extension in ("chatLogging", "playerTracking", "mrpTracking", "config",):

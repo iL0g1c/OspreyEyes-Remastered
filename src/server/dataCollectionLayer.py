@@ -474,6 +474,7 @@ def main(profiler):
         "aircraftChangeLogChannel": None,
         "displayCallsignChanges": True,
         "displayNewAccounts": True,
+        "displayAircraftChanges": True,
         "countUsers": True,
         "logAircraftDistributions": True,
         "logAircraftChanges": True,

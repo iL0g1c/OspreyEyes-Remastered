@@ -71,6 +71,15 @@ class Config(commands.Cog):
         await collection.update_one({}, {"$set": {"displayNewAccounts": new_configuration}})
         await interaction.response.send_message(f"Set displayNewAccounts to {new_configuration}")
 
+    @toggle_group.command(name="display_aircraft_changes", description="Toggle the discord displaying of aircraft changes.")
+    async def display_aircraft_changes(self, interaction: discord.Interaction): # toggles the discord displaying of aircraft changes
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        new_configuration = not configuration["displayAircraftChanges"]
+        await collection.update_one({}, {"$set": {"displayAircraftChanges": new_configuration}})
+        await interaction.response.send_message(f"Set displayAircraftChanges to {new_configuration}")
+
     @toggle_group.command(name="user_count_logger", description="Set the channel for callsign change logs.")
     async def toggle_user_count_logger(self, interaction: discord.Interaction): # toggles the user count logger
         db = self.mongo_db_client[self.DATABASE_NAME]
