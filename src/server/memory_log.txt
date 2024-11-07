@@ -1,0 +1,156 @@
+Starting memory log
+========================================
+[Memory Usage] Initial Memory Usage
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+<frozen importlib._bootstrap_external>:753: size=153 KiB, count=1418, average=110 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
+/home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=19.4 KiB, count=205, average=97 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
+<frozen abc>:106: size=11.6 KiB, count=46, average=259 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/server/dataCollectionLayer.py:55: size=5472 B, count=17, average=322 B
+/home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/venv/lib/python3.12/site-packages/pymongo/synchronous/pool.py:301: size=4752 B, count=6, average=792 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage After Initialization
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+<frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.1 KiB, count=530, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=24.9 KiB, count=532, average=48 B
+/home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
+<frozen abc>:106: size=11.6 KiB, count=46, average=259 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
+/home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage After Configuration Check
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+<frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.5 KiB, count=536, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=27.4 KiB, count=580, average=48 B
+/home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
+<frozen abc>:106: size=11.6 KiB, count=46, average=259 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
+/home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Processing Users
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+<frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.4 KiB, count=534, average=64 B
+/home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=16.2 KiB, count=346, average=48 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=11.8 KiB, count=248, average=49 B
+<frozen abc>:106: size=11.6 KiB, count=46, average=259 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Fetching Chat Messages
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4881, average=39 B
+<frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.0 KiB, count=528, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=23.0 KiB, count=62, average=380 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Adding Player Location Snapshot
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=188 KiB, count=4900, average=39 B
+<frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=40.9 KiB, count=655, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=25.9 KiB, count=546, average=49 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Processing Users
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=188 KiB, count=4888, average=39 B
+<frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.4 KiB, count=662, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=23.1 KiB, count=485, average=49 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Fetching Chat Messages
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=189 KiB, count=2099, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=188 KiB, count=2088, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4852, average=39 B
+<frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=132 KiB, count=2102, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.3 KiB, count=661, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=30.2 KiB, count=553, average=56 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=26.5 KiB, count=565, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.6 KiB, count=1050, average=24 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Processing Users
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=189 KiB, count=2099, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=188 KiB, count=2088, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4867, average=39 B
+<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=132 KiB, count=2101, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.5 KiB, count=632, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=32.8 KiB, count=668, average=50 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=29.5 KiB, count=629, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.6 KiB, count=1050, average=24 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Fetching Chat Messages
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=187 KiB, count=2079, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=186 KiB, count=2070, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=186 KiB, count=4816, average=39 B
+<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=130 KiB, count=2081, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.8 KiB, count=636, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=36.4 KiB, count=777, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=29.6 KiB, count=542, average=56 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.4 KiB, count=1040, average=24 B
+
+----------------------------------------
+
+[Memory Usage] Memory Usage Before Processing Users
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=187 KiB, count=2079, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=186 KiB, count=2070, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=186 KiB, count=4824, average=39 B
+<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=130 KiB, count=2081, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.8 KiB, count=636, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=30.7 KiB, count=648, average=49 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=27.3 KiB, count=500, average=56 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=24.6 KiB, count=525, average=48 B
+
+----------------------------------------
+

@@ -5,6 +5,7 @@ Multiple terminals with scrolling text
 [x] chat logger
 [x] callsign change tracker 
 [x] Online player count logger
+[ ] query online players by callsign keyword
 [x] Aircraft usage distribution
 [ ] Wait for a few days of aircraft data to test timespans
 [x] New pilots joining
@@ -26,6 +27,7 @@ Multiple terminals with scrolling text
 [ ] Account association algorithm (separate thread for background calculations)
 [ ] Discord username and server link grabber
 [X] rebrand bot to osprey eyes
+[ ] write documentation
 Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
@@ -36,6 +38,7 @@ BUGS
 ====================
 config might not get updated
 some pilots have no ID
+check database for duplicates and possible entry duplicating bugs
 
 
 SOLUTIONS TO DATBASE PROBLEMS
