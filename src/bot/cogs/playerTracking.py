@@ -10,7 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 from OspreyEyes import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
@@ -107,7 +107,8 @@ class PlayerTracker(commands.Cog):
         elif time_span.value == "after":
             documents = collection.find({"datetime": {"$gt": targetDate}})
         elif time_span.value == "on":
-            documents = collection.find({"datetime": targetDate})
+            next_day = targetDate + timedelta(days=1)
+            documents = collection.find({"datetime": {"$gte": targetDate, "$lt": next_day}})
         elif time_span.value == "all":
             documents = collection.find()
 
