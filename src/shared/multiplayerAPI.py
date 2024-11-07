@@ -8,8 +8,9 @@ class MultiplayerAPI:
     def __init__(self, sessionID, accountID):
         self.sessionID = sessionID
         self.accountID = accountID
-        self.myID = None,
-        self.lastMsgID = None,
+        self.myID = None
+        self.lastMsgID = None
+
     
     def handshake(self): # initializes connection and gains mandatory variables from server.
         # initializes server connection and gets details from server.

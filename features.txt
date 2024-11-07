@@ -13,17 +13,19 @@ Multiple terminals with scrolling text
 [x] command to display config
 [x] Can talk in geofs chat
 [x] When mentioned the bot responds in chat with "No comment"
-[ ] optimize server startup time / add logging
-Dog fight detection and tracking 
-Targeted account detailed tracking
-[ ]- flight path tracking 
-[x]- account activity
-[ ]- alt account identification
+[x] optimize server startup time / add logging
+[ ] Dog fight detection and tracking 
+[ ] geofs chat discord channel
+[ ] Targeted account detailed tracking (client side)
+    [ ]- flight path tracking 
+    [x]- account activity
+    [ ]- alt account identification
 [x] fix aircraft distribution so that it averages
-MRP force total and detailed activity loggers
-Chat target word detection
-Account association algorithm (separate thread for background calculations)
-Discord username and server link grabber
+[X] MRP force total and detailed activity loggers
+[ ] Chat target word detection
+[ ] Account association algorithm (separate thread for background calculations)
+[ ] Discord username and server link grabber
+[ ] rebrand bot to osprey eyes
 Being able to query all data collected by various parameters
 - player count before/after date
 - user by id
@@ -32,4 +34,15 @@ Being able to query all data collected by various parameters
 
 BUGS
 ====================
-can't send message
+config might not get updated
+playercount delay is wrong
+some pilots have no ID
+
+
+SOLUTIONS TO DATBASE PROBLEMS
+=============================
+[ ] dataCollectionLayer.py main loop time increase
+[X] optimize cpu heavy methods
+[X] optimize database callsign
+[ ] use threadpool instead of multiple threads
+[X] batch send webhooks

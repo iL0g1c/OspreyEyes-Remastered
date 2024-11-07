@@ -12,7 +12,7 @@ import os
 import sys
 from datetime import datetime
 from collections import defaultdict
-from MindsEye import MindsEyeBot
+from OspreyEyes import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -23,9 +23,10 @@ class PlayerTracker(commands.Cog):
         # gets envs
         load_dotenv()
         self.bot = bot
-        DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        self.DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        self.DATABASE_NAME = os.getenv('DATABASE_NAME')
         self.mapAPI = mapAPI.MapAPI()
-        mongodbURI = "mongodb://adminUser:password@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        mongodbURI = f"mongodb://adminUser:{self.DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
@@ -43,11 +44,12 @@ class PlayerTracker(commands.Cog):
     async def heatmap(self, interaction: discord.Interaction): # generates a heatmap of player activity locations
         await interaction.response.defer()
 
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["player_locations"]
         cursor = collection.find()
         # get the latitudes and longitudes from the database
         data = await cursor.to_list(length=None)
+        print(data)
         latitudes = [doc["latitude"] for doc in data]
         longitudes = [doc["longitude"] for doc in data]
 
@@ -83,7 +85,6 @@ class PlayerTracker(commands.Cog):
         app_commands.Choice(name="before", value="before"),
         app_commands.Choice(name="after", value="after"),
         app_commands.Choice(name="on", value="on"),
-        app_commands.Choice(name="between", value="between"),
         app_commands.Choice(name="all", value="all"),
     ])
     async def getAircraftDistribution(self, interaction: discord.Interaction, time_span: app_commands.Choice[str], day: int, month: int, year: int):
@@ -96,7 +97,7 @@ class PlayerTracker(commands.Cog):
                 await interaction.response.send_message("Invalid date.")
                 return
 
-        db = self.mongoDBClient["OspreyEyes"]
+        db = self.mongoDBClient[self.DATABASE_NAME]
         collection = db["aircraft"]
 
         # filter the documents based on the time span
@@ -106,8 +107,6 @@ class PlayerTracker(commands.Cog):
             documents = collection.find({"datetime": {"$gt": targetDate}})
         elif time_span.value == "on":
             documents = collection.find({"datetime": targetDate})
-        elif time_span.value == "between":
-            documents = collection.find({"datetime": {"$gte": targetDate, "$lt": targetDate + datetime.timedelta(days=1)}})
         elif time_span.value == "all":
             documents = collection.find()
 
