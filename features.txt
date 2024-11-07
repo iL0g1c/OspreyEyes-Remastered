@@ -5,6 +5,7 @@ Multiple terminals with scrolling text
 [x] chat logger
 [x] callsign change tracker 
 [x] Online player count logger
+[ ] query online players by callsign keyword
 [x] Aircraft usage distribution
 [ ] Wait for a few days of aircraft data to test timespans
 [x] New pilots joining
