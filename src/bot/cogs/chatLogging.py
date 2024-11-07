@@ -4,7 +4,7 @@ from discord.ext import commands
 import os
 import sys
 from dotenv import load_dotenv
-from MindsEye import MindsEyeBot
+from OspreyEyes import MindsEyeBot
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))

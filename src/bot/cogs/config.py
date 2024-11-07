@@ -4,7 +4,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from MindsEye import MindsEyeBot
+from OspreyEyes import MindsEyeBot
 
 class Config(commands.Cog):
     def __init__(self):

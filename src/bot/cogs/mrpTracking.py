@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
-from MindsEye import MindsEyeBot
+from OspreyEyes import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
 
 class MRPTracker(commands.Cog):
