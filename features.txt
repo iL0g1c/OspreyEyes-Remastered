@@ -37,6 +37,7 @@ BUGS
 ====================
 config might not get updated
 some pilots have no ID
+check database for duplicates and possible entry duplicating bugs
 
 
 SOLUTIONS TO DATBASE PROBLEMS

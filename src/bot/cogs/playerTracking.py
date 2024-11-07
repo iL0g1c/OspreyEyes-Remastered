@@ -26,6 +26,7 @@ class PlayerTracker(commands.Cog):
         self.DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
         self.mapAPI = mapAPI.MapAPI()
+        self.mapAPI.disableResponseList()
         mongodbURI = f"mongodb://adminUser:{self.DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 

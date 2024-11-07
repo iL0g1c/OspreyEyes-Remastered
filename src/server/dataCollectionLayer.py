@@ -39,7 +39,8 @@ class DataCollectionLayer():
         # sets up APIs
         self.logger.log(10, "Setting up APIs...")
         self.multiplayer_api = multiplayerAPI.MultiplayerAPI(self.SESSION_ID, self.ACCOUTN_ID)
-        self.map_api = mapAPI.MapAPI()
+        self.mapAPI = mapAPI.MapAPI()
+        self.mapAPI.disableResponseList()
 
         self.logger.log(10, "Setting up batch processors...")
         self.setup_batch_processors(db)
@@ -259,7 +260,7 @@ class DataCollectionLayer():
 
     def process_users(self):
         # Fetch online users from the map API
-        self.current_online_users = self.map_api.getUsers(None)
+        self.current_online_users = self.mapAPI.getUsers(None)
         db = self.mongo_db_client[self.DATABASE_NAME]
         user_collection = db["users"]
         configurations = self.config

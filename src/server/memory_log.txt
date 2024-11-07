@@ -1,730 +1,156 @@
 Starting memory log
 ========================================
 [Memory Usage] Initial Memory Usage
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
 <frozen importlib._bootstrap_external>:753: size=153 KiB, count=1418, average=110 B
 /home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
 /home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=19.4 KiB, count=205, average=97 B
 /home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
 <frozen abc>:106: size=11.6 KiB, count=46, average=259 B
-/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.4 KiB, count=7, average=1520 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/server/dataCollectionLayer.py:54: size=5472 B, count=17, average=322 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/server/dataCollectionLayer.py:55: size=5472 B, count=17, average=322 B
 /home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
 /home/matht/Documents/GitHub/OspreyEyes-Remastered/venv/lib/python3.12/site-packages/pymongo/synchronous/pool.py:301: size=4752 B, count=6, average=792 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage After Initialization
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
 <frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
 /home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.2 KiB, count=532, average=64 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=25.0 KiB, count=533, average=48 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.1 KiB, count=530, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=24.9 KiB, count=532, average=48 B
 /home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
 /home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
 <frozen abc>:106: size=11.6 KiB, count=46, average=259 B
-/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.4 KiB, count=7, average=1520 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
 /home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage After Configuration Check
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
 <frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
 /home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.4 KiB, count=535, average=64 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=27.5 KiB, count=581, average=48 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.5 KiB, count=536, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=27.4 KiB, count=580, average=48 B
 /home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
 /home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
 <frozen abc>:106: size=11.6 KiB, count=46, average=259 B
-/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.4 KiB, count=7, average=1520 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
 /home/matht/miniconda3/lib/python3.12/collections/__init__.py:508: size=5313 B, count=27, average=197 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Processing Users
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
 <frozen importlib._bootstrap_external>:753: size=152 KiB, count=1405, average=111 B
 /home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=70.1 KiB, count=929, average=77 B
 /home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.4 KiB, count=534, average=64 B
 /home/matht/miniconda3/lib/python3.12/dataclasses.py:473: size=18.3 KiB, count=185, average=101 B
 /home/matht/miniconda3/lib/python3.12/threading.py:293: size=16.3 KiB, count=44, average=380 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=16.2 KiB, count=345, average=48 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=11.9 KiB, count=250, average=49 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=16.2 KiB, count=346, average=48 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=11.8 KiB, count=248, average=49 B
 <frozen abc>:106: size=11.6 KiB, count=46, average=259 B
-/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.4 KiB, count=7, average=1520 B
+/home/matht/miniconda3/lib/python3.12/typing.py:395: size=10.3 KiB, count=6, average=1763 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=200 KiB, count=2227, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=199 KiB, count=2214, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=193 KiB, count=5066, average=39 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4881, average=39 B
 <frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=142 KiB, count=2229, average=65 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
 /home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=33.0 KiB, count=528, average=64 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=26.1 KiB, count=1114, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=26.1 KiB, count=1114, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=23.3 KiB, count=426, average=56 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
+/home/matht/miniconda3/lib/python3.12/threading.py:293: size=23.0 KiB, count=62, average=380 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Adding Player Location Snapshot
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=200 KiB, count=2227, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=199 KiB, count=2214, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=194 KiB, count=5081, average=39 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=188 KiB, count=4900, average=39 B
 <frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=142 KiB, count=2229, average=65 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.1 KiB, count=658, average=64 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=26.8 KiB, count=563, average=49 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=26.1 KiB, count=1114, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=26.1 KiB, count=1114, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=40.9 KiB, count=655, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=25.9 KiB, count=546, average=49 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Processing Users
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=200 KiB, count=2227, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=199 KiB, count=2214, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=193 KiB, count=5069, average=39 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=190 KiB, count=2113, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=189 KiB, count=2104, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=188 KiB, count=4888, average=39 B
 <frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=142 KiB, count=2229, average=65 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.7 KiB, count=667, average=64 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=26.1 KiB, count=1114, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=26.1 KiB, count=1114, average=24 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=24.2 KiB, count=506, average=49 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=135 KiB, count=2115, average=65 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.4 KiB, count=662, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.8 KiB, count=1057, average=24 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=24.8 KiB, count=1057, average=24 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=23.1 KiB, count=485, average=49 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=403 KiB, count=4482, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=400 KiB, count=4452, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=317 KiB, count=9256, average=35 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=284 KiB, count=4486, average=65 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=52.5 KiB, count=2242, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=52.5 KiB, count=2242, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=38.2 KiB, count=698, average=56 B
-/home/matht/miniconda3/lib/python3.12/threading.py:293: size=23.0 KiB, count=62, average=380 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=189 KiB, count=2099, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=188 KiB, count=2088, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4852, average=39 B
+<frozen importlib._bootstrap_external>:753: size=165 KiB, count=1507, average=112 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=132 KiB, count=2102, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.3 KiB, count=661, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=30.2 KiB, count=553, average=56 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=26.5 KiB, count=565, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.6 KiB, count=1050, average=24 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=403 KiB, count=4482, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=400 KiB, count=4452, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=318 KiB, count=9261, average=35 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=284 KiB, count=4486, average=65 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=189 KiB, count=2099, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=188 KiB, count=2088, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=187 KiB, count=4867, average=39 B
 <frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=52.5 KiB, count=2242, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=52.5 KiB, count=2242, average=24 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=38.8 KiB, count=621, average=64 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=38.2 KiB, count=698, average=56 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=132 KiB, count=2101, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.5 KiB, count=632, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=32.8 KiB, count=668, average=50 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=29.5 KiB, count=629, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.6 KiB, count=1050, average=24 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=605 KiB, count=6737, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=601 KiB, count=6688, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=442 KiB, count=13442, average=34 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=426 KiB, count=6743, average=65 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=187 KiB, count=2079, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=186 KiB, count=2070, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=186 KiB, count=4816, average=39 B
 <frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=79.0 KiB, count=3370, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=79.0 KiB, count=3370, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=52.5 KiB, count=960, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.5 KiB, count=664, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=130 KiB, count=2081, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.8 KiB, count=636, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=36.4 KiB, count=777, average=48 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=29.6 KiB, count=542, average=56 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=24.4 KiB, count=1040, average=24 B
 
 ----------------------------------------
 
 [Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=605 KiB, count=6737, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=601 KiB, count=6688, average=92 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=442 KiB, count=13447, average=34 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=426 KiB, count=6743, average=65 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
+/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3026, average=100 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=187 KiB, count=2079, average=92 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=186 KiB, count=2070, average=92 B
+/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=186 KiB, count=4824, average=39 B
 <frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=79.0 KiB, count=3370, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=79.0 KiB, count=3370, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=52.5 KiB, count=960, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=808 KiB, count=8992, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=802 KiB, count=8924, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=568 KiB, count=9000, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=566 KiB, count=17628, average=33 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=105 KiB, count=4498, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=105 KiB, count=4498, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=67.4 KiB, count=1232, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.5 KiB, count=664, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=808 KiB, count=8992, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=802 KiB, count=8924, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=568 KiB, count=9000, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=566 KiB, count=17633, average=33 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=105 KiB, count=4498, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=105 KiB, count=4498, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=67.4 KiB, count=1232, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1010 KiB, count=11243, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1002 KiB, count=11150, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=710 KiB, count=11253, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=690 KiB, count=21801, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=132 KiB, count=5624, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=132 KiB, count=5624, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=82.5 KiB, count=1509, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.5 KiB, count=664, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1010 KiB, count=11243, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1002 KiB, count=11150, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=710 KiB, count=11253, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=690 KiB, count=21801, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=132 KiB, count=5624, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=132 KiB, count=5624, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=82.5 KiB, count=1509, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1214 KiB, count=13518, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1204 KiB, count=13406, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=853 KiB, count=13530, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=815 KiB, count=26009, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=158 KiB, count=6762, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=158 KiB, count=6762, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=97.2 KiB, count=1777, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1214 KiB, count=13518, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1204 KiB, count=13406, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=853 KiB, count=13530, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=815 KiB, count=26013, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=158 KiB, count=6762, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=158 KiB, count=6762, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=97.2 KiB, count=1777, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1418 KiB, count=15785, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1407 KiB, count=15658, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=995 KiB, count=15799, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=941 KiB, count=30214, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=185 KiB, count=7896, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=185 KiB, count=7896, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=112 KiB, count=2045, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.5 KiB, count=664, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1418 KiB, count=15785, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1407 KiB, count=15658, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=995 KiB, count=15799, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=941 KiB, count=30218, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=185 KiB, count=7896, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=185 KiB, count=7896, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=112 KiB, count=2045, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1622 KiB, count=18052, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1609 KiB, count=17910, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1138 KiB, count=18068, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1065 KiB, count=34416, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=212 KiB, count=9030, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=212 KiB, count=9030, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=126 KiB, count=2297, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.8 KiB, count=669, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1622 KiB, count=18052, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1609 KiB, count=17910, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1138 KiB, count=18068, average=65 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1065 KiB, count=34417, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=212 KiB, count=9030, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=212 KiB, count=9030, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=126 KiB, count=2297, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.8 KiB, count=669, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1827 KiB, count=20337, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1813 KiB, count=20176, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1282 KiB, count=20355, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1191 KiB, count=38646, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=238 KiB, count=10173, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=238 KiB, count=10173, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=142 KiB, count=2603, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.9 KiB, count=670, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=1827 KiB, count=20337, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=1813 KiB, count=20176, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1282 KiB, count=20355, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1191 KiB, count=38651, average=32 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=238 KiB, count=10173, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=238 KiB, count=10173, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=142 KiB, count=2603, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.9 KiB, count=670, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2032 KiB, count=22616, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2016 KiB, count=22440, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1425 KiB, count=22636, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1316 KiB, count=42864, average=31 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=265 KiB, count=11313, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=265 KiB, count=11313, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=157 KiB, count=2872, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.9 KiB, count=670, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2032 KiB, count=22616, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2016 KiB, count=22440, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1425 KiB, count=22636, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1317 KiB, count=42870, average=31 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=265 KiB, count=11313, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=265 KiB, count=11313, average=24 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=157 KiB, count=2872, average=56 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.9 KiB, count=670, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2237 KiB, count=24897, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2219 KiB, count=24702, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1569 KiB, count=24919, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1442 KiB, count=47079, average=31 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=292 KiB, count=12454, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=292 KiB, count=12454, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=173 KiB, count=3160, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.8 KiB, count=669, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2237 KiB, count=24897, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2219 KiB, count=24702, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1569 KiB, count=24919, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1442 KiB, count=47084, average=31 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=292 KiB, count=12454, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=292 KiB, count=12454, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=173 KiB, count=3160, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2441 KiB, count=27178, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2423 KiB, count=26964, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1712 KiB, count=27202, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1567 KiB, count=51293, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=319 KiB, count=13595, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=319 KiB, count=13595, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=187 KiB, count=3414, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.1 KiB, count=674, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2441 KiB, count=27178, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2423 KiB, count=26964, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1712 KiB, count=27202, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1567 KiB, count=51299, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=319 KiB, count=13595, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=319 KiB, count=13595, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=187 KiB, count=3414, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2646 KiB, count=29455, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2626 KiB, count=29226, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1855 KiB, count=29481, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1692 KiB, count=55500, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=345 KiB, count=14734, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=345 KiB, count=14734, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=213 KiB, count=3898, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/threading.py:293: size=23.0 KiB, count=62, average=380 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2646 KiB, count=29455, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2626 KiB, count=29226, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1855 KiB, count=29481, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1692 KiB, count=55504, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=345 KiB, count=14734, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=345 KiB, count=14734, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=213 KiB, count=3898, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.6 KiB, count=665, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2851 KiB, count=31732, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2828 KiB, count=31476, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1998 KiB, count=31760, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1817 KiB, count=59703, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=372 KiB, count=15873, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=372 KiB, count=15873, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=227 KiB, count=4151, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.1 KiB, count=673, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=2851 KiB, count=31732, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=2828 KiB, count=31476, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=1998 KiB, count=31760, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1817 KiB, count=59708, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=372 KiB, count=15873, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=372 KiB, count=15873, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=227 KiB, count=4151, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.1 KiB, count=673, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3054 KiB, count=33997, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3030 KiB, count=33726, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2141 KiB, count=34027, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1941 KiB, count=63884, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=399 KiB, count=17006, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=399 KiB, count=17006, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=241 KiB, count=4412, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3054 KiB, count=33997, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3030 KiB, count=33726, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2141 KiB, count=34027, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=1941 KiB, count=63888, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=399 KiB, count=17006, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=399 KiB, count=17006, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=241 KiB, count=4412, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3257 KiB, count=36262, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3232 KiB, count=35976, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2283 KiB, count=36294, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2066 KiB, count=68064, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=425 KiB, count=18139, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=425 KiB, count=18139, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=256 KiB, count=4681, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3257 KiB, count=36262, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3232 KiB, count=35976, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2283 KiB, count=36294, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2066 KiB, count=68069, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=425 KiB, count=18139, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=425 KiB, count=18139, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=256 KiB, count=4681, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3462 KiB, count=38539, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3436 KiB, count=38246, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2427 KiB, count=38573, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2190 KiB, count=72256, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=452 KiB, count=19278, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=452 KiB, count=19278, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=271 KiB, count=4964, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3462 KiB, count=38539, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3436 KiB, count=38246, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2427 KiB, count=38573, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2190 KiB, count=72261, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=452 KiB, count=19278, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=452 KiB, count=19278, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=271 KiB, count=4964, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3666 KiB, count=40810, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3639 KiB, count=40508, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2569 KiB, count=40846, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2315 KiB, count=76444, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=478 KiB, count=20414, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=478 KiB, count=20414, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=285 KiB, count=5219, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3666 KiB, count=40810, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3639 KiB, count=40508, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2569 KiB, count=40846, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2315 KiB, count=76448, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=478 KiB, count=20414, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=478 KiB, count=20414, average=24 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=285 KiB, count=5219, average=56 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3871 KiB, count=43089, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3843 KiB, count=42776, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2713 KiB, count=43127, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2440 KiB, count=80639, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=505 KiB, count=21554, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=505 KiB, count=21554, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=301 KiB, count=5501, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=3871 KiB, count=43089, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=3843 KiB, count=42776, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2713 KiB, count=43127, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2439 KiB, count=80642, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=505 KiB, count=21554, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=505 KiB, count=21554, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=301 KiB, count=5501, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4075 KiB, count=45368, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4047 KiB, count=45044, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2856 KiB, count=45408, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2564 KiB, count=84833, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=532 KiB, count=22694, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=532 KiB, count=22694, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=316 KiB, count=5785, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4075 KiB, count=45368, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4047 KiB, count=45044, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2856 KiB, count=45408, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2564 KiB, count=84834, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=532 KiB, count=22694, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=532 KiB, count=22694, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=316 KiB, count=5785, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4280 KiB, count=47645, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4251 KiB, count=47312, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2999 KiB, count=47687, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2689 KiB, count=89040, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=559 KiB, count=23833, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=559 KiB, count=23833, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=332 KiB, count=6066, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4280 KiB, count=47645, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4251 KiB, count=47312, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=2999 KiB, count=47687, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2689 KiB, count=89042, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=559 KiB, count=23833, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=559 KiB, count=23833, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=332 KiB, count=6066, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4484 KiB, count=49918, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4454 KiB, count=49572, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=3142 KiB, count=49962, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2814 KiB, count=93253, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=585 KiB, count=24970, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=585 KiB, count=24970, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=346 KiB, count=6318, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=676, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4484 KiB, count=49918, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4454 KiB, count=49572, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=3142 KiB, count=49962, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2815 KiB, count=93258, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=585 KiB, count=24970, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=585 KiB, count=24970, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=346 KiB, count=6318, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4688 KiB, count=52189, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4657 KiB, count=51830, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=3285 KiB, count=52235, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2940 KiB, count=97463, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=612 KiB, count=26106, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=612 KiB, count=26106, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=361 KiB, count=6604, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:26: size=34.3 KiB, count=382, average=92 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Processing Users
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4688 KiB, count=52189, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4657 KiB, count=51830, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=3285 KiB, count=52235, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=2940 KiB, count=97468, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=612 KiB, count=26106, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=612 KiB, count=26106, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=361 KiB, count=6604, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=41.4 KiB, count=663, average=64 B
-
-----------------------------------------
-
-[Memory Usage] Memory Usage Before Fetching Chat Messages
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:16: size=4892 KiB, count=54452, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:21: size=4857 KiB, count=54066, average=92 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:68: size=3427 KiB, count=54500, average=64 B
-/home/matht/miniconda3/lib/python3.12/json/decoder.py:353: size=3064 KiB, count=101655, average=31 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:19: size=638 KiB, count=27238, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:18: size=638 KiB, count=27238, average=24 B
-/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=375 KiB, count=6864, average=56 B
-/home/matht/miniconda3/lib/python3.12/linecache.py:137: size=294 KiB, count=3025, average=100 B
-<frozen importlib._bootstrap_external>:753: size=164 KiB, count=1502, average=112 B
-/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=42.2 KiB, count=675, average=64 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:69: size=130 KiB, count=2081, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:67: size=39.8 KiB, count=636, average=64 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:558: size=30.7 KiB, count=648, average=49 B
+/home/matht/Documents/GitHub/OspreyEyes-Remastered/src/shared/mapAPI.py:17: size=27.3 KiB, count=500, average=56 B
+/home/matht/miniconda3/lib/python3.12/tracemalloc.py:193: size=24.6 KiB, count=525, average=48 B
 
 ----------------------------------------
 
