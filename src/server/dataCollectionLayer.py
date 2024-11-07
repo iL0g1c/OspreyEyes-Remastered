@@ -457,7 +457,7 @@ def main():
     data_collection_layer = DataCollectionLayer()
     data_collection_layer.logger.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
-    last_user_count_time = 3600
+    last_user_count_time = time.time()
 
     db = data_collection_layer.mongo_db_client[data_collection_layer.DATABASE_NAME]
     collection = db["configurations"]

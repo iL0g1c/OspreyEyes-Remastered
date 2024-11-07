@@ -21,10 +21,11 @@ class MRPTracker(commands.Cog):
 
     @mrp_group.command(name="add_force", description="Add a force to the MRP tracker.")
     async def addForce(self, interaction: discord.Interaction, name: str, callsign_filter: str):
+        await interaction.response.defer()
         db = self.mongo_db_client[self.DATABASE_NAME]
         collection = db["forces"]
         await collection.insert_one({"callsign_filter": callsign_filter, "name": name, "patrols": []})
-        await interaction.response.send_message(f"Force {name} added with callsign_filter {callsign_filter}")
+        await interaction.followup.send(f"Force {name} added with callsign_filter {callsign_filter}")
     
     @mrp_group.command(name="remove_force", description="Remove a force from the MRP tracker.")
     async def removeForce(self, interaction: discord.Interaction, name: str):

@@ -40,9 +40,6 @@ class MindsEyeBot(commands.Bot):
         self.config = self.load_config()
         self.setup_routes()
 
-        self.loop.create_task(self.process_tasks())
-        self.loop.create_task(self.monitor_config())
-
     def load_config(self):
         return mongoDBClient[DATABASE_NAME]["configurations"].find_one()
     
@@ -59,7 +56,6 @@ class MindsEyeBot(commands.Bot):
             await asyncio.sleep(5)
 
     async def clear_queue_for_event(self, event_type):
-        self.logger.info(f"Clearing {event_type} events from the queue...")
         new_queue = asyncio.Queue()
 
         # iterate through the queue and put all events that are not the specified type into the new queue
@@ -88,6 +84,10 @@ class MindsEyeBot(commands.Bot):
         self.logger.log(20, "Launching Flask server...")
         Thread(target=self.flaskApp.run, kwargs={"host": "127.0.0.1", "port": 5001}).start()
         self.logger.log(20, "Connecting to discord...")
+
+        self.logger.log(20, "Starting task processing loops...")
+        self.loop.create_task(self.process_tasks())
+        self.loop.create_task(self.monitor_config())
 
     def setup_routes(self):
         @self.flaskApp.route("/bot-mention", methods=["POST"])
@@ -136,7 +136,7 @@ class MindsEyeBot(commands.Bot):
             await chat_logger.automatedSendMessage("Nothing can hide from the all seeing eye.")
     
     async def process_aircraft_change(self, data):
-        channel = self.get_channel_config("aircraftChangeLogChannel")
+        channel = self.get_channel_config("aircraft-change")
         if not channel or not self.config.get("displayAircraftChanges", True):
             return
         
@@ -150,7 +150,7 @@ class MindsEyeBot(commands.Bot):
         await self.send_embeds(channel, embeds)
 
     async def process_new_account(self, data):
-        channel = self.get_channel_config("newAccountLogChannel")
+        channel = self.get_channel_config("new-account")
         if not channel or not self.config.get("displayNewAccounts", True):
             return
         
@@ -164,7 +164,7 @@ class MindsEyeBot(commands.Bot):
         await self.send_embeds(channel, embeds)
 
     async def process_callsign_change(self, data):
-        channel = self.get_channel_config("callsignChangeLogChannel")
+        channel = self.get_channel_config("callsign-change")
         if not channel or not self.config.get("displayCallsignChanges", True):
             return
         
@@ -185,18 +185,20 @@ class MindsEyeBot(commands.Bot):
 
     def get_channel_config(self, event_type): # gets the channel for the event type
         if event_type == "aircraft-change":
-            channel_id = self.get_channel(self.config["aircraftChangeLogChannel"])
+            channel = self.get_channel(self.config["aircraftChangeLogChannel"])
         elif event_type == "new-account":
-            channel_id = self.get_channel(self.config["newAccountLogChannel"])
+            channel = self.get_channel(self.config["newAccountLogChannel"])
         elif event_type == "callsign-change":
-            channel_id = self.get_channel(self.config["callsignChangeLogChannel"])
+            channel = self.get_channel(self.config["callsignChangeLogChannel"])
         else:
             self.logger.log(40, f"Invalid event type: {event_type}")
-
-        if not channel_id:
-            self.logger.warning(f"Channel ID for '{event_type}' is not set in the configuration.")
             return None
 
+        if not channel:
+            self.logger.warning(f"Channel ID for '{event_type}' is not set in the configuration.")
+            return None
+        return channel
+        
     async def _load_extensions(self) -> None:
         for extension in ("chatLogging", "playerTracking", "mrpTracking", "config",):
             await self.load_extension(f"cogs.{extension}")

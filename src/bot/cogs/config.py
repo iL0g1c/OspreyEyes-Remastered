@@ -25,17 +25,20 @@ class Config(commands.Cog):
         embed = discord.Embed(
             title="Current Configurations", 
             description=(
-                f"Display Callsign Changes: {configuration['displayCallsignChanges']}\n" +
-                f"Display New Accounts: {configuration['displayNewAccounts']}\n" +
-                f"User Count Logger: {configuration['countUsers']}\n" +
                 f"Chat Message Logging: {configuration['saveChatMessages']}\n" +
                 f"Heatmap Cumulation: {configuration['accumulateHeatMap']}\n" +
                 f"User Tracking: {configuration['storeUsers']}\n" +
-                f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
                 f"Callsign Change Log Channel: <#{configuration['callsignChangeLogChannel']}>\n" +
                 f"New Account Log Channel: <#{configuration['newAccountLogChannel']}>\n" +
                 f"Aircraft Change Log Channel: <#{configuration['aircraftChangeLogChannel']}>\n" + 
-                f"Aircraft Change Logging: {configuration['logAircraftChanges']}"
+                f"Display Callsign Changes: {configuration['displayCallsignChanges']}\n" +
+                f"Display New Accounts: {configuration['displayNewAccounts']}\n" +
+                f"Display Aircraft Changes: {configuration['displayAircraftChanges']}\n" +
+                f"User Count Logger: {configuration['countUsers']}\n" +
+                f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
+                f"Aircraft Change Logging: {configuration['logAircraftChanges']}\n" +
+                f"MRP Activity Tracking: {configuration['logMRPActivity']}"
+
             ),
             color=discord.Color.greyple()
         )
