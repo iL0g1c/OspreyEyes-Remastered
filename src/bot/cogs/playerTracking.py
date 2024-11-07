@@ -12,7 +12,7 @@ import os
 import sys
 from datetime import datetime
 from collections import defaultdict
-from MindsEye import MindsEyeBot
+from OspreyEyes import MindsEyeBot
 from paginationEmbed import PaginatedEmbed
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))

@@ -35,15 +35,6 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 
-IMPROVEMENTS
-====================
-remove fake airforce users from force patrol logs
-
-
-STOPING POINT
-====================
-Fix regex expression
-
 
 SOLUTIONS TO DATBASE PROBLEMS
 =============================
