@@ -25,17 +25,20 @@ class Config(commands.Cog):
         embed = discord.Embed(
             title="Current Configurations", 
             description=(
-                f"Display Callsign Changes: {configuration['displayCallsignChanges']}\n" +
-                f"Display New Accounts: {configuration['displayNewAccounts']}\n" +
-                f"User Count Logger: {configuration['countUsers']}\n" +
                 f"Chat Message Logging: {configuration['saveChatMessages']}\n" +
                 f"Heatmap Cumulation: {configuration['accumulateHeatMap']}\n" +
                 f"User Tracking: {configuration['storeUsers']}\n" +
-                f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
                 f"Callsign Change Log Channel: <#{configuration['callsignChangeLogChannel']}>\n" +
                 f"New Account Log Channel: <#{configuration['newAccountLogChannel']}>\n" +
                 f"Aircraft Change Log Channel: <#{configuration['aircraftChangeLogChannel']}>\n" + 
-                f"Aircraft Change Logging: {configuration['logAircraftChanges']}"
+                f"Display Callsign Changes: {configuration['displayCallsignChanges']}\n" +
+                f"Display New Accounts: {configuration['displayNewAccounts']}\n" +
+                f"Display Aircraft Changes: {configuration['displayAircraftChanges']}\n" +
+                f"User Count Logger: {configuration['countUsers']}\n" +
+                f"Aircraft Distribution: {configuration['logAircraftDistributions']}\n" +
+                f"Aircraft Change Logging: {configuration['logAircraftChanges']}\n" +
+                f"MRP Activity Tracking: {configuration['logMRPActivity']}"
+
             ),
             color=discord.Color.greyple()
         )
@@ -70,6 +73,15 @@ class Config(commands.Cog):
         new_configuration = not configuration["displayNewAccounts"]
         await collection.update_one({}, {"$set": {"displayNewAccounts": new_configuration}})
         await interaction.response.send_message(f"Set displayNewAccounts to {new_configuration}")
+
+    @toggle_group.command(name="display_aircraft_changes", description="Toggle the discord displaying of aircraft changes.")
+    async def display_aircraft_changes(self, interaction: discord.Interaction): # toggles the discord displaying of aircraft changes
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        collection = db["configurations"]
+        configuration = await collection.find_one()
+        new_configuration = not configuration["displayAircraftChanges"]
+        await collection.update_one({}, {"$set": {"displayAircraftChanges": new_configuration}})
+        await interaction.response.send_message(f"Set displayAircraftChanges to {new_configuration}")
 
     @toggle_group.command(name="user_count_logger", description="Set the channel for callsign change logs.")
     async def toggle_user_count_logger(self, interaction: discord.Interaction): # toggles the user count logger
