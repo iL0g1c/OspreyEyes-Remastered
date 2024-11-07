@@ -154,3 +154,4 @@ cython_debug/
 results.txt
 results_old.txt
 *.prof
+memory_log.txt
