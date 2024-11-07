@@ -34,12 +34,15 @@ Being able to query all data collected by various parameters
 
 BUGS
 ====================
+config might not get updated
+playercount delay is wrong
+some pilots have no ID
 
 
 SOLUTIONS TO DATBASE PROBLEMS
 =============================
-dataCollectionLayer.py main loop time increase
-optimize cpu heavy methods
-optimize database callsign
-use threadpool instead of multiple threads
-batch send webhooks
+[ ] dataCollectionLayer.py main loop time increase
+[X] optimize cpu heavy methods
+[X] optimize database callsign
+[ ] use threadpool instead of multiple threads
+[X] batch send webhooks

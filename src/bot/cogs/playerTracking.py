@@ -23,10 +23,10 @@ class PlayerTracker(commands.Cog):
         # gets envs
         load_dotenv()
         self.bot = bot
-        DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        DATABASE_NAME = os.getenv('DATABASE_NAME')
+        self.DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
+        self.DATABASE_NAME = os.getenv('DATABASE_NAME')
         self.mapAPI = mapAPI.MapAPI()
-        mongodbURI = f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        mongodbURI = f"mongodb://adminUser:{self.DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
@@ -49,6 +49,7 @@ class PlayerTracker(commands.Cog):
         cursor = collection.find()
         # get the latitudes and longitudes from the database
         data = await cursor.to_list(length=None)
+        print(data)
         latitudes = [doc["latitude"] for doc in data]
         longitudes = [doc["longitude"] for doc in data]
 

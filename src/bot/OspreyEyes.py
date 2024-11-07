@@ -10,6 +10,8 @@ from pymongo import MongoClient
 import json
 import asyncio
 import time
+import logging
+import sys
 
 tracemalloc.start()
 load_dotenv()
@@ -20,6 +22,13 @@ mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
 class MindsEyeBot(commands.Bot):
     def __init__(self, botToken):
+        # sets up logger
+        self.logger = logging.getLogger("OSPREY EYES")
+        self.logger.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.DEBUG)
+        self.logger.addHandler(console_handler)
+
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(
@@ -51,33 +60,39 @@ class MindsEyeBot(commands.Bot):
         @self.flaskApp.route('/aircraft-change', methods=['POST'])
         def triggerAircraftChange():
             data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
             db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
             if configuration["aircraftChangeLogChannel"] == None:
                 return 'Aircraft change log channel is not set.', 500
-            if configuration["logAircraftDistributions"] == False:
-                for task in self.aircraftChangeTasks:
-                    task.cancel()
-                self.aircraftChangeTasks = [task for task in self.aircraftChangeTasks if not task.cancelled()]
+
             channel = self.get_channel(int(configuration["aircraftChangeLogChannel"]))
-            async def sendMessage(embed, channel):
+            async def sendMessages(channel, embeds):
                 async with self.lock:
-                    await channel.send(embed=embed)
-                    await asyncio.sleep(self.throttleInterval)
-            embed = discord.Embed(
-                title="Aircraft Change",
-                description=f"Callsign: {data['callsign']}\n Old Aircraft: {data['oldAircraft']}\n New Aircraft: {data['newAircraft']}",
-                color=discord.Color.green()
-            )
-            if configuration["logAircraftChanges"]:
-                task = self.loop.create_task(sendMessage(embed, channel))
-                self.aircraftChangeTasks.append(task)
+                    for embed in embeds:
+                        await channel.send(embed=embed)
+                        await asyncio.sleep(self.throttleInterval)
+            embeds = []
+            for change_data in data:
+                embed = discord.Embed(
+                    title="Aircraft Change",
+                    description=f"Callsign: {change_data['callsign']}\n Old Aircraft: {change_data['oldAircraft']}\n New Aircraft: {change_data['newAircraft']}",
+                    color=discord.Color.green()
+                )
+                embeds.append(embed)
+
+            task = self.loop.create_task(sendMessages(channel, embeds))
+            self.aircraftChangeTasks.append(task)
             return '', 204
         
         @self.flaskApp.route('/new-account', methods=['POST'])
         def triggerNewAccount():
             data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
+            
             db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
@@ -88,23 +103,34 @@ class MindsEyeBot(commands.Bot):
                     task.cancel()
                 self.newAccountTasks = [task for task in self.newAccountTasks if not task.cancelled()]
             channel = self.get_channel(int(configuration["newAccountLogChannel"]))
-            async def sendMessage(embed, channel):
+
+            async def sendMessages(channel, embeds):
                 async with self.lock:
-                    await channel.send(embed=embed)
-                    await asyncio.sleep(self.throttleInterval)
-            embed = discord.Embed(
-                title="New Account",
-                description=f"Acoount ID: {data['acid']}\n Callsign: {data['callsign']}",
-                color=discord.Color.green()
-            )
+                    for embed in embeds:
+                        await channel.send(embed=embed)
+                        await asyncio.sleep(self.throttleInterval)
+
+            embeds = []
+            for account_data in data:
+                embed = discord.Embed(
+                    title="New Account",
+                    description=f"Acoount ID: {account_data['acid']}\n Callsign: {account_data['callsign']}",
+                    color=discord.Color.green()
+                )
+                embeds.append(embed)
+
+
             if configuration["displayNewAccounts"]:
-                task = self.loop.create_task(sendMessage(embed, channel))
+                task = self.loop.create_task(sendMessages(channel, embeds))
                 self.newAccountTasks.append(task)
             return '', 204
     
         @self.flaskApp.route('/callsign-change', methods=['POST'])
         def triggerCallsignChange():
             data = request.json
+            if not isinstance(data, list):
+                return 'Invalid data format. Expected a list.', 400
+
             db = mongoDBClient[self.DATBASE_NAME]
             collection = db["configurations"]
             configuration = collection.find_one()
@@ -115,37 +141,42 @@ class MindsEyeBot(commands.Bot):
                     task.cancel()
                 self.callsignChangeTasks = [task for task in self.callsignChangeTasks if not task.cancelled()]
             channel = self.get_channel(int(configuration["callsignChangeLogChannel"]))
-            async def sendMessage(embed, channel):
+            async def sendMessages(channel, embeds):
                 async with self.lock:
-                    await channel.send(embed=embed)
-                    await asyncio.sleep(self.throttleInterval)
-            embed = discord.Embed(
-                title="Callsign Change",
-                description=f"Acoount ID: {data['acid']}\n Old Callsign: {data['oldCallsign']}\n New Callsign: {data['newCallsign']}",
-                color=discord.Color.green()
-            )
+                    for embed in embeds:
+                        await channel.send(embed=embed)
+                        await asyncio.sleep(self.throttleInterval)
+            embeds = []
+            for change_data in data:
+                embed = discord.Embed(
+                    title="Callsign Change",
+                    description=f"Acoount ID: {change_data['acid']}\n Old Callsign: {change_data['oldCallsign']}\n New Callsign: {change_data['newCallsign']}",
+                    color=discord.Color.green()
+                )
+                embeds.append(embed)
             if configuration["displayCallsignChanges"]:
-                task = self.loop.create_task(sendMessage(embed, channel))
+                task = self.loop.create_task(sendMessages(channel, embeds))
                 self.callsignChangeTasks.append(task)
             return '', 204
+            
 
     async def on_ready(self):
-        print(f'{self.user} has connected to Discord!')
+        self.logger.log(20, f'{self.user} has connected to Discord!')
     
     async def setup_hook(self) -> None:
-        print("Starting up...")
-        print("Loading extensions...")
+        self.logger.log(20, "Starting up...")
+        self.logger.log(20, "Loading extensions...")
         await self._load_extensions()
-        print("Syncing commands...")
+        self.logger.log(20, "Syncing commands...")
         try:
             synced = await self.tree.sync()
-            print(f"Synced {len(synced)} command(s)")
+            self.logger.log(20, f"Synced {len(synced)} command(s)")
         except Exception as e:
-            print(e)
+            self.logger.log(40, f"Exception while syncing commands. Error: {e}")
         self.config = self.loadConfig()
-        print("Launching Flask server...")
+        self.logger.log(20, "Launching Flask server...")
         Thread(target=self.flaskApp.run, kwargs={"host": self.config["flaskHost"], "port": self.config["flaskPort"]}).start()
-        print("Connecting to discord...")
+        self.logger.log(20, "Connecting to discord...")
 
 
     async def _load_extensions(self) -> None:
@@ -157,7 +188,7 @@ bot = MindsEyeBot(BOT_TOKEN)
 @bot.event
 async def on_guild_join(guild):
     async for entry in guild.audit_logs(action=discord.AuditLogAction.bot_add):
-        print(f"Joined {guild.name}")
+        bot.logger.log(20, f"Joined {guild.name}")
 
 @bot.tree.command(name="ping", description="Check bot connection and latency.")
 async def ping(interaction: discord.Interaction):
