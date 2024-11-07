@@ -26,6 +26,7 @@ class PlayerTracker(commands.Cog):
         self.DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
         self.mapAPI = mapAPI.MapAPI()
+        self.mapAPI.disableResponseList()
         mongodbURI = f"mongodb://adminUser:{self.DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
@@ -33,12 +34,13 @@ class PlayerTracker(commands.Cog):
 
     @playersGroup.command(name="get_online_users", description="Get the online users from the map API.")
     async def getOnlineUsers(self, interaction: discord.Interaction): # gets the online users from the map API
+        await interaction.response.defer()
         stringifiedUsers = []
         currentOnlineUsers = self.mapAPI.getUsers(False)
         for user in currentOnlineUsers:
             stringifiedUsers.append(f"Callsign: {user.userInfo["callsign"]}, Account ID: {user.userInfo["id"]} Latitude: {user.coordinates[0]}, Longitude: {user.coordinates[1]} Aircraft: {user.aircraft["type"]}")
         embed = PaginatedEmbed(stringifiedUsers, title="Online Users", description="List of online users.")
-        await interaction.response.send_message(embed=embed.embed, view=embed) # sends the online users in a paginated embed
+        await interaction.followup.send(embed=embed.embed, view=embed) # sends the online users in a paginated embed
 
     @playersGroup.command(name="generate_player_heatmap", description="Generate a heatmap of player activity locations.")
     async def heatmap(self, interaction: discord.Interaction): # generates a heatmap of player activity locations
@@ -49,7 +51,6 @@ class PlayerTracker(commands.Cog):
         cursor = collection.find()
         # get the latitudes and longitudes from the database
         data = await cursor.to_list(length=None)
-        print(data)
         latitudes = [doc["latitude"] for doc in data]
         longitudes = [doc["longitude"] for doc in data]
 

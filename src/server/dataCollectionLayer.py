@@ -7,20 +7,18 @@ from urllib.parse import unquote
 from datetime import datetime, timedelta
 import numpy as np
 import requests
-import json
 import queue
 import threading
 import logging
 import math
 import re
-import cProfile
-import pstats
+import tracemalloc
 from MongoBatchProcessor import MongoBatchProcessor
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shared import multiplayerAPI, mapAPI
 
-
+tracemalloc.start()
 
 class DataCollectionLayer():
     def __init__(self):
@@ -41,7 +39,8 @@ class DataCollectionLayer():
         # sets up APIs
         self.logger.log(10, "Setting up APIs...")
         self.multiplayer_api = multiplayerAPI.MultiplayerAPI(self.SESSION_ID, self.ACCOUTN_ID)
-        self.map_api = mapAPI.MapAPI()
+        self.mapAPI = mapAPI.MapAPI()
+        self.mapAPI.disableResponseList()
 
         self.logger.log(10, "Setting up batch processors...")
         self.setup_batch_processors(db)
@@ -52,6 +51,23 @@ class DataCollectionLayer():
 
         self.logger.log(10, "Getting configuration settings...")
         self.config = self.getConfigurationSettings()
+
+        self.memory_log_file = open("memory_log.txt", "w")
+        self.memory_log_file.write("Starting memory log\n" + "="*40 + "\n")
+
+    def __del__(self):
+        self.memory_log_file.close()
+
+    def log_memory_usage(self, label):
+        snapshot = tracemalloc.take_snapshot()
+        top_stats = snapshot.statistics('lineno')
+
+        self.memory_log_file.write(f"[Memory Usage] {label}\n")
+        for stat in top_stats[:10]:
+            self.memory_log_file.write(f"{stat}\n")
+        self.memory_log_file.write("\n" + "-"*40 + "\n\n")
+
+        self.memory_log_file.flush()
         
     def setup_queues_and_threads(self):
         self.queues = {
@@ -244,7 +260,7 @@ class DataCollectionLayer():
 
     def process_users(self):
         # Fetch online users from the map API
-        self.current_online_users = self.map_api.getUsers(None)
+        self.current_online_users = self.mapAPI.getUsers(None)
         db = self.mongo_db_client[self.DATABASE_NAME]
         user_collection = db["users"]
         configurations = self.config
@@ -456,11 +472,12 @@ class DataCollectionLayer():
             self._cached_config = collection.find_one()
         return self._cached_config
 
-def main(profiler):
+def main():
     data_collection_layer = DataCollectionLayer()
+    data_collection_layer.log_memory_usage("Initial Memory Usage")
     data_collection_layer.logger.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
-    last_user_count_time = 3600
+    last_user_count_time = time.time()
 
     db = data_collection_layer.mongo_db_client[data_collection_layer.DATABASE_NAME]
     collection = db["configurations"]
@@ -474,12 +491,14 @@ def main(profiler):
         "aircraftChangeLogChannel": None,
         "displayCallsignChanges": True,
         "displayNewAccounts": True,
+        "displayAircraftChanges": True,
         "countUsers": True,
         "logAircraftDistributions": True,
         "logAircraftChanges": True,
         "logMRPActivity": True,
     }
 
+    data_collection_layer.log_memory_usage("Memory Usage After Initialization")
     if configuration is None:
         collection.insert_one(DEFAULT_CONFIG)
     else: # checks if the configuration settings exist
@@ -503,37 +522,30 @@ def main(profiler):
     previous_configuration = configuration
 
     data_collection_layer.logger.log(20, "Data collection layer started.")
-    try:
-        while True: # loops every second for api calls
-            configuration = collection.find_one()
+    data_collection_layer.log_memory_usage("Memory Usage After Configuration Check")
+    while True: # loops every second for api calls
+        configuration = collection.find_one()
 
-            for key in previous_configuration: # checks if the configuration settings have changed
-                if previous_configuration[key] != configuration[key]:
-                    data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
-                    previous_configuration[key] = configuration[key]
-            
+        for key in previous_configuration: # checks if the configuration settings have changed
+            if previous_configuration[key] != configuration[key]:
+                data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
+                previous_configuration[key] = configuration[key]
+        
 
-            if configuration["storeUsers"]:
-                data_collection_layer.process_users()
-            if configuration["saveChatMessages"]:
-                data_collection_layer.fetch_chat_messages()
-            if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
-                last_snapshot_time = time.time()
-                data_collection_layer.add_player_location_snapshot()
-            if configuration["countUsers"] and (time.time() - last_user_count_time >= 3600):
-                data_collection_layer.add_online_player_count()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Aborted by user. Printing profiling stats...")
-        profiler.disable()
-        profiler.dump_stats("dataCollectionLayer.prof")
-
-        with open("results.txt", "w") as f:
-            stats = pstats.Stats(profiler, stream=f).sort_stats("cumulative")
-            stats.print_stats(20)
-        print("Profiling stats printed to results.txt.")
+        if configuration["storeUsers"]:
+            data_collection_layer.log_memory_usage("Memory Usage Before Processing Users")
+            data_collection_layer.process_users()
+        if configuration["saveChatMessages"]:
+            data_collection_layer.log_memory_usage("Memory Usage Before Fetching Chat Messages")
+            data_collection_layer.fetch_chat_messages()
+        if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
+            data_collection_layer.log_memory_usage("Memory Usage Before Adding Player Location Snapshot")
+            last_snapshot_time = time.time()
+            data_collection_layer.add_player_location_snapshot()
+        if configuration["countUsers"] and (time.time() - last_user_count_time >= 3600):
+            data_collection_layer.log_memory_usage("Memory Usage Before Adding Online Player Count")
+            data_collection_layer.add_online_player_count()
+        time.sleep(1)
 
 if __name__ == "__main__":
-    profiler = cProfile.Profile()
-    profiler.enable()
-    main(profiler)
+    main()
