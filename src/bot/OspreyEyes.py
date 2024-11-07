@@ -7,7 +7,6 @@ import os
 from flask import Flask, request
 from threading import Thread
 from pymongo import MongoClient
-import json
 import asyncio
 import logging
 import sys
@@ -32,6 +31,7 @@ class MindsEyeBot(commands.Bot):
         intents.message_content = True
         super().__init__(command_prefix='=', intents=intents)
 
+        # sets up the event loop
         self.flaskApp = Flask(__name__)
         self.throttleInterval = 0.2
         self.task_queue = asyncio.Queue()
@@ -41,9 +41,35 @@ class MindsEyeBot(commands.Bot):
         self.setup_routes()
 
         self.loop.create_task(self.process_tasks())
+        self.loop.create_task(self.monitor_config())
 
     def load_config(self):
         return mongoDBClient[DATABASE_NAME]["configurations"].find_one()
+    
+    async def monitor_config(self): # monitors the configuration for changes
+        while True:
+            new_config = self.load_config()
+            if new_config:
+                if not new_config.get("displayAircraftChanges", True):
+                    await self.clear_queue_for_event("aircraft-change")
+                if not new_config.get("displayNewAccounts", True):
+                    await self.clear_queue_for_event("new-account")
+                if not new_config.get("displayCallsignChanges", True):
+                    await self.clear_queue_for_event("callsign-change")
+            await asyncio.sleep(5)
+
+    async def clear_queue_for_event(self, event_type):
+        self.logger.info(f"Clearing {event_type} events from the queue...")
+        new_queue = asyncio.Queue()
+
+        # iterate through the queue and put all events that are not the specified type into the new queue
+        while not self.task_queue.empty():
+            task_type, data = await self.task_queue.get()
+            if task_type != event_type:
+                await new_queue.put((task_type, data))
+            self.task_queue.task_done()
+        
+        self.task_queue = new_queue
 
     async def on_ready(self):
         self.logger.log(20, f'{self.user} has connected to Discord!')
@@ -65,113 +91,111 @@ class MindsEyeBot(commands.Bot):
 
     def setup_routes(self):
         @self.flaskApp.route("/bot-mention", methods=["POST"])
-        def bot_mention(self):
-            self.loop.create_task(self.get_cog("chatLogging").automatedSendMessage("Nothing can hide from the all seeing eye."))
+        def bot_mention():
+            asyncio.run_coroutine_threadsafe(self.task_queue.put(("mention", None)), self.loop)
             return "", 204
         @self.flaskApp.route("/aircraft-change", methods=["POST"])
-        def aircraft_change(self):
+        def aircraft_change():
             data = request.json
             if not isinstance(data, list):
                 return 'Invalid data format. Expected a list.', 400
-            
-            channel = self.get_channel_config("aircraft-change")
-            if not channel:
-                return 'Aircraft change log channel is not set.', 500
-            
-            if not self.config["displayAircraftChanges"]:
-                self.clear_tasks("aircraft-change")
-                return "", 204
-
-            embeds = [
-                discord.Embed(
-                    title="Aircraft Change",
-                    description=f"Callsign: {change_data['callsign']}\n Old Aircraft: {change_data['oldAircraft']}\n New Aircraft: {change_data['newAircraft']}",
-                    color=discord.Color.green()
-                )
-                for change_data in data
-            ]
-            task = self.loop.create_task(self.send_embeds(channel, embeds))
-            self.add_task("aircraft-change", task)
+            asyncio.run_coroutine_threadsafe(self.task_queue.put(("aircraft-change", data)), self.loop)
             return "", 204
-    
         @self.flaskApp.route("/new-account", methods=["POST"])
-        def new_account(self):
+        def new_account():
             data = request.json
             if not isinstance(data, list):
                 return 'Invalid data format. Expected a list.', 400
-            
-            channel = self.get_channel_config("new-account")
-            if not channel:
-                return 'New account log channel is not set.', 500
-            
-            if not self.config["displayNewAccounts"]:
-                self.clear_tasks("new-account")
-                return "", 204
-            
-            embeds = [
-                discord.Embed(
-                    title="New Account",
-                    description=f"Acoount ID: {account_data['acid']}\n Callsign: {account_data['callsign']}",
-                    color=discord.Color.green()
-                )
-                for account_data in data
-            ]
-            task = self.loop.create_task(self.send_embeds(channel, embeds))
-            self.add_task("new-account", task)
+            asyncio.run_coroutine_threadsafe(self.task_queue.put(("new-account", data)), self.loop)
             return "", 204
-    
         @self.flaskApp.route("/callsign-change", methods=["POST"])
-        def callsign_change(self):
+        def callsign_change():
             data = request.json
             if not isinstance(data, list):
                 return 'Invalid data format. Expected a list.', 400
-            
-            channel = self.get_channel_config("callsign-change")
-            if not channel:
-                return 'Callsign change log channel is not set.', 500
-            
-            if not self.config["displayCallsignChanges"]:
-                self.clear_tasks("callsign-change")
-                return "", 204
-            
-            embeds = [
-                discord.Embed(
-                    title="Callsign Change",
-                    description=f"Acoount ID: {callsign_data['acid']}\n Old Callsign: {callsign_data['oldCallsign']}\n New Callsign: {callsign_data['newCallsign']}",
-                    color=discord.Color.green()
-                )
-                for callsign_data in data
-            ]
-            task = self.loop.create_task(self.send_embeds(channel, embeds))
-            self.add_task("callsign-change", task)
+            asyncio.run_coroutine_threadsafe(self.task_queue.put(("callsign-change", data)), self.loop)
             return "", 204
+
+    async def process_tasks(self):
+        # process tasks from the queue
+        while True:
+            task_type, data = await self.task_queue.get()
+            if task_type == "mention":
+                await self.send_bot_mention()
+            elif task_type == "aircraft-change":
+                await self.process_aircraft_change(data)
+            elif task_type == "new-account":
+                await self.process_new_account(data)
+            elif task_type == "callsign-change":
+                await self.process_callsign_change(data)
+            self.task_queue.task_done()
+
+    async def send_bot_mention(self):
+        chat_logger = self.get_cog("chatLogging")
+        if chat_logger:
+            await chat_logger.automatedSendMessage("Nothing can hide from the all seeing eye.")
+    
+    async def process_aircraft_change(self, data):
+        channel = self.get_channel_config("aircraftChangeLogChannel")
+        if not channel or not self.config.get("displayAircraftChanges", True):
+            return
         
+        embeds = [
+            discord.Embed(
+                title="Aircraft Change",
+                description=f"Callsign: {change_data['callsign']}\n Old Aircraft: {change_data['oldAircraft']}\n New Aircraft: {change_data['newAircraft']}",
+                color=discord.Color.green()
+            ) for change_data in data
+        ]
+        await self.send_embeds(channel, embeds)
+
+    async def process_new_account(self, data):
+        channel = self.get_channel_config("newAccountLogChannel")
+        if not channel or not self.config.get("displayNewAccounts", True):
+            return
+        
+        embeds = [
+            discord.Embed(
+                title="New Account",
+                description=f"Acoount ID: {account_data['acid']}\n Callsign: {account_data['callsign']}",
+                color=discord.Color.green()
+            ) for account_data in data
+        ]
+        await self.send_embeds(channel, embeds)
+
+    async def process_callsign_change(self, data):
+        channel = self.get_channel_config("callsignChangeLogChannel")
+        if not channel or not self.config.get("displayCallsignChanges", True):
+            return
+        
+        embeds = [
+            discord.Embed(
+                title="Callsign Change",
+                description=f"Acoount ID: {callsign_data['acid']}\n Old Callsign: {callsign_data['oldCallsign']}\n New Callsign: {callsign_data['newCallsign']}",
+                color=discord.Color.green()
+            ) for callsign_data in data
+        ]
+        await self.send_embeds(channel, embeds)
     
     async def send_embeds(self, channel, embeds):
-        channel_id = self.config.get("log")
         async with self.lock:
             for embed in embeds:
                 await channel.send(embed=embed)
                 await asyncio.sleep(self.throttleInterval)
 
-    def get_channel_config(self, event_type):
+    def get_channel_config(self, event_type): # gets the channel for the event type
         if event_type == "aircraft-change":
-            return self.get_channel(self.config["aircraftChangeLogChannel"])
+            channel_id = self.get_channel(self.config["aircraftChangeLogChannel"])
         elif event_type == "new-account":
-            return self.get_channel(self.config["newAccountLogChannel"])
+            channel_id = self.get_channel(self.config["newAccountLogChannel"])
         elif event_type == "callsign-change":
-            return self.get_channel(self.config["callsignChangeLogChannel"])
+            channel_id = self.get_channel(self.config["callsignChangeLogChannel"])
         else:
             self.logger.log(40, f"Invalid event type: {event_type}")
-    
-    def add_task(self, task_type, task):
-        self.task_lists[task_type].append(task)
-        self.task_lists[task_type] = [t for t in self.task_lists[task_type] if not t.done()]
 
-    def clear_tasks(self, task_type):
-        for task in self.task_lists[task_type]:
-            task.cancel()
-        self.task_lists[task_type] = []
+        if not channel_id:
+            self.logger.warning(f"Channel ID for '{event_type}' is not set in the configuration.")
+            return None
 
     async def _load_extensions(self) -> None:
         for extension in ("chatLogging", "playerTracking", "mrpTracking", "config",):

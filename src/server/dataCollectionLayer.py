@@ -7,14 +7,11 @@ from urllib.parse import unquote
 from datetime import datetime, timedelta
 import numpy as np
 import requests
-import json
 import queue
 import threading
 import logging
 import math
 import re
-import cProfile
-import pstats
 from MongoBatchProcessor import MongoBatchProcessor
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -456,7 +453,7 @@ class DataCollectionLayer():
             self._cached_config = collection.find_one()
         return self._cached_config
 
-def main(profiler):
+def main():
     data_collection_layer = DataCollectionLayer()
     data_collection_layer.logger.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
@@ -504,37 +501,25 @@ def main(profiler):
     previous_configuration = configuration
 
     data_collection_layer.logger.log(20, "Data collection layer started.")
-    try:
-        while True: # loops every second for api calls
-            configuration = collection.find_one()
+    while True: # loops every second for api calls
+        configuration = collection.find_one()
 
-            for key in previous_configuration: # checks if the configuration settings have changed
-                if previous_configuration[key] != configuration[key]:
-                    data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
-                    previous_configuration[key] = configuration[key]
-            
+        for key in previous_configuration: # checks if the configuration settings have changed
+            if previous_configuration[key] != configuration[key]:
+                data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
+                previous_configuration[key] = configuration[key]
+        
 
-            if configuration["storeUsers"]:
-                data_collection_layer.process_users()
-            if configuration["saveChatMessages"]:
-                data_collection_layer.fetch_chat_messages()
-            if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
-                last_snapshot_time = time.time()
-                data_collection_layer.add_player_location_snapshot()
-            if configuration["countUsers"] and (time.time() - last_user_count_time >= 3600):
-                data_collection_layer.add_online_player_count()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Aborted by user. Printing profiling stats...")
-        profiler.disable()
-        profiler.dump_stats("dataCollectionLayer.prof")
-
-        with open("results.txt", "w") as f:
-            stats = pstats.Stats(profiler, stream=f).sort_stats("cumulative")
-            stats.print_stats(20)
-        print("Profiling stats printed to results.txt.")
+        if configuration["storeUsers"]:
+            data_collection_layer.process_users()
+        if configuration["saveChatMessages"]:
+            data_collection_layer.fetch_chat_messages()
+        if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
+            last_snapshot_time = time.time()
+            data_collection_layer.add_player_location_snapshot()
+        if configuration["countUsers"] and (time.time() - last_user_count_time >= 3600):
+            data_collection_layer.add_online_player_count()
+        time.sleep(1)
 
 if __name__ == "__main__":
-    profiler = cProfile.Profile()
-    profiler.enable()
-    main(profiler)
+    main()
