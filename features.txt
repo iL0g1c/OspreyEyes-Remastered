@@ -38,8 +38,8 @@ BUGS
 
 SOLUTIONS TO DATBASE PROBLEMS
 =============================
-dataCollectionLayer.py main loop time increase
-optimize cpu heavy methods
-optimize database callsign
-use threadpool instead of multiple threads
-batch send webhooks
+[ ] dataCollectionLayer.py main loop time increase
+[ ] optimize cpu heavy methods
+[ ] optimize database callsign
+[ ] use threadpool instead of multiple threads
+[X] batch send webhooks
