@@ -155,3 +155,4 @@ results.txt
 results_old.txt
 *.prof
 memory_log.txt
+removed_users.txt

@@ -36,7 +36,6 @@ class MapAPI:
         self._utilizeResponseList = True
         self.error = False
     def getUsers(self,foos, max_retries=10, backoff_factor=2):
-        print(len(self._responseList))
         attempt = 0
         while attempt <= max_retries:
             self.error = False
@@ -54,6 +53,8 @@ class MapAPI:
                 userList = []
                 for user in response_body['users']:
                     if user == None:
+                        continue
+                    elif user['acid'] == None:
                         continue
                     elif foos == False:
                         if user['cs'] == "Foo" or user['cs'] == '':
