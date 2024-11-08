@@ -1,20 +1,18 @@
 ULIMIATE GOAL: DETECT FRP (as well as log the crap out of everything)
 
-Multiple terminals with scrolling text
+[x] Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
 [x] callsign change tracker 
 [x] Online player count logger
 [ ] query online players by callsign keyword
 [x] Aircraft usage distribution
-[ ] Wait for a few days of aircraft data to test timespans
 [x] New pilots joining
 [x] log user aircraft changes
 [x] log user teleportation
 [x] command to display config
 [x] Can talk in geofs chat
 [x] When mentioned the bot responds in chat with "No comment"
-[x] optimize server startup time / add logging
 [ ] Dog fight detection and tracking 
 [ ] geofs chat discord channel
 [ ] Targeted account detailed tracking (client side)
@@ -35,14 +33,7 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 config might not get updated
-some pilots have no ID
-check database for duplicates and possible entry duplicating bugs (have seen them being repeated in the terminal)
 
-
-SOLUTIONS TO DATBASE PROBLEMS
-=============================
-[ ] dataCollectionLayer.py main loop time increase
-[X] optimize cpu heavy methods
-[X] optimize database callsign
-[ ] use threadpool instead of multiple threads
-[X] batch send webhooks
+TWEAKS
+====================
+If a pilot is landed, do not count to force patrol time.
