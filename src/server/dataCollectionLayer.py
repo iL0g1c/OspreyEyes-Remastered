@@ -24,10 +24,10 @@ class DataCollectionLayer():
     def __init__(self):
         # sets up logger
         self.logger = self.setup_logger()
-        self.logger.log(10, "Initializing data collection layer...")
+        self.systemLogs.log(10, "Initializing data collection layer...")
+
 
         # gets envs
-        self.logger.log(10, "Loading environment variables...")
         load_dotenv()
         self.load_environment_variables()
         self.mongo_db_client = MongoClient(self.get_mongo_uri())
@@ -37,22 +37,20 @@ class DataCollectionLayer():
         self.current_online_users = []
 
         # sets up APIs
-        self.logger.log(10, "Setting up APIs...")
         self.multiplayer_api = multiplayerAPI.MultiplayerAPI(self.SESSION_ID, self.ACCOUTN_ID)
         self.mapAPI = mapAPI.MapAPI()
         self.mapAPI.disableResponseList()
 
-        self.logger.log(10, "Setting up batch processors...")
         self.setup_batch_processors(db)
 
         self.remove_duplicate_users(initial_cleanup=True)
         db["users"].create_index("accountID", unique=True)
 
-        self.logger.log(10, "Setting up queues and threads...")
+        self.systemLogs.log(10, "Setting up queues and threads...")
         self.setup_queues_and_threads()
         self.last_aircraft_distribution_time = datetime.now()
 
-        self.logger.log(10, "Getting configuration settings...")
+        self.systemLogs.log(10, "Getting configuration settings...")
         self.config = self.getConfigurationSettings()
         
     def setup_queues_and_threads(self):
@@ -103,12 +101,56 @@ class DataCollectionLayer():
         return DEFAULT_CONFIG
 
     def setup_logger(self):
-        logger = logging.getLogger("SERVER")
-        logger.setLevel(logging.DEBUG)
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.DEBUG)
-        logger.addHandler(console_handler)
-        return logger
+        if not os.path.exists("../../logs"):
+            os.makedirs("../../logs")
+
+        # teleportation event
+        self.teleportationLogs = logging.getLogger("teleportation")
+        self.teleportationLogs.setLevel(logging.INFO)
+        teleportationHandler = logging.FileHandler("../../logs/teleportation.log")
+        teleportationFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        teleportationHandler.setFormatter(teleportationFormatter)
+        self.teleportationLogs.addHandler(teleportationHandler)
+
+        # aircraft change event
+        self.aircraftChangeLogs = logging.getLogger("aircraft-change")
+        self.aircraftChangeLogs.setLevel(logging.INFO)
+        aircraftChangeHandler = logging.FileHandler("../../logs/aircraft-change.log")
+        aircraftChangeFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        aircraftChangeHandler.setFormatter(aircraftChangeFormatter)
+        self.aircraftChangeLogs.addHandler(aircraftChangeHandler)
+
+        # callsign change event
+        self.callsignChangeLogs = logging.getLogger("callsign-change")
+        self.callsignChangeLogs.setLevel(logging.INFO)
+        callsignChangeHandler = logging.FileHandler("../../logs/callsign-change.log")
+        callsignChangeFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        callsignChangeHandler.setFormatter(callsignChangeFormatter)
+        self.callsignChangeLogs.addHandler(callsignChangeHandler)
+
+        # new account event
+        self.newAccountLogs = logging.getLogger("new-account")
+        self.newAccountLogs.setLevel(logging.INFO)
+        newAccountHandler = logging.FileHandler("../../logs/new-account.log")
+        newAccountFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        newAccountHandler.setFormatter(newAccountFormatter)
+        self.newAccountLogs.addHandler(newAccountHandler)
+
+        # offline-online event
+        self.offlineOnlineLogs = logging.getLogger("offline-online")
+        self.offlineOnlineLogs.setLevel(logging.INFO)
+        offlineOnlineHandler = logging.FileHandler("../../logs/offline-online.log")
+        offlineOnlineFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        offlineOnlineHandler.setFormatter(offlineOnlineFormatter)
+        self.offlineOnlineLogs.addHandler(offlineOnlineHandler)
+
+        # server events
+        self.systemLogs = logging.getLogger("server-events")
+        self.systemLogs.setLevel(logging.ERROR)
+        systemHandler = logging.FileHandler("../../logs/server-events.log")
+        systemFormatter = logging.Formatter("%(asctime)s - %(message)s")
+        systemHandler.setFormatter(systemFormatter)
+        self.systemLogs.addHandler(systemHandler)
     
     def load_environment_variables(self):
         self.SESSION_ID = os.getenv('GEOFS_SESSION_ID')
@@ -139,7 +181,7 @@ class DataCollectionLayer():
                         batch.clear()
                 time.sleep(batch_interval)
             except Exception as e:
-                self.logger.log(40, f"Error processing {queue_name} queue: {e}")
+                self.systemLogs.log(40, f"Error processing {queue_name} queue: {e}")
                 time.sleep(30 / self.MAX_REQUESTS)
 
     def send_batch(self, batch, session):
@@ -149,9 +191,9 @@ class DataCollectionLayer():
                 json=[req["data"] for req in batch]
             )
             if response.status_code != 204:
-                self.logger.log(30, f"Batch send failed. Status code: {response.status_code}")
+                self.systemLogs.log(30, f"Batch send failed. Status code: {response.status_code}")
         except Exception as e:
-            self.logger.log(40, f"Batch send failed. Error: {e}")
+            self.systemLogs.log(40, f"Batch send failed. Error: {e}")
 
     def check_chat_messages_for_mention(self):
         for message in self.current_chat_messages:
@@ -159,11 +201,11 @@ class DataCollectionLayer():
                 if  item in message["msg"].lower():
                     url = f"http://localhost:5001/bot-mention"
                     data = {"message": True}
-                    self.logger.log(20, "Detected pilot mentioned bot.")
+                    self.systemLogs.log(20, "Detected pilot mentioned bot.")
                     try:
                         response = requests.post(url, json=data)
                     except Exception as e:
-                        self.logger.log(40, f"Failed to trigger event. Error: {e}")
+                        self.systemLogs.log(40, f"Failed to trigger event. Error: {e}")
 
     def fetch_chat_messages(self): # fetches chat messages from the multiplayer API
         self.current_chat_messages = [
@@ -221,7 +263,7 @@ class DataCollectionLayer():
             regex = re.compile(r".*" + regex_pattern + r".*", re.IGNORECASE)
             if regex.search(user["currentCallsign"]):
                 if going_online:
-                    self.logger.log(20, f"Account ID: {user['accountID']} is patrolling for force {force}.")
+                    self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is patrolling for force {force}.")
                     force_event = {
                         "accountID": user["accountID"],
                         "callsign": user["currentCallsign"],
@@ -235,7 +277,7 @@ class DataCollectionLayer():
                         )
                     )
                 else:
-                    self.logger.log(20, f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
+                    self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is no longer patrolling for force {force}.")
                     self.batch_processors["forces"].add_to_batch(
                         UpdateOne(
                             {"callsign_filter": force, "patrols.accountID": user["accountID"], "patrols.end_time": None},
@@ -273,7 +315,7 @@ class DataCollectionLayer():
         for user in going_offline_users:
             # Ensure user has been offline long enough
             if datetime.now() - user["lastOnline"] > timedelta(minutes=1):
-                self.logger.log(20, f"Account ID: {user['accountID']} is offline.")
+                self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is offline.")
                 events = {
                     "eventType": "offline",
                     "timestamp": user["lastOnline"]
@@ -293,7 +335,7 @@ class DataCollectionLayer():
             "accountID": {"$in": current_account_ids}
         }))
         for user in going_online_users:
-            self.logger.log(20, f"Account ID: {user['accountID']} is online.")
+            self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is online.")
             event = {
                 "eventType": "online",
                 "timestamp": datetime.now()
@@ -332,7 +374,7 @@ class DataCollectionLayer():
 
             if user_id not in existing_users_map:
                 # new pilots
-                self.logger.log(20, f"New account detected: Account ID: {user_callsign}, Callsign: {user_callsign}")
+                self.newAccountLogs.log(20, f"New account detected: Account ID: {user_callsign}, Callsign: {user_callsign}")
                 user_data["events"] = []
                 self.batch_processors["users"].add_to_batch(InsertOne(user_data))
 
@@ -358,7 +400,7 @@ class DataCollectionLayer():
                     user_data["lastPosition"][1]
                 )
                 if distance >= 50:
-                    self.logger.log(20, f"Account ID: {user_id} teleported {distance} km.")
+                    self.teleportationLogs.log(20, f"Account ID: {user_id} teleported {round(distance)} km.")
                     teleportation_event = {
                         "eventType": "teleportation",
                         "oldLatittude": existing_user["lastPosition"][0],
@@ -372,7 +414,7 @@ class DataCollectionLayer():
                     
                 # check for aircraft changes
                 if configurations["logAircraftChanges"] and user_aircraft !=  existing_aircraft_map[user_id]:
-                    self.logger.log(20, f"Aircraft change detected: Callsign: {user_callsign}, Account ID: {user_id}, Old Aircraft: {existing_aircraft_map[user_id]} New Aircraft: {user_aircraft}")
+                    self.aircraftChangeLogs.log(20, f"Aircraft change detected: Callsign: {user_callsign}, Account ID: {user_id}, Old Aircraft: {existing_aircraft_map[user_id]} New Aircraft: {user_aircraft}")
                     aircraft_change_event = {
                         "eventType": "aircraftChange",
                         "timestamp": datetime.now(),
@@ -389,7 +431,7 @@ class DataCollectionLayer():
                     aircraft_change_webhooks.append({"url": url, "data": request_body})
                 # check for callsign changes
                 if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
-                    self.logger.log(20, f"Account ID: {user_id} changed callsign from {existing_user['currentCallsign']} to {user_callsign}")
+                    self.callsignChangeLogs.log(20, f"Account ID: {user_id} changed callsign from {existing_user['currentCallsign']} to {user_callsign}")
                     callsign_change_event = {
                         "eventType": "callsignChange",
                         "timestamp": datetime.now(),
@@ -440,7 +482,7 @@ class DataCollectionLayer():
         if configurations["logAircraftDistributions"]:
             current_time = datetime.now()
             if (current_time - self.last_aircraft_distribution_time).seconds >= 3600:
-                self.logger.log(20, "Logging aircraft distribution.")
+                self.systemLogs.log(20, "Logging aircraft distribution.")
                 aircraft_collection = db["aircraft"]
                 aircraft_collection.insert_one({"aircraft": aircraft_amounts, "datetime": datetime.now()})
                 self.last_aircraft_distribution_time = current_time
@@ -478,14 +520,14 @@ class DataCollectionLayer():
                             user_collection.delete_one({"_id": _id})
                         else:
                             self.batch_processors["users"].add_to_batch(DeleteOne({"_id": _id}))
-                            self.logger.log(20, f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}")
+                            self.systemLogs.log(20, f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}")
 
         if not initial_cleanup:
             self.batch_processors["users"].flush_batch()
 
 def main():
     data_collection_layer = DataCollectionLayer()
-    data_collection_layer.logger.log(20, "Starting data collection layer...")
+    data_collection_layer.systemLogs.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
     last_user_count_time = time.time()
 
@@ -513,7 +555,7 @@ def main():
     else: # checks if the configuration settings exist
         for key, value in DEFAULT_CONFIG.items(): # checks if the configuration settings are missing
             if key not in configuration:
-                data_collection_layer.logger.log(20, "Found a new configuration setting. Adding it to the database.")
+                data_collection_layer.systemLogs.log(20, "Found a new configuration setting. Adding it to the database.")
                 collection.update_one(
                     {"_id": configuration["_id"]},
                     {"$set": {key: value}}
@@ -521,7 +563,7 @@ def main():
                 configuration[key] = value
         keys_to_remove = [key for key in configuration if key not in DEFAULT_CONFIG and key != "_id"]
         if keys_to_remove:
-            data_collection_layer.logger.log(20, "Found old configuration settings. Removing them from the database.")
+            data_collection_layer.systemLogs.log(20, "Found old configuration settings. Removing them from the database.")
             collection.update_one(
                 {"_id": configuration["_id"]},
                 {"$unset": {key: "" for key in keys_to_remove}}
@@ -530,13 +572,13 @@ def main():
                 del configuration[key]
     previous_configuration = configuration
 
-    data_collection_layer.logger.log(20, "Data collection layer started.")
+    data_collection_layer.systemLogs.log(20, "Data collection layer started.")
     while True: # loops every second for api calls
         configuration = collection.find_one()
 
         for key in previous_configuration: # checks if the configuration settings have changed
             if previous_configuration[key] != configuration[key]:
-                data_collection_layer.logger.log(20, f"Configuration setting {key} changed to {configuration[key]}")
+                data_collection_layer.systemLogs.log(20, f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
         
 

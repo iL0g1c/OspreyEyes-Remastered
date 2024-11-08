@@ -35,14 +35,8 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 config might not get updated
-some pilots have no ID
-check database for duplicates and possible entry duplicating bugs (have seen them being repeated in the terminal)
+some pilots have no id
 
-
-SOLUTIONS TO DATBASE PROBLEMS
-=============================
-[ ] dataCollectionLayer.py main loop time increase
-[X] optimize cpu heavy methods
-[X] optimize database callsign
-[ ] use threadpool instead of multiple threads
-[X] batch send webhooks
+TWEAKS
+====================
+If a pilot is landed, do not count to force patrol time.
