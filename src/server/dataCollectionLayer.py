@@ -1,5 +1,5 @@
 import time
-from pymongo import MongoClient, UpdateOne, InsertOne
+from pymongo import MongoClient, UpdateOne, InsertOne, DeleteOne
 import os
 import sys
 from dotenv import load_dotenv
@@ -44,6 +44,8 @@ class DataCollectionLayer():
 
         self.logger.log(10, "Setting up batch processors...")
         self.setup_batch_processors(db)
+
+        db["users"].create_index("accountID", unique=True)
 
         self.logger.log(10, "Setting up queues and threads...")
         self.setup_queues_and_threads()
@@ -259,6 +261,7 @@ class DataCollectionLayer():
         self.batch_processors["forces"].flush_batch()
 
     def process_users(self):
+        self.remove_duplicate_users()
         # Fetch online users from the map API
         self.current_online_users = self.mapAPI.getUsers(None)
         db = self.mongo_db_client[self.DATABASE_NAME]
@@ -321,7 +324,7 @@ class DataCollectionLayer():
 
         # Process current online users
         for user in self.current_online_users:
-            if user.userInfo["callsign"] == "Foo":
+            if user.userInfo["callsign"] == "Foo" or user.userInfo["id"] == None:
                 continue
             user_id = user.userInfo["id"]
             user_callsign = user.userInfo["callsign"]
@@ -342,9 +345,6 @@ class DataCollectionLayer():
                 aircraft_amounts[user_aircraft] += 1
             else:
                 aircraft_amounts[user_aircraft] = 1
-
-            if user.userInfo["callsign"] == "Foo":  # skips users without callsigns
-                continue
 
             if user_id not in existing_users_map:
                 # new pilots
@@ -462,7 +462,6 @@ class DataCollectionLayer():
                 self.last_aircraft_distribution_time = current_time
 
         self.batch_processors["users"].flush_batch()
-        self.batch_processors["forces"].flush_batch()
 
         
     def getConfigurationSettings(self): # gets the configuration settings from the database
@@ -471,6 +470,28 @@ class DataCollectionLayer():
             collection = db["configurations"]
             self._cached_config = collection.find_one()
         return self._cached_config
+
+    def remove_duplicate_users(self):
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        user_collection = db["users"]
+
+        with open("removed_users.txt", "a") as f:
+            pipeline = [
+                {"$group": {"_id": "$accountID", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+                {"$match": {"count": {"$gt": 1}}}
+            ]
+            duplicates = list(user_collection.aggregate(pipeline))
+
+            for duplicate in duplicates:
+                ids_to_check = sorted(duplicate["ids"])
+
+                for _id in ids_to_check[1:]:
+                    user = user_collection.find_one({"_id": _id})
+                    if not user.get("events"):
+                        f.write(f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}\n")
+                        self.batch_processors["users"].add_to_batch(DeleteOne({"_id": _id}))
+                        self.logger.log(20, f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}")
+        self.batch_processors["users"].flush_batch()
 
 def main():
     data_collection_layer = DataCollectionLayer()

@@ -21,12 +21,10 @@ Multiple terminals with scrolling text
     [ ]- flight path tracking 
     [x]- account activity
     [ ]- alt account identification
-[x] fix aircraft distribution so that it averages
 [X] MRP force total and detailed activity loggers
 [ ] Chat target word detection
 [ ] Account association algorithm (separate thread for background calculations)
 [ ] Discord username and server link grabber
-[X] rebrand bot to osprey eyes
 [ ] write documentation
 Being able to query all data collected by various parameters
 - player count before/after date
@@ -38,7 +36,7 @@ BUGS
 ====================
 config might not get updated
 some pilots have no ID
-check database for duplicates and possible entry duplicating bugs
+check database for duplicates and possible entry duplicating bugs (have seen them being repeated in the terminal)
 
 
 SOLUTIONS TO DATBASE PROBLEMS
