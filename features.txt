@@ -1,20 +1,18 @@
 ULIMIATE GOAL: DETECT FRP (as well as log the crap out of everything)
 
-Multiple terminals with scrolling text
+[x] Multiple terminals with scrolling text
 [x] Player density map
 [x] chat logger
 [x] callsign change tracker 
 [x] Online player count logger
 [ ] query online players by callsign keyword
 [x] Aircraft usage distribution
-[ ] Wait for a few days of aircraft data to test timespans
 [x] New pilots joining
 [x] log user aircraft changes
 [x] log user teleportation
 [x] command to display config
 [x] Can talk in geofs chat
 [x] When mentioned the bot responds in chat with "No comment"
-[x] optimize server startup time / add logging
 [ ] Dog fight detection and tracking 
 [ ] geofs chat discord channel
 [ ] Targeted account detailed tracking (client side)
@@ -35,7 +33,6 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 config might not get updated
-some pilots have no id
 
 TWEAKS
 ====================
