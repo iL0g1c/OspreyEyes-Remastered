@@ -1,5 +1,5 @@
 import time
-from pymongo import MongoClient, UpdateOne, InsertOne
+from pymongo import MongoClient, UpdateOne, InsertOne, DeleteOne
 import os
 import sys
 from dotenv import load_dotenv
@@ -45,29 +45,15 @@ class DataCollectionLayer():
         self.logger.log(10, "Setting up batch processors...")
         self.setup_batch_processors(db)
 
+        self.remove_duplicate_users(initial_cleanup=True)
+        db["users"].create_index("accountID", unique=True)
+
         self.logger.log(10, "Setting up queues and threads...")
         self.setup_queues_and_threads()
         self.last_aircraft_distribution_time = datetime.now()
 
         self.logger.log(10, "Getting configuration settings...")
         self.config = self.getConfigurationSettings()
-
-        self.memory_log_file = open("memory_log.txt", "w")
-        self.memory_log_file.write("Starting memory log\n" + "="*40 + "\n")
-
-    def __del__(self):
-        self.memory_log_file.close()
-
-    def log_memory_usage(self, label):
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
-
-        self.memory_log_file.write(f"[Memory Usage] {label}\n")
-        for stat in top_stats[:10]:
-            self.memory_log_file.write(f"{stat}\n")
-        self.memory_log_file.write("\n" + "-"*40 + "\n\n")
-
-        self.memory_log_file.flush()
         
     def setup_queues_and_threads(self):
         self.queues = {
@@ -259,6 +245,7 @@ class DataCollectionLayer():
         self.batch_processors["forces"].flush_batch()
 
     def process_users(self):
+        self.remove_duplicate_users()
         # Fetch online users from the map API
         self.current_online_users = self.mapAPI.getUsers(None)
         db = self.mongo_db_client[self.DATABASE_NAME]
@@ -321,7 +308,7 @@ class DataCollectionLayer():
 
         # Process current online users
         for user in self.current_online_users:
-            if user.userInfo["callsign"] == "Foo":
+            if user.userInfo["callsign"] == "Foo" or user.userInfo["id"] == None:
                 continue
             user_id = user.userInfo["id"]
             user_callsign = user.userInfo["callsign"]
@@ -342,9 +329,6 @@ class DataCollectionLayer():
                 aircraft_amounts[user_aircraft] += 1
             else:
                 aircraft_amounts[user_aircraft] = 1
-
-            if user.userInfo["callsign"] == "Foo":  # skips users without callsigns
-                continue
 
             if user_id not in existing_users_map:
                 # new pilots
@@ -462,7 +446,6 @@ class DataCollectionLayer():
                 self.last_aircraft_distribution_time = current_time
 
         self.batch_processors["users"].flush_batch()
-        self.batch_processors["forces"].flush_batch()
 
         
     def getConfigurationSettings(self): # gets the configuration settings from the database
@@ -472,9 +455,36 @@ class DataCollectionLayer():
             self._cached_config = collection.find_one()
         return self._cached_config
 
+    def remove_duplicate_users(self, initial_cleanup=False):
+        db = self.mongo_db_client[self.DATABASE_NAME]
+        user_collection = db["users"]
+
+        with open("removed_users.txt", "a") as f:
+            pipeline = [
+                {"$group": {"_id": "$accountID", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+                {"$match": {"count": {"$gt": 1}}}
+            ]
+            duplicates = list(user_collection.aggregate(pipeline))
+
+            for duplicate in duplicates:
+                ids_to_check = sorted(duplicate["ids"])
+
+                for _id in ids_to_check[1:]:
+                    user = user_collection.find_one({"_id": _id})
+                    if not user.get("events"):
+                        f.write(f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}\n")
+
+                        if initial_cleanup:
+                            user_collection.delete_one({"_id": _id})
+                        else:
+                            self.batch_processors["users"].add_to_batch(DeleteOne({"_id": _id}))
+                            self.logger.log(20, f"Removed duplicate user with accountID {duplicate['_id']} and _id {_id}")
+
+        if not initial_cleanup:
+            self.batch_processors["users"].flush_batch()
+
 def main():
     data_collection_layer = DataCollectionLayer()
-    data_collection_layer.log_memory_usage("Initial Memory Usage")
     data_collection_layer.logger.log(20, "Starting data collection layer...")
     last_snapshot_time = 1800
     last_user_count_time = time.time()
@@ -498,7 +508,6 @@ def main():
         "logMRPActivity": True,
     }
 
-    data_collection_layer.log_memory_usage("Memory Usage After Initialization")
     if configuration is None:
         collection.insert_one(DEFAULT_CONFIG)
     else: # checks if the configuration settings exist
@@ -522,7 +531,6 @@ def main():
     previous_configuration = configuration
 
     data_collection_layer.logger.log(20, "Data collection layer started.")
-    data_collection_layer.log_memory_usage("Memory Usage After Configuration Check")
     while True: # loops every second for api calls
         configuration = collection.find_one()
 
@@ -533,17 +541,13 @@ def main():
         
 
         if configuration["storeUsers"]:
-            data_collection_layer.log_memory_usage("Memory Usage Before Processing Users")
             data_collection_layer.process_users()
         if configuration["saveChatMessages"]:
-            data_collection_layer.log_memory_usage("Memory Usage Before Fetching Chat Messages")
             data_collection_layer.fetch_chat_messages()
         if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
-            data_collection_layer.log_memory_usage("Memory Usage Before Adding Player Location Snapshot")
             last_snapshot_time = time.time()
             data_collection_layer.add_player_location_snapshot()
         if configuration["countUsers"] and (time.time() - last_user_count_time >= 3600):
-            data_collection_layer.log_memory_usage("Memory Usage Before Adding Online Player Count")
             data_collection_layer.add_online_player_count()
         time.sleep(1)
 
