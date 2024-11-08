@@ -54,6 +54,8 @@ class MapAPI:
                 for user in response_body['users']:
                     if user == None:
                         continue
+                    elif user['acid'] == None:
+                        continue
                     elif foos == False:
                         if user['cs'] == "Foo" or user['cs'] == '':
                             pass
