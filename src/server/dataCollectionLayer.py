@@ -26,7 +26,6 @@ class DataCollectionLayer():
         self.logger = self.setup_logger()
         self.systemLogs.log(10, "Initializing data collection layer...")
 
-
         # gets envs
         load_dotenv()
         self.load_environment_variables()
@@ -159,7 +158,7 @@ class DataCollectionLayer():
 
     def get_mongo_uri(self):
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        return f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        return f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=OspreyEyes"
         
     def start_webhook_threads(self):
         for key in self.queues:
