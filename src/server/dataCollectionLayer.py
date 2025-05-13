@@ -37,7 +37,7 @@ class DataCollectionLayer():
         self.current_online_users = []
 
         # sets up APIs
-        self.multiplayer_api = multiplayerAPI.MultiplayerAPI(self.SESSION_ID, self.ACCOUTN_ID)
+        self.multiplayer_api = multiplayerAPI.MultiplayerAPI(self.SESSION_ID, self.ACCOUNT_ID)
         self.mapAPI = mapAPI.MapAPI()
         self.mapAPI.disableResponseList()
 
