@@ -1,7 +1,7 @@
 import json
 import traceback
 import time
-from http_client import safe_post
+from .http_client import safe_post
 
 
 class BackendError(Exception):
