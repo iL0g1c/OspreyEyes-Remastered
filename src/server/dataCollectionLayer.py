@@ -154,12 +154,12 @@ class DataCollectionLayer():
     
     def load_environment_variables(self):
         self.SESSION_ID = os.getenv('GEOFS_SESSION_ID')
-        self.ACCOUTN_ID = os.getenv('GEOFS_ACCOUNT_ID')
+        self.ACCOUNT_ID = os.getenv('GEOFS_ACCOUNT_ID')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
 
     def get_mongo_uri(self):
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        return f"mongodb://adminUser:{DATABASE_TOKEN}@66.179.248.17:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
+        return f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=admin"
         
     def start_webhook_threads(self):
         for key in self.queues:
