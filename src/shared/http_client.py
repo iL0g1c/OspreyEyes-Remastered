@@ -42,45 +42,57 @@ def safe_post(
     payload: dict,
     timeout: tuple[int, int] = (5, 15),
     max_json_retries: int = 2,
-    reset_session_on_error: bool = True
+    reset_session_on_error: bool = True,
+    **request_kwargs,            #  <-- forward anything else (cookies, headers…)
 ) -> dict | None:
     """
-    POST with urllib3-retries + JSON-retries + optional session reset.
+    POST a JSON payload with robust retries.
 
-    Returns parsed JSON on success, or None on total failure.
+    • First layer of retries comes from urllib3.Retry inside _session
+    • Second layer retries JSON-parse errors or exhausted network failures
+    • Optionally rebuilds the Session if we suspect a stale socket
+    • Returns parsed JSON on success, or None on total failure
     """
     global _session
 
     for attempt in range(max_json_retries + 1):
         try:
-            resp = _session.post(url, json=payload, timeout=timeout)
-            resp.raise_for_status()      # raises on HTTP 4xx/5xx
-            return resp.json()           # may raise JSONDecodeError
+            resp = _session.post(
+                url,
+                json=payload,
+                timeout=timeout,
+                **request_kwargs
+            )
+            resp.raise_for_status()    # raises for HTTP 4xx/5xx after urllib3 retries
+            return resp.json()         # may raise json.JSONDecodeError
 
+        # ---------- retry on bad JSON -----------------------------------------
         except json.JSONDecodeError as jde:
-            log.warning("Invalid JSON on attempt %d/%d: %s",
-                        attempt + 1, max_json_retries + 1, jde)
+            log.warning(
+                "Invalid JSON (%s) on attempt %d/%d",
+                jde, attempt + 1, max_json_retries + 1
+            )
             traceback.print_exc()
 
+        # ---------- retry on network / HTTP errors ----------------------------
         except requests.RequestException as re:
-            # this includes timeouts, connection errors, HTTPError after retries
-            log.error("RequestException on attempt %d: %s",
-                      attempt + 1, re)
+            log.error("RequestException on attempt %d: %s", attempt + 1, re)
             traceback.print_exc()
+
             if reset_session_on_error:
-                log.info("Reinitializing HTTP session (stale socket?)")
+                log.info("Re-initialising HTTP session (possible stale socket)")
                 try:
                     _session.close()
                 except Exception:
                     pass
                 _session = make_session()
 
-        # exponential backoff between JSON retries
+        # ---------- back-off before the next loop iteration -------------------
         if attempt < max_json_retries:
-            sleep_sec = 2 ** attempt
-            log.info("Sleeping %ds before next JSON retry...", sleep_sec)
+            sleep_sec = 2 ** attempt            # 1 s, 2 s, 4 s …
+            log.info("Sleeping %ds before retry", sleep_sec)
             time.sleep(sleep_sec)
 
-    # all attempts failed
-    log.error("safe_post: gave up after %d JSON attempts", max_json_retries + 1)
+    # All retries failed
+    log.error("safe_post: gave up after %d attempts", max_json_retries + 1)
     return None

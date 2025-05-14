@@ -1,7 +1,9 @@
-import requests
+# src/shared/multiplayerAPI.py
+
 import json
 import time
 import traceback
+from .http_client import safe_post
 
 
 class MultiplayerAPI:
@@ -11,9 +13,8 @@ class MultiplayerAPI:
         self.myID = None
         self.lastMsgID = None
 
-    
-    def handshake(self): # initializes connection and gains mandatory variables from server.
-        # initializes server connection and gets details from server.
+    def handshake(self):
+        """Initialize connection; populate self.myID and self.lastMsgID."""
         while True:
             body = {
                 "origin": "https://www.geo-fs.com",
@@ -21,52 +22,52 @@ class MultiplayerAPI:
                 "sid": self.sessionID,
                 "id": "",
                 "ac": "1",
-                "co": [9999999999999999,9999999999999999,999999999999999,9999999999999999,999999999999999,999999999999999],
-                "ve": [2.7011560632672626e-10,7.436167948071671e-11,0.000004503549489433212,0,0,0],
-                "st": {"gr":True,"as":0},
-                "ti": 1678751444055,
-                "m": "", 
+                "co": [9999999999999999]*6,
+                "ve": [0.0]*6,
+                "st": {"gr": True, "as": 0},
+                "ti": int(time.time() * 1000),
+                "m": "",
                 "ci": 0
             }
-            try:
-                response = requests.post(
-                    "https://mps.geo-fs.com/update",
-                    json = body,
-                    cookies = {"PHPSESSID": self.sessionID}
-                )
-                response_body = json.loads(response.text)
-                self.myID = response_body["myId"]
 
+            resp = safe_post(
+                "https://mps.geo-fs.com/update",
+                body,
+                timeout=(5, 15),
+                max_json_retries=2,
+                cookies={"PHPSESSID": self.sessionID}
+            )
+            if not resp:
+                print("Handshake failed, retrying in 5s…")
+                traceback.print_exc()
+                time.sleep(5)
+                continue
 
-                body2 = {
-                    "origin": "https://www.geo-fs.com",
-                    "acid": self.accountID,
-                    "sid": self.sessionID,
-                    "id": self.myID,
-                    "ac": "1",
-                    "co": [9999999999999999,9999999999999999,999999999999999,9999999999999999,999999999999999,999999999999999],
-                    "ve": [2.7011560632672626e-10,7.436167948071671e-11,0.000004503549489433212,0,0,0],
-                    "st": {"gr":True,"as":0},
-                    "ti": 1678751444055,
-                    "m": "", 
-                    "ci": self.lastMsgID
-                }
-                response = requests.post(
-                    "https://mps.geo-fs.com/update",
-                    json = body2,
-                    cookies = {"PHPSESSID": self.sessionID}
-                )
-                response_body = json.loads(response.text)
-                self.myID = response_body["myId"]
-                self.lastMsgID = response_body["lastMsgId"]
-                return
-            except Exception as e:
-                    print("Unable to connect to GeoFS. Check your connection and restart the application.")
-                    print(f"Error message: {e}")
-                    traceback.print_exc()
-                    time.sleep(5)
+            # first call gives us myID
+            self.myID = resp.get("myId")
 
-    def sendMsg(self, msg):
+            # second call to pick up lastMsgId
+            body["id"] = self.myID
+            body["ci"] = self.lastMsgID
+            resp2 = safe_post(
+                "https://mps.geo-fs.com/update",
+                body,
+                timeout=(5, 15),
+                max_json_retries=2,
+                cookies={"PHPSESSID": self.sessionID}
+            )
+            if not resp2:
+                print("Second handshake call failed, retrying in 5s…")
+                traceback.print_exc()
+                time.sleep(5)
+                continue
+
+            self.myID = resp2.get("myId")
+            self.lastMsgID = resp2.get("lastMsgId")
+            return
+
+    def sendMsg(self, msg: str):
+        """Post a chat message into Geo‑FS."""
         while True:
             body = {
                 "origin": "https://www.geo-fs.com",
@@ -74,29 +75,31 @@ class MultiplayerAPI:
                 "sid": self.sessionID,
                 "id": self.myID,
                 "ac": "1",
-                "co": [9999999999999999,9999999999999999,999999999999999,9999999999999999,999999999999999,999999999999999],
-                "ve": [2.7011560632672626e-10,7.436167948071671e-11,0.000004503549489433212,0,0,0],
-                "st": {"gr":True,"as":0},
+                "co": [9999999999999999]*6,
+                "ve": [0.0]*6,
+                "st": {"gr": True, "as": 0},
                 "ti": None,
                 "m": msg,
                 "ci": self.lastMsgID
             }
-            try:
-                response = requests.post(
-                    "https://mps.geo-fs.com/update",
-                    json = body,
-                    cookies = {"PHPSESSID": self.sessionID}
-                )
-                response_body = json.loads(response.text)
-                self.myID = response_body["myId"]
-                return
-            except Exception as e:
-                    print("Unable to connect to GeoFS. Check your connection and restart the application.")
-                    print(f"Error message: {e}")
-                    traceback.print_exc()
-                    time.sleep(5)
 
-    def getMessages(self):
+            resp = safe_post(
+                "https://mps.geo-fs.com/update",
+                body,
+                timeout=(5, 15),
+                max_json_retries=2,
+                cookies={"PHPSESSID": self.sessionID}
+            )
+            if resp:
+                self.myID = resp.get("myId")
+                return
+
+            print("sendMsg failed, retrying in 5s…")
+            traceback.print_exc()
+            time.sleep(5)
+
+    def getMessages(self) -> list[dict]:
+        """Fetch latest chat messages and update self.lastMsgID."""
         while True:
             body = {
                 "origin": "https://www.geo-fs.com",
@@ -104,26 +107,26 @@ class MultiplayerAPI:
                 "sid": self.sessionID,
                 "id": self.myID,
                 "ac": "1",
-                "co": [9999999999999999,9999999999999999,999999999999999,9999999999999999,999999999999999,999999999999999],
-                "ve": [2.7011560632672626e-10,7.436167948071671e-11,0.000004503549489433212,0,0,0],
-                "st": {"gr":True,"as":0},
+                "co": [9999999999999999]*6,
+                "ve": [0.0]*6,
+                "st": {"gr": True, "as": 0},
                 "ti": None,
                 "m": "",
                 "ci": self.lastMsgID
             }
-            try:
-                response = requests.post(
-                    "https://mps.geo-fs.com/update",
-                    json = body,
-                    cookies = {"PHPSESSID": self.sessionID}
-                )
-                response_body = json.loads(response.text)
-                self.myID = response_body["myId"]
-                self.lastMsgID = response_body["lastMsgId"]
 
-                return response_body["chatMessages"]
-            except Exception as e:
-                print("Unable to connect to GeoFS. Check your connection and restart the application.")
-                print(f"Error message: {e}")
-                traceback.print_exc()
-                time.sleep(5)
+            resp = safe_post(
+                "https://mps.geo-fs.com/update",
+                body,
+                timeout=(5, 15),
+                max_json_retries=2,
+                cookies={"PHPSESSID": self.sessionID}
+            )
+            if resp:
+                self.myID = resp.get("myId")
+                self.lastMsgID = resp.get("lastMsgId")
+                return resp.get("chatMessages", [])
+
+            print("getMessages failed, retrying in 5s…")
+            traceback.print_exc()
+            time.sleep(5)
