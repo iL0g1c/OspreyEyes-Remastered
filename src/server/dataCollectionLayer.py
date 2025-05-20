@@ -237,6 +237,8 @@ class DataCollectionLayer():
         collection.insert_one({"count": len(self.current_online_users), "datetime": datetime.now()})
     
     def calculate_aircraft_change(self, old_lat, old_lon, new_lat, new_lon): # calculates the distance between the old and new pilot position
+        if None in (old_lat, old_lon, new_lat, new_lon):
+            return 0
         # convert points to radians
         lon1, lat1, lon2, lat2 = map(math.radians, [old_lon, old_lat, new_lon, new_lat])
 
