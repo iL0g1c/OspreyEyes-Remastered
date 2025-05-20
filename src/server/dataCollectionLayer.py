@@ -372,7 +372,7 @@ class DataCollectionLayer():
             upsert = UpdateOne(
                 {'accountID':uid},
                 {
-                    '$setOnInsert':{'accountID':uid,'events':[], 'pastCallsigns':[cs]},
+                    '$setOnInsert':{'accountID':uid,'events':[]},
                     '$set':{'currentCallsign':cs,'currentAircraft':ac,'Online':True,'lastOnline':datetime.now(),'lastPosition':pos},
                     '$addToSet':{'pastCallsigns':cs},
                     **({'$push':{'events':{'$each':evts}}} if evts else {})
