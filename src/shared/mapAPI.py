@@ -1,112 +1,103 @@
-import requests
 import json
 import traceback
 import time
+from .http_client import safe_post
 
-## EXCEPTIONS ##
+
 class BackendError(Exception):
+    """Raised when the backend service returns an unexpected error."""
     pass
 
-## USER CLASSES ##
 
 class Player:
-    def __init__ (self,userobj, aircrafCodes):
-        #add grounded
+    def __init__(self, userobj, aircraft_codes):
+        # Convert GeoFS user object into Player attributes
         self.airspeed = userobj['st']['as']
-        self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
-        self.coordinates = (userobj['co'][0],userobj['co'][1])
-        self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
-        self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
+        self.userInfo = {'id': userobj['acid'], 'callsign': userobj['cs']}
+        self.coordinates = (userobj['co'][0], userobj['co'][1])
+        self.altitude = round((userobj['co'][2] or 0) * 3.28084, 2)      # meters → feet
+        self.verticalSpeed = round((userobj['co'][3] or 0) * 3.28084, 2)  # meters → feet
         try:
             self.aircraft = {
-                'type':aircrafCodes[str(userobj['ac'])]["name"],
-                'id':userobj['ac']
+                'type': aircraft_codes[str(userobj['ac'])]['name'],
+                'id': userobj['ac']
             }
         except KeyError:
-            self.aircraft = {
-                'type':"Unknown",
-                'id':userobj['ac']
-            }
-## MAIN CLASS ##
+            self.aircraft = {'type': 'Unknown', 'id': userobj['ac']}
+
+
 class MapAPI:
+    """Client for interacting with the GeoFS map API."""
     def __init__(self):
-        with open("../../data/aircraftcodes.json", "r") as reader:
-            self.aircrafCodes = json.load(reader)
+        # Load aircraft code mappings
+        with open('../../data/aircraftcodes.json', 'r') as f:
+            self.aircraft_codes = json.load(f)
+
         self._responseList = []
         self._utilizeResponseList = True
         self.error = False
-    def getUsers(self,foos, max_retries=10, backoff_factor=2):
-        attempt = 0
-        while attempt <= max_retries:
-            self.error = False
-            try:
-                response = requests.post(
-                    "https://mps.geo-fs.com/map",
-                    json = {
-                        "id":"",
-                        "gid": None
-                    }
-                )
-                response.raise_for_status()
-                response_body = response.json()
 
-                userList = []
-                for user in response_body['users']:
-                    if user == None:
-                        continue
-                    elif user['acid'] == None:
-                        continue
-                    elif foos == False:
-                        if user['cs'] == "Foo" or user['cs'] == '':
-                            pass
-                        else:
-                            userList.append(Player(user, self.aircrafCodes))
-                    elif foos == True:
-                        if user['cs'] != "Foo":
-                            pass
-                        else:
-                            userList.append(Player(user, self.aircrafCodes))
-                    elif foos == None:
-                        userList.append(Player(user, self.aircrafCodes))
-                    else:
-                        raise AttributeError('"Foos" attribute must be boolean or NoneType.')
-                    
-                if self._utilizeResponseList:
-                    self._responseList.append(userList)
-                return userList
-            except (requests.RequestException, json.JSONDecodeError) as e:
-                self.error = True
-                print(f"Error on attempt {attempt + 1}: Unable to connect to GeoFS. Error: {e}")
-                traceback.print_exc()
-                attempt += 1
-                if attempt <= max_retries:
-                    wait_time = backoff_factor ** attempt
-                    print(f"Retrying in {wait_time} seconds...")
-                    time.sleep(wait_time)
-                else:
-                    print("Max retries reached. Please check your connection and restart the application.")
-                    return None
+    def getUsers(self, foos):
+        """
+        Fetch list of online users from GeoFS map endpoint.
 
-    def returnResponseList(self,reset:bool):
-        if reset == True:
-            before = self._responseList
+        Args:
+            foos (bool | None):
+                - True:   include only users whose callsign == 'Foo'
+                - False:  exclude 'Foo' and empty callsigns
+                - None:   include all users
+
+        Returns:
+            list[Player] | None: Parsed Player list, or None on failure.
+        """
+        payload = {'id': '', 'gid': None}
+        response_body = safe_post(
+            'https://mps.geo-fs.com/map',
+            payload,
+            timeout=(5, 15),
+            max_json_retries=2
+        )
+        if response_body is None:
+            self.error = True
+            return None
+
+        user_list = []
+        for u in response_body.get('users', []):
+            if not u or u.get('acid') is None:
+                continue
+
+            cs = u.get('cs', '')
+            if foos is False and cs in ('Foo', ''):
+                continue
+            if foos is True and cs != 'Foo':
+                continue
+
+            user_list.append(Player(u, self.aircraft_codes))
+
+        if self._utilizeResponseList:
+            self._responseList.append(user_list)
+        return user_list
+
+    def returnResponseList(self, reset: bool):
+        """
+        Return the recorded response lists and optionally reset the internal buffer.
+
+        Args:
+            reset (bool): If True, clear the buffer after returning.
+
+        Returns:
+            list: The previously recorded lists of Player snapshots.
+        """
+        if reset:
+            data = self._responseList
             self._responseList = []
-            return before
+            return data
         return self._responseList
+
     def disableResponseList(self):
+        """Stop internally recording subsequent responses."""
         self._utilizeResponseList = False
+
     def enableResponseList(self):
+        """Resume internally recording responses."""
         self._utilizeResponseList = True
-
-
-'''
-st gr -- grounded
-st as -- airspeed
-ac -- aircraft number [refr aircraftcodes.json]
-acid -- user id
-cs -- callsign
-co 0 latitude
-co 1 longitude
-co 2 altitude in meters
-co 3 vertical speed in meters
-'''
