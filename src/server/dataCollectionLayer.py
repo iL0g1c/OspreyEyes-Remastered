@@ -289,6 +289,17 @@ class DataCollectionLayer():
         self.remove_duplicate_users()
         # Fetch online users from the map API
         self.current_online_users = self.mapAPI.getUsers(None)
+
+        # check for duplicate pilots
+        seen = set()
+        unique_users = []
+        for u in self.current_online_users:
+            if u.userInfo["id"] in seen:
+                continue
+            seen.add(u.userInfo["id"])
+            unique_users.append(u)
+        self.current_online_users = unique_users
+
         db = self.mongo_db_client[self.DATABASE_NAME]
         user_collection = db["users"]
         configurations = self.config
@@ -376,6 +387,8 @@ class DataCollectionLayer():
                 self.newAccountLogs.log(20, f"New account detected: Account ID: {user_callsign}, Callsign: {user_callsign}")
                 user_data["events"] = []
                 self.batch_processors["users"].add_to_batch(InsertOne(user_data))
+
+                existing_users_map[user_id] = user_data
 
                 if configurations["displayNewAccounts"]:
                     url = f"http://localhost:5001/new-account"
