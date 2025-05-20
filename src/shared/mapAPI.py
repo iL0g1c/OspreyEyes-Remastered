@@ -18,9 +18,9 @@ class Player:
             else:
                 self.airspeed = 0
             self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
-            self.coordinates = (userobj['co'][0],userobj['co'][1])
-            self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
-            self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
+            self.coordinates = (userobj['co'][0] or 0,userobj['co'][1] or 0)
+            self.altitude = round((userobj['co'][2] or 0) * 3.28084,2) # meters to feet
+            self.verticalSpeed = round((userobj['co'][3] or 0) * 3.28084,2) # meters to feet
             try:
                 self.aircraft = {
                     'type':aircrafCodes[str(userobj['ac'])]["name"],
