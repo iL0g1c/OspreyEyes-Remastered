@@ -52,6 +52,8 @@ class DataCollectionLayer():
         self.systemLogs.log(10, "Getting configuration settings...")
         self.config = self.getConfigurationSettings()
         
+        self.MAX_REQUESTS = 10
+
     def setup_queues_and_threads(self):
         self.queues = {
             "callsign_change": queue.Queue(),
@@ -287,227 +289,99 @@ class DataCollectionLayer():
 
     def process_users(self):
         self.remove_duplicate_users()
-        # Fetch online users from the map API
-        self.current_online_users = self.mapAPI.getUsers(None)
-
-        # check for duplicate pilots
-        seen = set()
-        unique_users = []
-        for u in self.current_online_users:
-            if u.userInfo["id"] in seen:
-                continue
-            seen.add(u.userInfo["id"])
-            unique_users.append(u)
-        self.current_online_users = unique_users
+        raw = self.mapAPI.getUsers(None) or []
+        seen = set(); unique = []
+        for u in raw:
+            uid = u.userInfo['id']
+            if uid and uid not in seen:
+                seen.add(uid); unique.append(u)
+        self.current_online_users = unique
 
         db = self.mongo_db_client[self.DATABASE_NAME]
-        user_collection = db["users"]
-        configurations = self.config
+        user_coll = db['users']
+        configs = self.config
 
-        # Initialize variables for tracking new, updated, and offline users
-        new_users = []
-        update_operations = []
-        new_account_webhooks = []
-        callsign_change_webhooks = []
-        aircraft_change_webhooks = []
-        aircraft_amounts = {}
-        force_callsign_filters = self.get_force_callsign_filters()
-
-        current_account_ids = [user.userInfo["id"] for user in self.current_online_users]
-        existing_users_map = {user["accountID"]: user for user in user_collection.find({"accountID": {"$in": current_account_ids}})}
-        existing_aircraft_map = {user["accountID"]: user["currentAircraft"] for user in existing_users_map.values()}
+        # prepare existing map
+        cur_ids = [u.userInfo['id'] for u in unique]
+        exist_map = {d['accountID']: d for d in user_coll.find({'accountID':{'$in':cur_ids}})}
 
         # Handle users going offline
-        going_offline_users = list(user_collection.find({
-            "Online": True,
-            "accountID": {"$nin": current_account_ids}
-        })) 
-        for user in going_offline_users:
-            # Ensure user has been offline long enough
-            if datetime.now() - user["lastOnline"] > timedelta(minutes=1):
-                self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is offline.")
-                events = {
-                    "eventType": "offline",
-                    "timestamp": user["lastOnline"]
-                }
-                # Log before update
-                self.batch_processors["users"].add_to_batch(
+        going_offline = list(user_coll.find({
+            'Online': True,
+            'accountID': {'$nin': cur_ids}
+        }))
+        for doc in going_offline:
+            if datetime.now() - doc['lastOnline'] > timedelta(minutes=1):
+                self.offlineOnlineLogs.info(f"Account ID: {doc['accountID']} is offline.")
+                evt = {'eventType':'offline', 'timestamp':doc['lastOnline']}
+                self.batch_processors['users'].add_to_batch(
                     UpdateOne(
-                        {"accountID": user["accountID"]},
-                        {"$set": {"Online": False, "lastOnline": datetime.now()}, "$push": {"events": events}}
+                        {'accountID':doc['accountID']},
+                        {'$set':{'Online':False, 'lastOnline':datetime.now()}, '$push':{'events':evt}}
                     )
                 )
-                self.update_airforce_patrol_logs(False, user, force_callsign_filters)
-
-        # Handle users going online
-        going_online_users = list(user_collection.find({
-            "Online": False,
-            "accountID": {"$in": current_account_ids}
+                self.update_airforce_patrol_logs(False, doc, self.get_force_callsign_filters())
+        # handle users going online
+        going_online = list(user_coll.find({
+            'Online': False,
+            'accountID': {'$in': cur_ids}
         }))
-        for user in going_online_users:
-            self.offlineOnlineLogs.log(20, f"Account ID: {user['accountID']} is online.")
-            event = {
-                "eventType": "online",
-                "timestamp": datetime.now()
-            }
-            self.batch_processors["users"].add_to_batch(
+        for doc in going_online:
+            self.offlineOnlineLogs.info(f"Account ID: {doc['accountID']} is online.")
+            evt = {'eventType':'online', 'timestamp':datetime.now()}
+            self.batch_processors['users'].add_to_batch(
                 UpdateOne(
-                    {"accountID": user["accountID"]},
-                    {"$set": {"Online": True}, "$push": {"events": event}}
+                    {'accountID':doc['accountID']},
+                    {'$set':{'Online':True}, '$push':{'events':evt}}
                 )
             )
-            self.update_airforce_patrol_logs(True, user, force_callsign_filters)    
+            self.update_airforce_patrol_logs(True, doc, self.get_force_callsign_filters())
 
         # Process current online users
-        for user in self.current_online_users:
-            if user.userInfo["callsign"] == "Foo" or user.userInfo["id"] == None:
-                continue
-            user_id = user.userInfo["id"]
-            user_callsign = user.userInfo["callsign"]
-            user_aircraft = user.aircraft["type"]
-            user_position = user.coordinates
-            user_data = {
-                "accountID": user_id,
-                "currentCallsign": user_callsign,
-                "currentAircraft": user_aircraft,
-                "Online": True,
-                "lastOnline": datetime.now(),
-                "lastPosition": user_position
-            }
+        filters = self.get_force_callsign_filters()
+        for u in unique:
+            uid = u.userInfo['id']; cs = u.userInfo['callsign']; ac = u.aircraft['type']; pos = u.coordinates
+            # new-account hook
+            if uid not in exist_map and configs['displayNewAccounts']:
+                self.queues['new_account'].put({'url':'http://localhost:5001/new-account','data':{'acid':uid,'callsign':cs}})
+                self.update_airforce_patrol_logs(True, {'accountID':uid,'currentCallsign':cs}, filters)
+            # event detection
+            evts = []
+            # teleport
+            old = exist_map.get(uid, {}).get('lastPosition')
+            if old:
+                dist = self.calculate_aircraft_change(old[0], old[1], pos[0], pos[1])
+                if dist >= 50:
+                    self.teleportationLogs.info(f"Account ID: {uid} teleported {round(dist)} km.")
+                    evts.append({'eventType':'teleportation','oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist})
+            # aircraft change
+            old_ac = exist_map.get(uid, {}).get('currentAircraft')
+            if configs['logAircraftChanges'] and old_ac and ac != old_ac:
+                self.aircraftChangeLogs.info(f"Aircraft change: {uid} from {old_ac} to {ac}")
+                evts.append({'eventType':'aircraftChange','oldAircraft':old_ac,'newAircraft':ac,'timestamp':datetime.now()})
+                self.queues['aircraft_change'].put({'url':'http://localhost:5001/aircraft-change','data':{'callsign':cs,'oldAircraft':old_ac,'newAircraft':ac}})
+            # callsign change
+            old_cs = exist_map.get(uid, {}).get('currentCallsign')
+            if old_cs and old_cs != cs:
+                self.callsignChangeLogs.info(f"Callsign change: {uid} from {old_cs} to {cs}")
+                evts.append({'eventType':'callsignChange','oldCallsign':old_cs,'newCallsign':cs,'timestamp':datetime.now()})
+                if configs['displayCallsignChanges']:
+                    self.queues['callsign_change'].put({'url':'http://localhost:5001/callsign-change','data':{'acid':uid,'oldCallsign':old_cs,'newCallsign':cs}})
 
-            pending_events = []
-
-            if user_aircraft in aircraft_amounts:
-                aircraft_amounts[user_aircraft] += 1
-            else:
-                aircraft_amounts[user_aircraft] = 1
-
-            if user_id not in existing_users_map:
-                # new pilots
-                self.newAccountLogs.log(20, f"New account detected: Account ID: {user_callsign}, Callsign: {user_callsign}")
-                user_data["events"] = []
-                self.batch_processors["users"].add_to_batch(InsertOne(user_data))
-
-                existing_users_map[user_id] = user_data
-
-                if configurations["displayNewAccounts"]:
-                    url = f"http://localhost:5001/new-account"
-                    request_body = {
-                        "acid": user_id,
-                        "callsign": user_callsign
-                    }
-                    new_account_webhooks.append({"url": url, "data": request_body})
-
-                self.update_airforce_patrol_logs(True, user_data, force_callsign_filters)
-            else:
-                # existing user updates
-                existing_user = existing_users_map[user_id]
-                pending_events = []
-
-                # check for teleportation
-                distance = self.calculate_aircraft_change( 
-                    existing_user["lastPosition"][0],
-                    existing_user["lastPosition"][1],
-                    user_data["lastPosition"][0],
-                    user_data["lastPosition"][1]
-                )
-                if distance >= 50:
-                    self.teleportationLogs.log(20, f"Account ID: {user_id} teleported {round(distance)} km.")
-                    teleportation_event = {
-                        "eventType": "teleportation",
-                        "oldLatittude": existing_user["lastPosition"][0],
-                        "oldLongitude": existing_user["lastPosition"][1],
-                        "newLatitude": user_position[0],
-                        "newLongitude": user_position[1],
-                        "timestamp": datetime.now(),
-                        "distance": distance
-                    }
-                    pending_events.append(teleportation_event)
-                    
-                # check for aircraft changes
-                if configurations["logAircraftChanges"] and user_aircraft !=  existing_aircraft_map[user_id]:
-                    self.aircraftChangeLogs.log(20, f"Aircraft change detected: Callsign: {user_callsign}, Account ID: {user_id}, Old Aircraft: {existing_aircraft_map[user_id]} New Aircraft: {user_aircraft}")
-                    aircraft_change_event = {
-                        "eventType": "aircraftChange",
-                        "timestamp": datetime.now(),
-                        "newAircraft": user_aircraft,
-                        "oldAircraft": existing_aircraft_map[user_id],
-                    }
-                    pending_events.append(aircraft_change_event)
-                    url = f"http://localhost:5001/aircraft-change"
-                    request_body = {
-                        "callsign": user.userInfo["callsign"],
-                        "newAircraft": user_aircraft,
-                        "oldAircraft": existing_aircraft_map[user_id]
-                    }
-                    aircraft_change_webhooks.append({"url": url, "data": request_body})
-                # check for callsign changes
-                if existing_user.get("currentCallsign") != user.userInfo["callsign"]:
-                    self.callsignChangeLogs.log(20, f"Account ID: {user_id} changed callsign from {existing_user['currentCallsign']} to {user_callsign}")
-                    callsign_change_event = {
-                        "eventType": "callsignChange",
-                        "timestamp": datetime.now(),
-                        "newCallsign": user_callsign,
-                        "oldCallsign": existing_user["currentCallsign"]
-                    }
-                    pending_events.append(callsign_change_event)
-                    if configurations["displayCallsignChanges"]:
-                        url = f"http://localhost:5001/callsign-change"
-                        request_body = {
-                            "acid": user_id,
-                            "newCallsign": user_callsign,
-                            "oldCallsign": existing_user["currentCallsign"]
-                        }
-                        callsign_change_webhooks.append({"url": url, "data": request_body})
-
-            update_data = {
-                "$set": {
-                    "currentCallsign": user_callsign,
-                    "currentAircraft": user_aircraft,
-                    "lastOnline": datetime.now(),
-                    "lastPosition": user_position
+            # upsert user doc
+            upsert = UpdateOne(
+                {'accountID':uid},
+                {
+                    '$setOnInsert':{'accountID':uid,'events':[], 'pastCallsigns':[cs]},
+                    '$set':{'currentCallsign':cs,'currentAircraft':ac,'Online':True,'lastOnline':datetime.now(),'lastPosition':pos},
+                    '$addToSet':{'pastCallsigns':cs},
+                    **({'$push':{'events':{'$each':evts}}} if evts else {})
                 },
-                "$addToSet": {
-                    "pastCallsigns": user_callsign
-                }
-            }
-            if pending_events:
-                update_data["$push"] = {"events": {"$each": pending_events}}
-
-            self.batch_processors["users"].add_to_batch(
-                UpdateOne(
-                    {"accountID": user_id},
-                    update_data,
-                    upsert=True
-                )
+                upsert=True
             )
+            self.batch_processors['users'].add_to_batch(upsert)
 
-        for request in new_account_webhooks:
-            self.queues["new_account"].put(request)
-
-        for request in callsign_change_webhooks:
-            self.queues["callsign_change"].put(request)
-        
-        for request in aircraft_change_webhooks:
-            self.queues["aircraft_change"].put(request)
-
-        if configurations["logAircraftDistributions"]:
-            current_time = datetime.now()
-            if (current_time - self.last_aircraft_distribution_time).seconds >= 3600:
-                self.systemLogs.log(20, "Logging aircraft distribution.")
-                aircraft_collection = db["aircraft"]
-                aircraft_collection.insert_one({"aircraft": aircraft_amounts, "datetime": datetime.now()})
-                self.last_aircraft_distribution_time = current_time
-
-        self.batch_processors["users"].flush_batch()
-
-        
-    def getConfigurationSettings(self): # gets the configuration settings from the database
-        if not hasattr(self, "_cached_config"):
-            db = self.mongo_db_client[self.DATABASE_NAME]
-            collection = db["configurations"]
-            self._cached_config = collection.find_one()
-        return self._cached_config
+        self.batch_processors['users'].flush_batch()
 
     def remove_duplicate_users(self, initial_cleanup=False):
         db = self.mongo_db_client[self.DATABASE_NAME]
