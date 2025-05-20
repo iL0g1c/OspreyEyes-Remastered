@@ -11,25 +11,30 @@ class BackendError(Exception):
 
 class Player:
     def __init__ (self,userobj, aircrafCodes):
-        #add grounded
-        if "as" in userobj['st']:
-            self.airspeed = userobj['st']['as']
-        else:
-            self.airspeed = 0
-        self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
-        self.coordinates = (userobj['co'][0],userobj['co'][1])
-        self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
-        self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
         try:
-            self.aircraft = {
-                'type':aircrafCodes[str(userobj['ac'])]["name"],
-                'id':userobj['ac']
-            }
-        except KeyError:
-            self.aircraft = {
-                'type':"Unknown",
-                'id':userobj['ac']
-            }
+            #add grounded
+            if "as" in userobj['st']:
+                self.airspeed = userobj['st']['as']
+            else:
+                self.airspeed = 0
+            self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
+            self.coordinates = (userobj['co'][0],userobj['co'][1])
+            self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
+            self.verticalSpeed = round(userobj['co'][3]*3.28084,2) # meters to feet
+            try:
+                self.aircraft = {
+                    'type':aircrafCodes[str(userobj['ac'])]["name"],
+                    'id':userobj['ac']
+                }
+            except KeyError:
+                self.aircraft = {
+                    'type':"Unknown",
+                    'id':userobj['ac']
+                }
+        except:
+            print("Error in Player class")
+            print(userobj)
+            traceback.print_exc()
 ## MAIN CLASS ##
 class MapAPI:
     def __init__(self):
