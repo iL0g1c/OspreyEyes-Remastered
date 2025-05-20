@@ -12,6 +12,7 @@ class BackendError(Exception):
 class Player:
     def __init__ (self,userobj, aircrafCodes):
         #add grounded
+        print(userobj)
         self.airspeed = userobj['st']['as']
         self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
         self.coordinates = (userobj['co'][0],userobj['co'][1])
