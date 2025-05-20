@@ -12,8 +12,10 @@ class BackendError(Exception):
 class Player:
     def __init__ (self,userobj, aircrafCodes):
         #add grounded
-        print(userobj)
-        self.airspeed = userobj['st']['as']
+        if "as" in userobj['st']:
+            self.airspeed = userobj['st']['as']
+        else:
+            self.airspeed = 0
         self.userInfo = {'id':userobj['acid'],'callsign':userobj['cs']}
         self.coordinates = (userobj['co'][0],userobj['co'][1])
         self.altitude = round(userobj['co'][2]*3.28084,2) # meters to feet
