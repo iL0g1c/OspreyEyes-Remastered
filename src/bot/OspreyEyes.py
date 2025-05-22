@@ -31,8 +31,18 @@ class MindsEyeBot(commands.Bot):
         intents.message_content = True
         super().__init__(command_prefix='=', intents=intents)
 
-        # sets up the event loop
         self.flaskApp = Flask(__name__)
+        self.flaskApp.logger.handlers = self.logger.handlers
+        self.flaskApp.logger.setLevel(self.logger.level)
+
+        werkzeug_logger = logging.getLogger('werkzeug')
+        werkzeug_logger.handlers.clear()
+        werkzeug_logger.propagate = False
+        werkzeug_logger.setLevel(self.logger.level)
+        werkzeug_logger.addHandler(console_handler)
+
+        # sets up the event loop
+
         self.throttleInterval = 0.2
         self.task_queue = asyncio.Queue()
 
