@@ -23,7 +23,7 @@ class Player:
             self.verticalSpeed = round((userobj['co'][3] or 0) * 3.28084,2) # meters to feet
             try:
                 self.aircraft = {
-                    'type':aircrafCodes[str(userobj['ac'])]["name"],
+                    'type':aircraft_codes[str(userobj['ac'])]["name"],
                     'id':userobj['ac']
                 }
             except KeyError:
