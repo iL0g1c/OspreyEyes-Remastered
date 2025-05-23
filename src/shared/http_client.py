@@ -41,7 +41,7 @@ def safe_post(
     url: str,
     payload: dict,
     timeout: tuple[int, int] = (5, 15),
-    max_json_retries: int = 2,
+    max_json_retries: int = 5,
     reset_session_on_error: bool = True,
     **request_kwargs,            #  <-- forward anything else (cookies, headers…)
 ) -> dict | None:
@@ -63,20 +63,32 @@ def safe_post(
                 timeout=timeout,
                 **request_kwargs
             )
-            resp.raise_for_status()    # raises for HTTP 4xx/5xx after urllib3 retries
-            return resp.json()         # may raise json.JSONDecodeError
+            resp.raise_for_status()
+            
+            # handle empty or whitespace-only body
+            raw = resp.text
+            if not raw or not raw.strip():
+                log.debug("Empty response body, returning empty dict")
+                return {}
+            
+            try:
+                return resp.json()
+            except json.JSONDecodeError as jde:
+                log.warning("Invalid JSON (%s) on attempt %d/%d", jde, attempt+1, max_json_retries+1)
+                traceback.print_exc()
 
-        # ---------- retry on bad JSON -----------------------------------------
-        except json.JSONDecodeError as jde:
-            log.warning(
-                "Invalid JSON (%s) on attempt %d/%d",
-                jde, attempt + 1, max_json_retries + 1
-            )
-            traceback.print_exc()
+                if reset_session_on_error:
+                    log.info("Re-initialising HTTP session due to JSON error")
+                    try:
+                        _session.close()
+                    except Exception:
+                        pass
+                    _session = make_session()
 
-        # ---------- retry on network / HTTP errors ----------------------------
+                # fall through to retry
+
         except requests.RequestException as re:
-            log.error("RequestException on attempt %d: %s", attempt + 1, re)
+            log.error("RequestException on attempt %d/%d: %s", attempt+1, max_json_retries+1, re)
             traceback.print_exc()
 
             if reset_session_on_error:
@@ -87,9 +99,9 @@ def safe_post(
                     pass
                 _session = make_session()
 
-        # ---------- back-off before the next loop iteration -------------------
+        # back-off before the next loop iteration
         if attempt < max_json_retries:
-            sleep_sec = 2 ** attempt            # 1 s, 2 s, 4 s …
+            sleep_sec = 2 ** attempt  # 1s, 2s, 4s, ...
             log.info("Sleeping %ds before retry", sleep_sec)
             time.sleep(sleep_sec)
 
