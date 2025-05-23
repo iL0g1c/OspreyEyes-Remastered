@@ -35,6 +35,8 @@ Being able to query all data collected by various parameters
 BUGS
 ====================
 [ ] config might not get updated
+[ ] callsign changes not being logged correctly in database.
+[ ] current aircraft logging is broken.
 
 TWEAKS
 ====================
