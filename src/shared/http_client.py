@@ -67,6 +67,9 @@ def safe_post(
             
             # handle empty or whitespace-only body
             raw = resp.text
+
+            log.debug("Response body: %s", raw)
+
             if not raw or not raw.strip():
                 log.debug("Empty response body, returning empty dict")
                 return {}
