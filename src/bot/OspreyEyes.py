@@ -15,7 +15,9 @@ load_dotenv()
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
-mongodbURI = f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=OspreyEyes"
+DATABASE_IP = os.getenv('DATABASE_IP')
+DATABASE_USER = os.getenv('DATABASE_USER')
+mongodbURI = f"mongodb://{DATABASE_USER}:{DATABASE_TOKEN}@{DATABASE_IP}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource={DATABASE_NAME}"
 mongoDBClient = MongoClient(mongodbURI) # sets up database client
 
 class MindsEyeBot(commands.Bot):
