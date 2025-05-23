@@ -46,7 +46,6 @@ class MapAPI:
 
         self._responseList = []
         self._utilizeResponseList = True
-        self.error = False
 
     def getUsers(self, foos):
         """
@@ -66,11 +65,8 @@ class MapAPI:
             'https://mps.geo-fs.com/map',
             payload,
             timeout=(5, 15),
-            max_json_retries=2
+            max_json_retries=5
         )
-        if response_body is None:
-            self.error = True
-            return None
 
         user_list = []
         for u in response_body.get('users', []):
@@ -88,22 +84,6 @@ class MapAPI:
         if self._utilizeResponseList:
             self._responseList.append(user_list)
         return user_list
-
-    def returnResponseList(self, reset: bool):
-        """
-        Return the recorded response lists and optionally reset the internal buffer.
-
-        Args:
-            reset (bool): If True, clear the buffer after returning.
-
-        Returns:
-            list: The previously recorded lists of Player snapshots.
-        """
-        if reset:
-            data = self._responseList
-            self._responseList = []
-            return data
-        return self._responseList
 
     def disableResponseList(self):
         """Stop internally recording subsequent responses."""
