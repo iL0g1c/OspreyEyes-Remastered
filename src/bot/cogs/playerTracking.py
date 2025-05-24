@@ -25,9 +25,11 @@ class PlayerTracker(commands.Cog):
         self.bot = bot
         self.DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
+        DATABASE_IP = os.getenv('DATABASE_IP')
+        DATABASE_USER = os.getenv('DATABASE_USER')
         self.mapAPI = mapAPI.MapAPI()
         self.mapAPI.disableResponseList()
-        mongodbURI = f"mongodb://OspreyEyes:{self.DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=OspreyEyes"
+        mongodbURI = f"mongodb://{DATABASE_USER}:{self.DATABASE_TOKEN}@{DATABASE_IP}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource={self.DATABASE_NAME}"
         self.mongoDBClient = AsyncIOMotorClient(mongodbURI) # sets up database client
 
     playersGroup = app_commands.Group(name="players", description="Commands for tracking player activity.") # creates a the player commands group
