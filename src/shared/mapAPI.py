@@ -74,7 +74,7 @@ class MapAPI:
                 continue
 
             cs = u.get('cs', '')
-            if foos is False and cs in ('Foo', ''):
+            if foos is False and cs == 'Foo':
                 continue
             if foos is True and cs != 'Foo':
                 continue

@@ -41,12 +41,11 @@ BUGS
 TWEAKS
 ====================
 [-] If a pilot is landed, do not count to force patrol time.
+[x] Foos are filtered out in the mapapi
 
 
 
 INVESTIGATIONS
 ====================
-[ ] Why do a lot of new accounts have a callsign of Foo.
-    [ ] Should I use the MapAPI to filter out foos automatically?
 [ ] If there are two instances of an account does it break the script.
     [ ] Is this why that callsign was switching between foo and standard callsgin.
