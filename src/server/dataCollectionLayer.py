@@ -295,7 +295,7 @@ class DataCollectionLayer():
 
     def process_users(self):
         self.remove_duplicate_users()
-        raw = self.mapAPI.getUsers(None) or []
+        raw = self.mapAPI.getUsers(False) or []
         seen = set(); unique = []
         for u in raw:
             uid = u.userInfo['id']
