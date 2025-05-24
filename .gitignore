@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 
 *.prof
+removed_users.txt

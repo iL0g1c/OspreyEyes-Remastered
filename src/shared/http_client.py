@@ -68,10 +68,10 @@ def safe_post(
 
         # ---------- retry on bad JSON -----------------------------------------
         except json.JSONDecodeError as jde:
-            log.warning(
-                "Invalid JSON (%s) on attempt %d/%d",
-                jde, attempt + 1, max_json_retries + 1
-            )
+            log.error("Failed to parse JSON from %s (status %d): %s",
+              url, resp.status_code, jde)
+            
+            log.error("Response text repr: %r", resp.text)
             traceback.print_exc()
 
         # ---------- retry on network / HTTP errors ----------------------------
