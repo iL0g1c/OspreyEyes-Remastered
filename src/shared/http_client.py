@@ -63,8 +63,12 @@ def safe_post(
                 timeout=timeout,
                 **request_kwargs
             )
-            resp.raise_for_status()    # raises for HTTP 4xx/5xx after urllib3 retries
-            return resp.json()         # may raise json.JSONDecodeError
+            if resp != None:
+                resp.raise_for_status()
+                return resp.json()
+            else:
+                log.error("Response is None, no JSON to parse")
+                return None
 
         # ---------- retry on bad JSON -----------------------------------------
         except json.JSONDecodeError as jde:

@@ -67,7 +67,8 @@ class MapAPI:
             timeout=(5, 15),
             max_json_retries=5
         )
-
+        if response_body is None:
+            return []
         user_list = []
         for u in response_body.get('users', []):
             if not u or u.get('acid') is None:
