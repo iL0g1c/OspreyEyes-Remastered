@@ -67,6 +67,8 @@ def safe_post(
                 resp.raise_for_status()
                 return resp.json()
             else:
+                log.error(f"resp: {str(type(resp))}")
+                log.error(f"resp.text: {str(type(resp.text))}")
                 log.error("Response is None, no JSON to parse")
                 return None
 
