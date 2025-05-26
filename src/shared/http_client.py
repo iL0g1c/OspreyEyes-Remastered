@@ -63,7 +63,9 @@ def safe_post(
                 timeout=timeout,
                 **request_kwargs
             )
-            if resp != None:
+            log.error(f"resp: {str(type(resp))}")
+            log.error(f"resp.text: {str(type(resp.text))}")
+            if resp.text != "":
                 resp.raise_for_status()
                 return resp.json()
             else:
