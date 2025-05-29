@@ -41,17 +41,6 @@ def make_session() -> requests.Session:
 # one shared session for your entire process
 _session = make_session()
 
-def fetch_and_store_cert(hostname, port=443, path=CERT_PATH):
-    """
-    Retrieves the server's current leaf certificate and writes it to `path`.
-    """
-    print("c")
-    cert_pem = ssl.get_server_certificate((hostname, port))
-    print("d")
-    with open(path, "w") as f:
-        f.write(cert_pem)
-    return path
-
 def safe_post(
     url: str,
     payload: dict,
@@ -68,31 +57,16 @@ def safe_post(
     • Optionally rebuilds the Session if we suspect a stale socket
     • Returns parsed JSON on success, or None on total failure
     """
-    print(1)
     global _session
-    print(2)
-    hostname = requests.utils.urlparse(url).hostname
-    # ensure we have an initial cert on disk
-    if not request_kwargs.get("verify") and not os.path.exists(CERT_PATH):
-        fetch_and_store_cert(hostname)
-    print(3)
-    # always start by verifying against our pinned cert
-    request_kwargs["verify"] = CERT_PATH
-    print(4)
-    test = 1
+
     for attempt in range(max_json_retries + 1):
-        print(test)
-        test += 1
         try:
-            print("a")
             resp = _session.post(
                 url,
                 json=payload,
                 timeout=timeout,
                 **request_kwargs
             )
-            print(resp)
-            print(resp.text)
             if resp.text != "":
                 resp.raise_for_status()
                 return resp.json()
