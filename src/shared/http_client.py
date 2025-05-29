@@ -1,16 +1,21 @@
 import requests
 from requests.adapters import HTTPAdapter
+from requests.exceptions import SSLError, RequestException
 from urllib3.util.retry import Retry
 import json
 import time
 import logging
 import traceback
+import ssl
+import os
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 log.addHandler(handler)
+
+CERT_PATH = "pinned-server-cert.pem"
 
 
 def make_session() -> requests.Session:
@@ -36,6 +41,14 @@ def make_session() -> requests.Session:
 # one shared session for your entire process
 _session = make_session()
 
+def fetch_and_store_cert(hostname, port=443, path=CERT_PATH):
+    """
+    Retrieves the server's current leaf certificate and writes it to `path`.
+    """
+    cert_pem = ssl.get_server_certificate((hostname, port))
+    with open(path, "w") as f:
+        f.write(cert_pem)
+    return path
 
 def safe_post(
     url: str,
@@ -54,6 +67,14 @@ def safe_post(
     • Returns parsed JSON on success, or None on total failure
     """
     global _session
+
+    hostname = requests.utils.urlparse(url).hostname
+    # ensure we have an initial cert on disk
+    if not request_kwargs.get("verify") and not os.path.exists(CERT_PATH):
+        fetch_and_store_cert(hostname)
+
+    # always start by verifying against our pinned cert
+    request_kwargs["verify"] = CERT_PATH
 
     for attempt in range(max_json_retries + 1):
         try:
@@ -80,6 +101,11 @@ def safe_post(
             log.error("Response text repr: %r", resp.text)
             traceback.print_exc()
 
+        # ---------- retry on SSL errors ---------------------------------------
+        except SSLError as ssl_err:
+            fetch_and_store_cert(hostname)
+            continue
+        
         # ---------- retry on network / HTTP errors ----------------------------
         except requests.RequestException as re:
             log.error("RequestException on attempt %d: %s", attempt + 1, re)
