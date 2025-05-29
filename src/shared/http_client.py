@@ -1,6 +1,5 @@
 import requests
 from requests.adapters import HTTPAdapter
-from requests.exceptions import SSLError, RequestException
 from urllib3.util.retry import Retry
 import json
 import time
