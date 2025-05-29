@@ -295,7 +295,9 @@ class DataCollectionLayer():
 
     def process_users(self):
         self.remove_duplicate_users()
+        print(1)
         raw = self.mapAPI.getUsers(False) or []
+        print(2)
         seen = set(); unique = []
         for u in raw:
             uid = u.userInfo['id']
@@ -466,7 +468,6 @@ def main():
 
     data_collection_layer.systemLogs.log(20, "Data collection layer started.")
     while True: # loops every second for api calls
-        print(1)
         configuration = collection.find_one()
 
         for key in previous_configuration: # checks if the configuration settings have changed
@@ -474,10 +475,8 @@ def main():
                 data_collection_layer.systemLogs.log(20, f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
         
-        print(2)
         if configuration["storeUsers"]:
             data_collection_layer.process_users()
-            print(3)
         if configuration["saveChatMessages"]:
             data_collection_layer.fetch_chat_messages()
         if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
