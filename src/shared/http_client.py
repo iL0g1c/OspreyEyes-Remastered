@@ -6,16 +6,12 @@ import json
 import time
 import logging
 import traceback
-import ssl
-import os
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 log.addHandler(handler)
-
-CERT_PATH = "pinned-server-cert.pem"
 
 
 def make_session() -> requests.Session:
@@ -83,11 +79,6 @@ def safe_post(
             
             log.error("Response text repr: %r", resp.text)
             traceback.print_exc()
-
-        # ---------- retry on SSL errors ---------------------------------------
-        except SSLError as ssl_err:
-            fetch_and_store_cert(hostname)
-            continue
 
         # ---------- retry on network / HTTP errors ----------------------------
         except requests.RequestException as re:
