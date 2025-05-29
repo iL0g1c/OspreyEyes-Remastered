@@ -60,7 +60,6 @@ class MapAPI:
         Returns:
             list[Player] | None: Parsed Player list, or None on failure.
         """
-        print(1)
         payload = {'id': '', 'gid': None}
         try:
             response_body = safe_post(
@@ -73,15 +72,11 @@ class MapAPI:
             print(f"Error fetching users: {e}")
             traceback.print_exc()
             return []
-        print(2)
         if response_body is None:
             return []
         user_list = []
-        print(3)
-        test = 1
+
         for u in response_body.get('users', []):
-            print(test)
-            test += 1
             if not u or u.get('acid') is None:
                 continue
 

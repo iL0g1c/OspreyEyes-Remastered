@@ -66,16 +66,17 @@ def safe_post(
     • Optionally rebuilds the Session if we suspect a stale socket
     • Returns parsed JSON on success, or None on total failure
     """
+    print(1)
     global _session
-
+    print(2)
     hostname = requests.utils.urlparse(url).hostname
     # ensure we have an initial cert on disk
     if not request_kwargs.get("verify") and not os.path.exists(CERT_PATH):
         fetch_and_store_cert(hostname)
-
+    print(3)
     # always start by verifying against our pinned cert
     request_kwargs["verify"] = CERT_PATH
-
+    print(4)
     for attempt in range(max_json_retries + 1):
         try:
             resp = _session.post(
@@ -105,7 +106,7 @@ def safe_post(
         except SSLError as ssl_err:
             fetch_and_store_cert(hostname)
             continue
-        
+
         # ---------- retry on network / HTTP errors ----------------------------
         except requests.RequestException as re:
             log.error("RequestException on attempt %d: %s", attempt + 1, re)
