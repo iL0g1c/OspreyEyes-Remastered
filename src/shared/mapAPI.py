@@ -66,7 +66,8 @@ class MapAPI:
                 'https://mps.geo-fs.com/map',
                 payload,
                 timeout=(5, 15),
-                max_json_retries=5
+                max_json_retries=5,
+                verify=False
             )
         except Exception as e:
             print(f"Error fetching users: {e}")

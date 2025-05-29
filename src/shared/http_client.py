@@ -5,6 +5,8 @@ import json
 import time
 import logging
 import traceback
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
