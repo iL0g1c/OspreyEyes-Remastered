@@ -45,7 +45,9 @@ def fetch_and_store_cert(hostname, port=443, path=CERT_PATH):
     """
     Retrieves the server's current leaf certificate and writes it to `path`.
     """
+    print("c")
     cert_pem = ssl.get_server_certificate((hostname, port))
+    print("d")
     with open(path, "w") as f:
         f.write(cert_pem)
     return path
