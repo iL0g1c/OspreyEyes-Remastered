@@ -77,14 +77,20 @@ def safe_post(
     # always start by verifying against our pinned cert
     request_kwargs["verify"] = CERT_PATH
     print(4)
+    test = 1
     for attempt in range(max_json_retries + 1):
+        print(test)
+        test += 1
         try:
+            print("a")
             resp = _session.post(
                 url,
                 json=payload,
                 timeout=timeout,
                 **request_kwargs
-            )   
+            )
+            print(resp)
+            print(resp.text)
             if resp.text != "":
                 resp.raise_for_status()
                 return resp.json()
@@ -93,7 +99,7 @@ def safe_post(
                 log.error(f"resp.text: {str(type(resp.text))}")
                 log.error("Response is None, no JSON to parse")
                 return None
-
+            
         # ---------- retry on bad JSON -----------------------------------------
         except json.JSONDecodeError as jde:
             log.error("Failed to parse JSON from %s (status %d): %s",
