@@ -477,6 +477,7 @@ def main():
 
         if configuration["storeUsers"]:
             data_collection_layer.process_users()
+            print(2)
         if configuration["saveChatMessages"]:
             data_collection_layer.fetch_chat_messages()
         if configuration["accumulateHeatMap"] and (time.time() - last_snapshot_time >= 1800):
