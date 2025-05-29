@@ -466,6 +466,7 @@ def main():
 
     data_collection_layer.systemLogs.log(20, "Data collection layer started.")
     while True: # loops every second for api calls
+        print(1)
         configuration = collection.find_one()
 
         for key in previous_configuration: # checks if the configuration settings have changed
