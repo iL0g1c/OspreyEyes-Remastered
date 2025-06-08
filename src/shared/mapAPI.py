@@ -23,7 +23,7 @@ class Player:
             self.verticalSpeed = round((userobj['co'][3] or 0) * 3.28084,2) # meters to feet
             try:
                 self.aircraft = {
-                    'type':aircrafCodes[str(userobj['ac'])]["name"],
+                    'type':aircraft_codes[str(userobj['ac'])]["name"],
                     'id':userobj['ac']
                 }
             except KeyError:
@@ -46,7 +46,6 @@ class MapAPI:
 
         self._responseList = []
         self._utilizeResponseList = True
-        self.error = False
 
     def getUsers(self, foos):
         """
@@ -62,23 +61,28 @@ class MapAPI:
             list[Player] | None: Parsed Player list, or None on failure.
         """
         payload = {'id': '', 'gid': None}
-        response_body = safe_post(
-            'https://mps.geo-fs.com/map',
-            payload,
-            timeout=(5, 15),
-            max_json_retries=2
-        )
+        try:
+            response_body = safe_post(
+                'https://mps.geo-fs.com/map',
+                payload,
+                timeout=(5, 15),
+                max_json_retries=5,
+                verify=False
+            )
+        except Exception as e:
+            print(f"Error fetching users: {e}")
+            traceback.print_exc()
+            return []
         if response_body is None:
-            self.error = True
-            return None
-
+            return []
         user_list = []
+
         for u in response_body.get('users', []):
             if not u or u.get('acid') is None:
                 continue
 
             cs = u.get('cs', '')
-            if foos is False and cs in ('Foo', ''):
+            if foos is False and cs == 'Foo':
                 continue
             if foos is True and cs != 'Foo':
                 continue
@@ -88,22 +92,6 @@ class MapAPI:
         if self._utilizeResponseList:
             self._responseList.append(user_list)
         return user_list
-
-    def returnResponseList(self, reset: bool):
-        """
-        Return the recorded response lists and optionally reset the internal buffer.
-
-        Args:
-            reset (bool): If True, clear the buffer after returning.
-
-        Returns:
-            list: The previously recorded lists of Player snapshots.
-        """
-        if reset:
-            data = self._responseList
-            self._responseList = []
-            return data
-        return self._responseList
 
     def disableResponseList(self):
         """Stop internally recording subsequent responses."""

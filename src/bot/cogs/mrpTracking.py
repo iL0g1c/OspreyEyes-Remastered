@@ -14,7 +14,9 @@ class MRPTracker(commands.Cog):
         load_dotenv()
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
-        MONGO_DB_URI = f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=OspreyEyes"
+        DATABASE_IP = os.getenv('DATABASE_IP')
+        DATABASE_USER = os.getenv('DATABASE_USER')
+        MONGO_DB_URI = f"mongodb://{DATABASE_USER}:{DATABASE_TOKEN}@{DATABASE_IP}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource={self.DATABASE_NAME}"
         self.mongo_db_client = AsyncIOMotorClient(MONGO_DB_URI)
 
     mrp_group = app_commands.Group(name="mrp", description="Commands for the MRP tracker.")

@@ -157,10 +157,14 @@ class DataCollectionLayer():
         self.SESSION_ID = os.getenv('GEOFS_SESSION_ID')
         self.ACCOUNT_ID = os.getenv('GEOFS_ACCOUNT_ID')
         self.DATABASE_NAME = os.getenv('DATABASE_NAME')
+        self.DATABASE_IP = os.getenv('DATABASE_IP')
+        self.DATABASE_USER = os.getenv('DATABASE_USER')
 
     def get_mongo_uri(self):
         DATABASE_TOKEN = os.getenv('DATABASE_TOKEN')
-        return f"mongodb://OspreyEyes:{DATABASE_TOKEN}@192.168.1.132:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=OspreyEyes"
+        connection_string = f"mongodb://{self.DATABASE_USER}:{DATABASE_TOKEN}@{self.DATABASE_IP}:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource={self.DATABASE_NAME}"
+        print(connection_string)
+        return connection_string
         
     def start_webhook_threads(self):
         for key in self.queues:
@@ -291,7 +295,7 @@ class DataCollectionLayer():
 
     def process_users(self):
         self.remove_duplicate_users()
-        raw = self.mapAPI.getUsers(None) or []
+        raw = self.mapAPI.getUsers(False) or []
         seen = set(); unique = []
         for u in raw:
             uid = u.userInfo['id']
@@ -469,7 +473,6 @@ def main():
                 data_collection_layer.systemLogs.log(20, f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
         
-
         if configuration["storeUsers"]:
             data_collection_layer.process_users()
         if configuration["saveChatMessages"]:

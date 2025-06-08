@@ -4,19 +4,19 @@ ULIMIATE GOAL: DETECT FRP (as well as log the crap out of everything)
 [x] Player density map
 [x] chat logger
 [x] callsign change tracker 
-[x] Online player count logger
+[X] Online player count logger
 [ ] query online players by callsign keyword
 [x] Aircraft usage distribution
 [x] New pilots joining
 [x] log user aircraft changes
 [x] log user teleportation
 [x] command to display config
-[x] Can talk in geofs chat
-[x] When mentioned the bot responds in chat with "No comment"
+[-] Can talk in geofs chat
+[-] When mentioned the bot responds in chat with "No comment"
 [ ] Dog fight detection and tracking 
 [ ] geofs chat discord channel
 [ ] Targeted account detailed tracking (client side)
-    [ ]- flight path tracking 
+    [ ]- flight path tracking.
     [x]- account activity
     [ ]- alt account identification
 [X] MRP force total and detailed activity loggers
@@ -29,11 +29,23 @@ Being able to query all data collected by various parameters
 - user by id
 - user by callsign
 
+[ ] DMs Osprey when an error is detected.
+
 
 BUGS
 ====================
-config might not get updated
+[ ] config might not get updated
+[ ] callsign changes not being logged correctly in database.
+[ ] current aircraft logging is broken.
 
 TWEAKS
 ====================
-If a pilot is landed, do not count to force patrol time.
+[-] If a pilot is landed, do not count to force patrol time.
+[x] Foos are filtered out in the mapapi
+
+
+
+INVESTIGATIONS
+====================
+[ ] If there are two instances of an account does it break the script.
+    [ ] Is this why that callsign was switching between foo and standard callsgin.
