@@ -5,6 +5,8 @@ import json
 import time
 import logging
 import traceback
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -36,7 +38,6 @@ def make_session() -> requests.Session:
 # one shared session for your entire process
 _session = make_session()
 
-
 def safe_post(
     url: str,
     payload: dict,
@@ -62,7 +63,7 @@ def safe_post(
                 json=payload,
                 timeout=timeout,
                 **request_kwargs
-            )   
+            )
             if resp.text != "":
                 resp.raise_for_status()
                 return resp.json()
@@ -71,7 +72,7 @@ def safe_post(
                 log.error(f"resp.text: {str(type(resp.text))}")
                 log.error("Response is None, no JSON to parse")
                 return None
-
+            
         # ---------- retry on bad JSON -----------------------------------------
         except json.JSONDecodeError as jde:
             log.error("Failed to parse JSON from %s (status %d): %s",

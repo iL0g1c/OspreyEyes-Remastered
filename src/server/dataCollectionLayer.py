@@ -473,7 +473,6 @@ def main():
                 data_collection_layer.systemLogs.log(20, f"Configuration setting {key} changed to {configuration[key]}")
                 previous_configuration[key] = configuration[key]
         
-
         if configuration["storeUsers"]:
             data_collection_layer.process_users()
         if configuration["saveChatMessages"]:

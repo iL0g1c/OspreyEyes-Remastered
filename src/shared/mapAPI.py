@@ -61,15 +61,22 @@ class MapAPI:
             list[Player] | None: Parsed Player list, or None on failure.
         """
         payload = {'id': '', 'gid': None}
-        response_body = safe_post(
-            'https://mps.geo-fs.com/map',
-            payload,
-            timeout=(5, 15),
-            max_json_retries=5
-        )
+        try:
+            response_body = safe_post(
+                'https://mps.geo-fs.com/map',
+                payload,
+                timeout=(5, 15),
+                max_json_retries=5,
+                verify=False
+            )
+        except Exception as e:
+            print(f"Error fetching users: {e}")
+            traceback.print_exc()
+            return []
         if response_body is None:
             return []
         user_list = []
+
         for u in response_body.get('users', []):
             if not u or u.get('acid') is None:
                 continue
