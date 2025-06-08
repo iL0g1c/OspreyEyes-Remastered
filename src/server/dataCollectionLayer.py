@@ -349,6 +349,7 @@ class DataCollectionLayer():
             uid = u.userInfo['id']; cs = u.userInfo['callsign']; ac = u.aircraft['type']; pos = u.coordinates
             # new-account hook
             if uid not in exist_map and configs['displayNewAccounts']:
+                self.newAccountLogs.info(f"New account detected: {uid} with callsign {cs}.")
                 self.queues['new_account'].put({'url':'http://localhost:5001/new-account','data':{'acid':uid,'callsign':cs}})
                 self.update_airforce_patrol_logs(True, {'accountID':uid,'currentCallsign':cs}, filters)
             # event detection
