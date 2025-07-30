@@ -64,8 +64,12 @@ def build_pipeline(usaf_days: int, other_days: int):
                 },
             }
         },
-        {"$match": {"usaf_events.0": {"$exists": True}}},
-        {"$addFields": {"has_other_codes": {"$gt": [{"$size": "$other_events"}, 0]}}},
+        {
+            "$match": {
+                "usaf_events.0": {"$exists": True},
+                "other_events.0": {"$exists": True},
+            }
+        },
         {"$project": {"usaf_events": 0, "other_events": 0}}
     ]
     return pipeline
