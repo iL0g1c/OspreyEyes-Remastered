@@ -1,0 +1,29 @@
+[
+  {
+    "_id": {"$oid": "684c432bf1bca1d963329229"},
+    "accountID": 1290169,
+    "Online": false,
+    "currentAircraft": "Unknown",
+    "currentCallsign": "-noah47-",
+    "pastCallsigns": ["-noah47-", "SkyFox"],
+    "lastOnline": {"$date": "2025-06-15T12:04:16.622Z"}
+  },
+  {
+    "_id": {"$oid": "684c432bf1bca1d963329230"},
+    "accountID": 555,
+    "Online": true,
+    "currentAircraft": "Piper Cub",
+    "currentCallsign": "SkyFox",
+    "pastCallsigns": ["SkyFox", "Alpha"],
+    "lastOnline": {"$date": "2025-06-15T12:05:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "684c432bf1bca1d963329231"},
+    "accountID": 777,
+    "Online": false,
+    "currentAircraft": "Unknown",
+    "currentCallsign": "Alpha",
+    "pastCallsigns": ["Beta"],
+    "lastOnline": {"$date": "2025-06-15T12:05:00.000Z"}
+  }
+]
