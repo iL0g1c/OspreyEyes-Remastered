@@ -112,7 +112,7 @@ exportPngBtn.addEventListener('click', () => exportPng());
 function regenerateGraph() {
   if (!rawAccounts.length) return;
   setStatus('Rebuilding graph with current parameters...');
-  requestIdleCallback(() => {
+  runWhenIdle(() => {
     currentGraph = buildGraph(rawAccounts, {
       minCallsigns: parseInt(minCallsignsInput.value, 10),
       maxAccountsPerCallsign: parseInt(linkThresholdInput.value, 10),
@@ -556,8 +556,8 @@ function resetGraph() {
   exportPngBtn.disabled = true;
 }
 
-function requestIdleCallback(cb) {
-  if ('requestIdleCallback' in window) {
+function runWhenIdle(cb) {
+  if (typeof window.requestIdleCallback === 'function') {
     window.requestIdleCallback(cb);
   } else {
     setTimeout(cb, 0);

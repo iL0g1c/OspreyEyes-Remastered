@@ -16,3 +16,7 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 - Connected components are assigned a shared color palette and rendered with a gradient so that neighboring accounts remain visually related.
 
 Because everything is handled client-side, no user information leaves the machine where the file is loaded.
+
+### Offline dependency
+
+The ForceGraph runtime is vendored locally as `force-graph.min.js`, so the visualization works even on machines without internet access or in hardened environments where CDNs such as unpkg/jsDelivr are blocked.
