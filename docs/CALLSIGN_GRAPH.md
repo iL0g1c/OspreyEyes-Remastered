@@ -43,5 +43,7 @@ the UI.
   SVG (positions are converted into vector instructions after the simulation
   settles).
 
-The simulation is powered by `force-graph`'s WebGL renderer, so even the large
-components stay interactive while the layout cools to a low-tension state.
+The simulation is powered by the `force-graph` WebGL renderer, which is now
+vendored inside `src/tools/user_graph/static/vendor` so the UI never depends on
+an external CDN. This keeps even large components interactive while the layout
+cools to a low-tension state.
