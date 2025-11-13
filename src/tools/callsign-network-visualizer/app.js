@@ -22,9 +22,8 @@ const graph = ForceGraph()(document.getElementById('graph'))
   .cooldownTicks(200)
   .warmupTicks(100)
   .cooldownTime(20000)
-  .linkOpacity(0.4)
   .linkWidth(link => 0.5 + Math.log2(1 + link.weight))
-  .linkColor(link => link.color)
+  .linkColor(link => applyOpacity(link.color, 0.4))
   .nodeLabel(node => node.tooltip)
   .onEngineStop(() => setStatus('Layout stabilized. You can now explore or export the map.'))
   .onNodeHover(node => {
@@ -390,6 +389,14 @@ function rgbToHex(r, g, b) {
   return `#${[r, g, b]
     .map(value => value.toString(16).padStart(2, '0'))
     .join('')}`;
+}
+
+function applyOpacity(hexColor, alpha = 1) {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) {
+    return `rgba(125, 211, 252, ${alpha})`;
+  }
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
 }
 
 function makeLinkKey(a, b) {
