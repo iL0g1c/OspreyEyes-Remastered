@@ -9,6 +9,8 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 4. Search for a specific account ID or callsign with the finder box.
 5. Export the current view to **SVG** (vector) or **PNG** (raster) using the buttons in the header.
 
+Large MongoDB exports (100 MB+) are streamed and parsed incrementally so you can upload multi-gigabyte datasets without exhausting browser memory. The status banner shows live byte/percentage progress plus how many accounts have been parsed so far.
+
 > Want to make sure everything is wired up before loading a large dump? Upload
 > `sample-data/multi-account-example.json`, which contains three synthetic accounts that intentionally share
 > callsigns so the graph immediately renders two links.

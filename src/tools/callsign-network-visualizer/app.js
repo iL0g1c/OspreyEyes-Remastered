@@ -83,24 +83,29 @@ window.addEventListener('resize', () => {
   graph.d3ReheatSimulation();
 });
 
-fileInput.addEventListener('change', event => {
+fileInput.addEventListener('change', async event => {
   const [file] = event.target.files;
   if (!file) return;
   resetGraph();
   setStatus(`Loading ${file.name}...`);
-  const reader = new FileReader();
-  reader.onload = ({ target }) => {
-    try {
-      rawAccounts = normalizeDataset(target.result);
-      setStatus(`Loaded ${rawAccounts.length.toLocaleString()} accounts. Building graph...`);
-      regenerateGraph();
-    } catch (error) {
-      console.error(error);
-      setStatus(`Unable to parse file: ${error.message}`);
-    }
-  };
-  reader.onerror = () => setStatus('Failed to read file. Please try again.');
-  reader.readAsText(file);
+  try {
+    rawAccounts = await loadDatasetFromFile(file, progress => {
+      const percent = progress.totalBytes
+        ? ((progress.bytesRead / progress.totalBytes) * 100).toFixed(1)
+        : '0.0';
+      const parsed = progress.parsed.toLocaleString();
+      setStatus(
+        `Parsing ${file.name}: ${percent}% (${formatBytes(progress.bytesRead)} of ${formatBytes(
+          progress.totalBytes
+        )}) · ${parsed} accounts processed...`
+      );
+    });
+    setStatus(`Loaded ${rawAccounts.length.toLocaleString()} accounts. Building graph...`);
+    regenerateGraph();
+  } catch (error) {
+    console.error(error);
+    setStatus(`Unable to load file: ${error.message}`);
+  }
 });
 
 [minCallsignsInput, linkThresholdInput].forEach(input => {
@@ -234,6 +239,179 @@ function normalizeDataset(text) {
     if (!lines.length) throw error;
     return lines.map(line => JSON.parse(line));
   }
+}
+
+async function loadDatasetFromFile(file, onProgress) {
+  const LARGE_FILE_THRESHOLD = 120 * 1024 * 1024; // 120 MB
+  if (file.size <= LARGE_FILE_THRESHOLD || typeof file.stream !== 'function') {
+    const text = await file.text();
+    return normalizeDataset(text);
+  }
+  return streamLargeDataset(file, onProgress);
+}
+
+async function streamLargeDataset(file, onProgress) {
+  const reader = file.stream().getReader();
+  const decoder = new TextDecoder();
+  const accounts = [];
+  let buffer = '';
+  let bytesRead = 0;
+  let detectedFormat = null;
+  const arrayState = {
+    started: false,
+    depth: 0,
+    inString: false,
+    escapeNext: false,
+    objectStart: -1,
+    done: false
+  };
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (value) {
+      bytesRead += value.byteLength;
+      buffer += decoder.decode(value, { stream: !done });
+    }
+    if (done) {
+      buffer += decoder.decode();
+    }
+
+    if (typeof onProgress === 'function') {
+      onProgress({ bytesRead, totalBytes: file.size, parsed: accounts.length });
+    }
+
+    if (!detectedFormat) {
+      const trimmed = buffer.trimStart();
+      if (!trimmed.length) {
+        if (done) break;
+        continue;
+      }
+      const firstChar = trimmed[0];
+      if (firstChar === '[') {
+        detectedFormat = 'array';
+      } else if (firstChar === '{') {
+        detectedFormat = 'ndjson';
+      } else {
+        throw new Error('Unsupported JSON format. Expected an array or newline-delimited JSON.');
+      }
+    }
+
+    if (detectedFormat === 'ndjson') {
+      const segments = buffer.split(/\r?\n/);
+      buffer = segments.pop() ?? '';
+      segments.forEach(segment => {
+        const trimmed = segment.trim();
+        if (!trimmed) return;
+        accounts.push(JSON.parse(trimmed));
+      });
+      if (done) {
+        const tail = buffer.trim();
+        if (tail) accounts.push(JSON.parse(tail));
+        buffer = '';
+      }
+    } else if (detectedFormat === 'array') {
+      const { items, remaining } = consumeArrayBuffer(buffer, arrayState);
+      if (items.length) {
+        accounts.push(...items);
+      }
+      buffer = remaining;
+      if (arrayState.done) {
+        if (typeof reader.cancel === 'function') {
+          await reader.cancel();
+        }
+        break;
+      }
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  if (detectedFormat === 'array' && !arrayState.done) {
+    const { items } = consumeArrayBuffer(buffer, arrayState);
+    if (items.length) {
+      accounts.push(...items);
+    }
+  } else if (detectedFormat === 'ndjson' && buffer.trim()) {
+    accounts.push(JSON.parse(buffer.trim()));
+  }
+
+  return accounts;
+}
+
+function consumeArrayBuffer(buffer, state) {
+  const items = [];
+  let i = 0;
+  while (i < buffer.length) {
+    const char = buffer[i];
+    if (!state.started) {
+      if (isWhitespace(char)) {
+        i += 1;
+        continue;
+      }
+      if (char === '[') {
+        state.started = true;
+        i += 1;
+        continue;
+      }
+      throw new Error('JSON array export must start with "[".');
+    }
+
+    if (state.inString) {
+      if (state.escapeNext) {
+        state.escapeNext = false;
+      } else if (char === '\\') {
+        state.escapeNext = true;
+      } else if (char === '"') {
+        state.inString = false;
+      }
+      i += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      state.inString = true;
+      i += 1;
+      continue;
+    }
+
+    if (char === '{') {
+      if (state.depth === 0) {
+        state.objectStart = i;
+      }
+      state.depth += 1;
+    } else if (char === '}') {
+      state.depth -= 1;
+      if (state.depth === 0 && state.objectStart !== -1) {
+        const chunk = buffer.slice(state.objectStart, i + 1);
+        items.push(JSON.parse(chunk));
+        buffer = buffer.slice(i + 1);
+        i = -1;
+        state.objectStart = -1;
+      }
+    } else if (char === ']' && state.depth === 0) {
+      state.done = true;
+      buffer = buffer.slice(i + 1);
+      break;
+    }
+
+    i += 1;
+  }
+
+  return { items, remaining: buffer };
+}
+
+function isWhitespace(char) {
+  return char === ' ' || char === '\n' || char === '\r' || char === '\t';
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const power = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / 1024 ** power;
+  return `${value.toFixed(power === 0 ? 0 : 1)} ${units[power]}`;
 }
 
 function normalizeAccount(account, fallbackIndex) {
