@@ -44,13 +44,41 @@ const graph = Graph(graphElement)
   .linkColor(link => `rgba(226, 232, 240, ${Math.min(0.8, 0.25 + Math.log(link.weight + 1) * 0.15)})`)
   .graphData({ nodes: [], links: [] });
 
+function createCenterGravityForce(strength = 0.02) {
+  let nodes = [];
+  const force = () => {
+    if (!nodes || !nodes.length) {
+      return;
+    }
+    nodes.forEach(node => {
+      const x = node.x || 0;
+      const y = node.y || 0;
+      node.vx = (node.vx || 0) - x * strength;
+      node.vy = (node.vy || 0) - y * strength;
+    });
+  };
+  force.initialize = initNodes => {
+    nodes = initNodes || [];
+  };
+  force.strength = value => {
+    if (typeof value === 'undefined') {
+      return strength;
+    }
+    strength = value;
+    return force;
+  };
+  return force;
+}
+
 const d3Api = window.d3;
-if (graph.d3Force && d3Api && typeof d3Api.forceRadial === 'function') {
-  const centerGravity = d3Api.forceRadial(0, 0, 0);
-  centerGravity.strength(0.02);
-  graph.d3Force('centerGravity', centerGravity);
-} else {
-  console.warn('d3 radial force unavailable; center gravity skipped.');
+if (graph.d3Force) {
+  if (d3Api && typeof d3Api.forceRadial === 'function') {
+    const centerGravity = d3Api.forceRadial(0, 0, 0).strength(0.02);
+    graph.d3Force('centerGravity', centerGravity);
+  } else {
+    console.info('Applying fallback center gravity force.');
+    graph.d3Force('centerGravity', createCenterGravityForce(0.02));
+  }
 }
 
 graph.onEngineStop(() => {

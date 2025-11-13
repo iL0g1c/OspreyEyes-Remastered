@@ -42,6 +42,9 @@ the UI.
 * **Export** – capture the current view as either a PNG (canvas snapshot) or an
   SVG (positions are converted into vector instructions after the simulation
   settles).
+* **Center gravity** – every layout includes a subtle radial force that keeps
+  disconnected components gently pulled toward the origin so they remain in the
+  viewport, even when the optional d3 helpers are unavailable.
 
 The simulation is powered by the `force-graph` WebGL renderer, which is now
 vendored inside `src/tools/user_graph/static/vendor` so the UI never depends on
