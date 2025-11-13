@@ -14,8 +14,17 @@ let currentComponentId = null;
 let jobPoller = null;
 let latestSummary = [];
 
-const Graph = ForceGraph2D();
 const graphElement = document.getElementById('graph');
+const graphEngineFactory = window.ForceGraph2D || window.ForceGraph;
+
+if (typeof graphEngineFactory !== 'function') {
+  const error = 'ForceGraph renderer failed to load. Please verify the CDN is reachable and refresh the page.';
+  console.error(error);
+  uploadStatus.textContent = error;
+  throw new Error(error);
+}
+
+const Graph = graphEngineFactory();
 const graph = Graph(graphElement)
   .nodeId('id')
   .nodeLabel(node => `${node.label}\nPast callsigns: ${node.nodeSize}\nShared overlaps: ${node.sharedCallsignCount}\nDegree: ${node.degree}`)
