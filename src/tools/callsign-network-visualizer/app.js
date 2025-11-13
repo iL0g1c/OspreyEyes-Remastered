@@ -95,6 +95,14 @@ fileInput.addEventListener('change', async event => {
   setStatus(`Loading ${file.name}...`);
   showProgress(`Preparing ${file.name}...`);
   try {
+    let streamingMode = false;
+    const handleStreamingStart = () => {
+      streamingMode = true;
+      setStatus(
+        `Streaming ${file.name} (${formatBytes(file.size)}). Large-file mode keeps the UI responsive while we parse chunks...`
+      );
+      updateProgress(0, `Streaming ${file.name}...`);
+    };
     rawAccounts = await loadDatasetFromFile(file, progress => {
       const percent = progress.totalBytes
         ? ((progress.bytesRead / progress.totalBytes) * 100).toFixed(1)
@@ -105,12 +113,13 @@ fileInput.addEventListener('change', async event => {
           ? `${percent}% · ${formatBytes(progress.bytesRead)} of ${formatBytes(progress.totalBytes)} · ${parsed} accounts`
           : `${formatBytes(progress.bytesRead)} processed · ${parsed} accounts`
       );
+      const phase = streamingMode ? 'Streaming' : 'Parsing';
       setStatus(
-        `Parsing ${file.name}: ${percent}% (${formatBytes(progress.bytesRead)} of ${formatBytes(
+        `${phase} ${file.name}: ${percent}% (${formatBytes(progress.bytesRead)} of ${formatBytes(
           progress.totalBytes
         )}) · ${parsed} accounts processed...`
       );
-    });
+    }, handleStreamingStart);
     completeProgress(`Parsed ${rawAccounts.length.toLocaleString()} accounts.`);
     setStatus(`Loaded ${rawAccounts.length.toLocaleString()} accounts. Building graph...`);
     regenerateGraph();
@@ -254,7 +263,7 @@ function normalizeDataset(text) {
   }
 }
 
-async function loadDatasetFromFile(file, onProgress) {
+async function loadDatasetFromFile(file, onProgress, onStreamingStart) {
   const LARGE_FILE_THRESHOLD = 120 * 1024 * 1024; // 120 MB
   if (file.size <= LARGE_FILE_THRESHOLD || typeof file.stream !== 'function') {
     if (typeof onProgress === 'function') {
@@ -267,6 +276,9 @@ async function loadDatasetFromFile(file, onProgress) {
     }
     return result;
   }
+  if (typeof onStreamingStart === 'function') {
+    onStreamingStart();
+  }
   return streamLargeDataset(file, onProgress);
 }
 
@@ -277,6 +289,7 @@ async function streamLargeDataset(file, onProgress) {
   let buffer = '';
   let bytesRead = 0;
   let detectedFormat = null;
+  const yieldProgress = createYieldController();
   const arrayState = {
     started: false,
     depth: 0,
@@ -319,20 +332,28 @@ async function streamLargeDataset(file, onProgress) {
     if (detectedFormat === 'ndjson') {
       const segments = buffer.split(/\r?\n/);
       buffer = segments.pop() ?? '';
-      segments.forEach(segment => {
+      for (const segment of segments) {
         const trimmed = segment.trim();
-        if (!trimmed) return;
+        if (!trimmed) continue;
         accounts.push(JSON.parse(trimmed));
-      });
+        // Yield periodically so the UI can update the streamed progress bar.
+        await yieldProgress();
+      }
       if (done) {
         const tail = buffer.trim();
-        if (tail) accounts.push(JSON.parse(tail));
+        if (tail) {
+          accounts.push(JSON.parse(tail));
+          await yieldProgress();
+        }
         buffer = '';
       }
     } else if (detectedFormat === 'array') {
       const { items, remaining } = consumeArrayBuffer(buffer, arrayState);
       if (items.length) {
-        accounts.push(...items);
+        for (const item of items) {
+          accounts.push(item);
+          await yieldProgress();
+        }
       }
       buffer = remaining;
       if (arrayState.done) {
@@ -351,13 +372,55 @@ async function streamLargeDataset(file, onProgress) {
   if (detectedFormat === 'array' && !arrayState.done) {
     const { items } = consumeArrayBuffer(buffer, arrayState);
     if (items.length) {
-      accounts.push(...items);
+      for (const item of items) {
+        accounts.push(item);
+        await yieldProgress();
+      }
     }
   } else if (detectedFormat === 'ndjson' && buffer.trim()) {
     accounts.push(JSON.parse(buffer.trim()));
+    await yieldProgress();
   }
 
   return accounts;
+}
+
+function createYieldController(batchSize = 400, maxIntervalMs = 120) {
+  let processedSinceYield = 0;
+  let lastYield = now();
+  return async function maybeYield(force = false) {
+    processedSinceYield += 1;
+    const current = now();
+    if (!force && processedSinceYield < batchSize && current - lastYield < maxIntervalMs) {
+      return;
+    }
+    processedSinceYield = 0;
+    await yieldToBrowser();
+    lastYield = now();
+  };
+}
+
+function yieldToBrowser() {
+  return new Promise(resolve => {
+    if (typeof window !== 'undefined') {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(() => resolve());
+        return;
+      }
+      if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => resolve());
+        return;
+      }
+    }
+    setTimeout(resolve, 0);
+  });
+}
+
+function now() {
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    return performance.now();
+  }
+  return Date.now();
 }
 
 function consumeArrayBuffer(buffer, state) {
