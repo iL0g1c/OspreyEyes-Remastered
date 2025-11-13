@@ -12,6 +12,8 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 ## Data processing rules
 - Each account becomes a node whose size is proportional to its unique `pastCallsigns` entries.
 - Two nodes are connected if they share a callsign. The strength of the edge is the sum of their recency scores for that callsign (more recent changes create stronger links).
+- An account's current callsign is folded into its history (using the `lastOnline` timestamp) so the freshest identity is always represented, even if it never appeared in `pastCallsigns`.
+- Callsign comparisons are case-insensitive, so `Noah47`, `NOAH47`, and `noah47` all produce links.
 - To keep the visualization performant for very large collections (200k+ accounts), the UI caps the number of accounts connected through any single callsign. This safeguard can be adjusted or removed from the control panel.
 - Connected components are assigned a shared color palette and rendered with a gradient so that neighboring accounts remain visually related.
 

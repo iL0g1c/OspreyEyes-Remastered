@@ -149,7 +149,7 @@ function buildGraph(accounts, options) {
     nodeById.set(normalised.id, normalised);
 
     normalised.callsigns.forEach(entry => {
-      const key = entry.value;
+      const key = entry.normalized ?? (typeof entry.value === 'string' ? entry.value.toLowerCase() : entry.value);
       if (!key) return;
       if (!callsignIndex.has(key)) {
         callsignIndex.set(key, []);
@@ -219,7 +219,11 @@ function normalizeDataset(text) {
 function normalizeAccount(account, fallbackIndex) {
   if (!account) return null;
   const id = account.accountID ?? account._id?.$oid ?? `account-${fallbackIndex}`;
-  const callsigns = normalizeCallsigns(account.pastCallsigns || []);
+  const callsigns = withCurrentCallsign(
+    normalizeCallsigns(account.pastCallsigns || []),
+    account.currentCallsign,
+    account.lastOnline
+  );
   if (!callsigns.length) return null;
 
   const deduped = dedupeCallsigns(callsigns);
@@ -262,6 +266,15 @@ function normalizeCallsigns(rawList) {
     .filter(Boolean);
 }
 
+function withCurrentCallsign(list, currentCallsign, timestamp) {
+  const entries = Array.isArray(list) ? [...list] : [];
+  const current = buildCallsignEntry(currentCallsign, timestamp);
+  if (current) {
+    entries.push(current);
+  }
+  return entries;
+}
+
 function buildCallsignEntry(value, timestamp) {
   if (!value || typeof value !== 'string') return null;
   const sanitized = value.trim();
@@ -269,6 +282,7 @@ function buildCallsignEntry(value, timestamp) {
   const ts = extractDate(timestamp);
   return {
     value: sanitized,
+    normalized: sanitized.toLowerCase(),
     timestamp: ts ? ts.getTime() : null,
     score: computeRecencyScore(ts)
   };
@@ -277,9 +291,10 @@ function buildCallsignEntry(value, timestamp) {
 function dedupeCallsigns(entries) {
   const seen = new Map();
   entries.forEach(entry => {
-    const existing = seen.get(entry.value);
+    const key = entry.normalized ?? entry.value.toLowerCase();
+    const existing = seen.get(key);
     if (!existing || (entry.timestamp || 0) > (existing.timestamp || 0)) {
-      seen.set(entry.value, entry);
+      seen.set(key, entry);
     }
   });
   return Array.from(seen.values());
