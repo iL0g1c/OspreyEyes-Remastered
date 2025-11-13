@@ -8,6 +8,7 @@ const linkThresholdInput = document.getElementById('link-threshold');
 const repulsionInput = document.getElementById('repulsion');
 const distanceInput = document.getElementById('distance');
 const searchInput = document.getElementById('search');
+const graphContainer = document.getElementById('graph');
 
 let rawAccounts = [];
 let currentGraph = { nodes: [], links: [] };
@@ -16,14 +17,14 @@ let highlightedNode = null;
 let hoverNeighbors = new Set();
 let searchTimeout = null;
 
-const graph = ForceGraph()(document.getElementById('graph'))
+const graph = ForceGraph()(graphContainer)
   .nodeId('id')
   .nodeVal(node => Math.max(1, node.callsignCount))
   .cooldownTicks(200)
   .warmupTicks(100)
   .cooldownTime(20000)
-  .linkWidth(link => 0.5 + Math.log2(1 + link.weight))
-  .linkColor(link => applyOpacity(link.color, 0.4))
+  .linkWidth(link => Math.min(6, 1 + Math.log2(1 + link.weight)))
+  .linkColor(link => applyOpacity(link.color, 0.8))
   .nodeLabel(node => node.tooltip)
   .onEngineStop(() => setStatus('Layout stabilized. You can now explore or export the map.'))
   .onNodeHover(node => {
@@ -60,6 +61,12 @@ graph.nodePointerAreaPaint((node, color, ctx) => {
   ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
   ctx.fillStyle = color;
   ctx.fill();
+});
+
+resizeGraph();
+window.addEventListener('resize', () => {
+  resizeGraph();
+  graph.d3ReheatSimulation();
 });
 
 fileInput.addEventListener('change', event => {
@@ -562,4 +569,12 @@ function runWhenIdle(cb) {
   } else {
     setTimeout(cb, 0);
   }
+}
+
+function resizeGraph() {
+  if (!graphContainer) return;
+  const { width, height } = graphContainer.getBoundingClientRect();
+  if (!width || !height) return;
+  graph.width(width);
+  graph.height(height);
 }

@@ -122,6 +122,12 @@ button:not(:disabled):hover {
 #graph {
   flex: 1;
   min-height: 60vh;
+  height: calc(100vh - 260px);
+  border-radius: 20px;
+  background: radial-gradient(circle at top, rgba(79, 70, 229, 0.12), transparent 60%),
+    rgba(5, 6, 10, 0.95);
+  position: relative;
+  overflow: hidden;
 }
 
 main {
@@ -132,10 +138,10 @@ main {
 
 #graph canvas {
   width: 100% !important;
-  height: calc(100vh - 260px) !important;
-  border-radius: 20px;
-  background: radial-gradient(circle at top, rgba(79, 70, 229, 0.12), transparent 60%),
-    rgba(5, 6, 10, 0.95);
+  height: 100% !important;
+  display: block;
+  border-radius: inherit;
+  background: transparent;
 }
 
 .tooltip {
@@ -165,6 +171,6 @@ main {
   }
 
   #graph canvas {
-    height: calc(100vh - 320px) !important;
+    height: 100% !important;
   }
 }
