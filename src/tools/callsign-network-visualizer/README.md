@@ -9,6 +9,10 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 4. Search for a specific account ID or callsign with the finder box.
 5. Export the current view to **SVG** (vector) or **PNG** (raster) using the buttons in the header.
 
+> Want to make sure everything is wired up before loading a large dump? Upload
+> `sample-data/multi-account-example.json`, which contains three synthetic accounts that intentionally share
+> callsigns so the graph immediately renders two links.
+
 ## Data processing rules
 - Each account becomes a node whose size is proportional to its unique `pastCallsigns` entries.
 - Two nodes are connected if they share a callsign. The strength of the edge is the sum of their recency scores for that callsign (more recent changes create stronger links).
@@ -18,6 +22,8 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 - Connected components are assigned a shared color palette and rendered with a gradient so that neighboring accounts remain visually related.
 
 Because everything is handled client-side, no user information leaves the machine where the file is loaded.
+
+If a dataset contains zero overlapping callsigns (or the filters hide every overlap), the status bar now makes that explicit so you know the missing links are a data issue rather than a rendering problem. Try lowering the "Minimum callsigns per node" or raising the "Maximum accounts per callsign" threshold before assuming something is broken.
 
 ### Offline dependency
 

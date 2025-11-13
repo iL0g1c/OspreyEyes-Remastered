@@ -13,6 +13,20 @@ const graphContainer = document.getElementById('graph');
 let rawAccounts = [];
 let currentGraph = { nodes: [], links: [] };
 let adjacencyMap = new Map();
+window.callsignGraphState = {
+  get graph() {
+    return currentGraph;
+  },
+  get status() {
+    return statusEl.textContent;
+  },
+  get nodes() {
+    return currentGraph.nodes;
+  },
+  get links() {
+    return currentGraph.links;
+  }
+};
 let highlightedNode = null;
 let hoverNeighbors = new Set();
 let searchTimeout = null;
@@ -130,7 +144,13 @@ function regenerateGraph() {
     updateStats(currentGraph);
     exportSvgBtn.disabled = currentGraph.nodes.length === 0;
     exportPngBtn.disabled = currentGraph.nodes.length === 0;
-    setStatus(`Rendered ${currentGraph.nodes.length.toLocaleString()} nodes and ${currentGraph.links.length.toLocaleString()} links.`);
+    const nodeCount = currentGraph.nodes.length.toLocaleString();
+    const linkCount = currentGraph.links.length.toLocaleString();
+    let message = `Rendered ${nodeCount} nodes and ${linkCount} links.`;
+    if (currentGraph.links.length === 0) {
+      message += ' No shared callsigns were detected. Try lowering the minimum callsigns per node or increasing the maximum accounts per callsign if you expect overlaps.';
+    }
+    setStatus(message);
   });
 }
 
