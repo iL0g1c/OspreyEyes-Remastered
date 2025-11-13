@@ -22,7 +22,6 @@ const graph = ForceGraph()(document.getElementById('graph'))
   .cooldownTicks(200)
   .warmupTicks(100)
   .cooldownTime(20000)
-  .linkDirectionalParticles(0)
   .linkOpacity(0.4)
   .linkWidth(link => 0.5 + Math.log2(1 + link.weight))
   .linkColor(link => link.color)
@@ -33,6 +32,10 @@ const graph = ForceGraph()(document.getElementById('graph'))
     hoverNeighbors = collectNeighbors(node);
   })
   .onNodeClick(node => focusOnNode(node));
+
+if (typeof graph.linkDirectionalParticles === 'function') {
+  graph.linkDirectionalParticles(0);
+}
 
 graph.d3Force('charge').strength(() => parseInt(repulsionInput.value, 10));
 graph.d3Force('link').distance(link => link.distance).strength(0.1);
