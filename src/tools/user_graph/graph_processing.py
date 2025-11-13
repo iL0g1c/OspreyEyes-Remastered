@@ -101,6 +101,7 @@ class GraphBuildResult:
     components: Dict[str, GraphComponent]
     total_nodes: int
     total_edges: int
+    node_to_component: Dict[str, str]
 
     def summary(self) -> List[Dict[str, object]]:
         return sorted(
@@ -108,6 +109,49 @@ class GraphBuildResult:
             key=lambda entry: entry["nodeCount"],
             reverse=True,
         )
+
+    def component_for_account(self, account_id: str) -> Optional[GraphComponent]:
+        component_id = self.node_to_component.get(account_id)
+        if not component_id:
+            return None
+        return self.components.get(component_id)
+
+    def combined_payload(self, limit: Optional[int] = None) -> Dict[str, object]:
+        all_nodes: List[GraphNode] = []
+        for component in self.components.values():
+            all_nodes.extend(component.nodes)
+        if limit and limit < len(all_nodes):
+            sorted_nodes = sorted(
+                all_nodes,
+                key=lambda node: (node.shared_callsign_count, node.node_size),
+                reverse=True,
+            )
+            limited_nodes = sorted_nodes[:limit]
+            node_ids = {node.id for node in limited_nodes}
+        else:
+            limited_nodes = all_nodes
+            node_ids = {node.id for node in limited_nodes}
+        edges: List[Dict[str, object]] = []
+        for component in self.components.values():
+            for edge in component.edges:
+                if edge.source in node_ids and edge.target in node_ids:
+                    edges.append(edge.to_dict())
+        return {
+            "componentId": "all",
+            "nodes": [node.to_dict() for node in limited_nodes],
+            "edges": edges,
+            "componentCount": len(self.components),
+            "nodeCount": self.total_nodes,
+            "edgeCount": self.total_edges,
+        }
+
+    def payload_for_account(self, account_id: str, limit: Optional[int] = None) -> Optional[Dict[str, object]]:
+        component = self.component_for_account(account_id)
+        if not component:
+            return None
+        payload = component.payload(limit)
+        payload["rootAccountId"] = account_id
+        return payload
 
 
 def _iter_users(file_path: Path) -> Iterable[Dict[str, object]]:
@@ -196,12 +240,14 @@ def _build_components(nodes: Dict[str, GraphNode], edges: List[GraphEdge]) -> Gr
         union(edge.source, edge.target)
 
     components: Dict[str, GraphComponent] = {}
+    node_to_component: Dict[str, str] = {}
     for node_id, node in nodes.items():
         root = find(node_id)
         if root not in components:
             components[root] = GraphComponent(component_id=root, color=_random_color(root), nodes=[], edges=[])
         node.color = components[root].color
         components[root].nodes.append(node)
+        node_to_component[node_id] = root
 
     for edge in edges:
         root = find(edge.source)
@@ -209,7 +255,12 @@ def _build_components(nodes: Dict[str, GraphNode], edges: List[GraphEdge]) -> Gr
 
     total_edges = len(edges)
     total_nodes = len(nodes)
-    return GraphBuildResult(components=components, total_edges=total_edges, total_nodes=total_nodes)
+    return GraphBuildResult(
+        components=components,
+        total_edges=total_edges,
+        total_nodes=total_nodes,
+        node_to_component=node_to_component,
+    )
 
 
 def build_graph_from_export(
@@ -348,6 +399,20 @@ class GraphProcessingService:
         if not component:
             return None
         return component.payload(limit)
+
+    def get_combined_graph(self, job_id: str, limit: Optional[int] = None) -> Optional[Dict[str, object]]:
+        with self._lock:
+            graph = self._graphs.get(job_id)
+        if not graph:
+            return None
+        return graph.combined_payload(limit)
+
+    def get_graph_for_account(self, job_id: str, account_id: str, limit: Optional[int] = None) -> Optional[Dict[str, object]]:
+        with self._lock:
+            graph = self._graphs.get(job_id)
+        if not graph:
+            return None
+        return graph.payload_for_account(account_id, limit)
 
     def drop_job(self, job_id: str) -> None:
         with self._lock:

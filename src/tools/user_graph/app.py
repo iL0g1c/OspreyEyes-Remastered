@@ -25,6 +25,18 @@ def index() -> str:
     return render_template("index.html")
 
 
+# Shared helpers
+
+
+def _parse_limit(value: Optional[str]) -> Optional[int]:
+    if value is None or value == "":
+        return None
+    parsed = int(value)
+    if parsed < 0:
+        parsed = 0
+    return parsed
+
+
 @app.post("/api/upload")
 def upload() -> tuple:
     file = request.files.get("file")
@@ -55,15 +67,32 @@ def drop_job(job_id: str):
 @app.get("/api/job/<job_id>/component/<component_id>")
 def component(job_id: str, component_id: str):
     limit_param = request.args.get("limit")
-    limit: Optional[int] = None
-    if limit_param:
-        try:
-            limit = max(0, int(limit_param))
-        except ValueError:
-            return jsonify({"error": "limit must be numeric"}), 400
+    try:
+        limit = _parse_limit(limit_param)
+    except ValueError:
+        return jsonify({"error": "limit must be numeric"}), 400
     payload = processor.get_component(job_id, component_id, limit if limit else None)
     if not payload:
         return jsonify({"error": "Component not found"}), 404
+    return jsonify(payload)
+
+
+@app.get("/api/job/<job_id>/graph")
+def graph_view(job_id: str):
+    limit_param = request.args.get("limit")
+    root_account = request.args.get("rootAccount")
+    try:
+        limit = _parse_limit(limit_param)
+    except ValueError:
+        return jsonify({"error": "limit must be numeric"}), 400
+    if root_account:
+        payload = processor.get_graph_for_account(job_id, root_account.strip(), limit if limit else None)
+        if not payload:
+            return jsonify({"error": "Account not found"}), 404
+        return jsonify(payload)
+    payload = processor.get_combined_graph(job_id, limit if limit else None)
+    if not payload:
+        return jsonify({"error": "Graph not ready"}), 404
     return jsonify(payload)
 
 

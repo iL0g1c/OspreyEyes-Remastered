@@ -8,11 +8,15 @@ const focusButton = document.getElementById('focus-button');
 const resetViewButton = document.getElementById('reset-view');
 const exportPngButton = document.getElementById('export-png');
 const exportSvgButton = document.getElementById('export-svg');
+const loadAllButton = document.getElementById('load-all');
+const rootInput = document.getElementById('root-account');
+const loadRootButton = document.getElementById('load-root');
 
 let currentJobId = null;
 let currentComponentId = null;
 let jobPoller = null;
 let latestSummary = [];
+let currentView = null;
 
 const graphElement = document.getElementById('graph');
 const graphEngineFactory = window.ForceGraph2D || window.ForceGraph;
@@ -68,6 +72,9 @@ async function uploadDataset(event) {
     const payload = await response.json();
     currentJobId = payload.jobId;
     latestSummary = [];
+    currentComponentId = null;
+    currentView = null;
+    graph.graphData({ nodes: [], links: [] });
     setStatus(`Upload complete. Job ${currentJobId} queued.`);
     pollJobStatus();
   } catch (error) {
@@ -88,6 +95,8 @@ function disableInteraction(isDisabled) {
   resetViewButton.disabled = isDisabled;
   exportPngButton.disabled = isDisabled;
   exportSvgButton.disabled = isDisabled;
+  loadAllButton.disabled = isDisabled;
+  loadRootButton.disabled = isDisabled;
 }
 
 async function pollJobStatus() {
@@ -160,6 +169,7 @@ async function loadComponent(componentId, options = {}) {
     return;
   }
   currentComponentId = componentId;
+  currentView = { type: 'component', id: componentId };
   const limit = typeof options.limit === 'number' ? options.limit : parseInt(nodeLimitInput.value, 10) || undefined;
   setStatus(`Loading component ${componentId} with limit ${limit || 'all'}…`);
   try {
@@ -181,14 +191,87 @@ function renderGraph(data) {
     return;
   }
   graph.graphData({ nodes: data.nodes, links: data.edges });
-  setStatus(`Component ${data.componentId} ready with ${data.nodes.length.toLocaleString()} nodes and ${data.edges.length.toLocaleString()} edges.`);
+  const nodeCount = data.nodes.length.toLocaleString();
+  const edgeCount = data.edges.length.toLocaleString();
+  if (data.componentId === 'all') {
+    setStatus(`All ${data.componentCount} components rendered with ${nodeCount} nodes and ${edgeCount} edges.`);
+  } else if (data.rootAccountId) {
+    setStatus(`Component ${data.componentId} containing account ${data.rootAccountId} ready with ${nodeCount} nodes and ${edgeCount} edges.`);
+  } else {
+    setStatus(`Component ${data.componentId} ready with ${nodeCount} nodes and ${edgeCount} edges.`);
+  }
 }
 
 function applyLimit() {
-  if (!currentComponentId) {
+  const limit = parseInt(nodeLimitInput.value, 10);
+  if (!currentView) {
     return;
   }
-  loadComponent(currentComponentId, { limit: parseInt(nodeLimitInput.value, 10) });
+  if (currentView.type === 'component' && currentComponentId) {
+    loadComponent(currentComponentId, { limit });
+  } else if (currentView.type === 'all') {
+    loadAllComponents({ limit });
+  } else if (currentView.type === 'root') {
+    loadRootGraph(currentView.id, { limit });
+  }
+}
+
+async function loadAllComponents(options = {}) {
+  if (!currentJobId) {
+    return;
+  }
+  currentView = { type: 'all' };
+  currentComponentId = null;
+  const limit = typeof options.limit === 'number' ? options.limit : parseInt(nodeLimitInput.value, 10) || undefined;
+  setStatus(`Loading all components with limit ${limit || 'all'}…`);
+  try {
+    const params = new URLSearchParams();
+    if (limit) {
+      params.set('limit', limit);
+    }
+    const response = await fetch(`/api/job/${currentJobId}/graph${params.toString() ? `?${params}` : ''}`);
+    if (!response.ok) {
+      const problem = await response.json().catch(() => ({}));
+      throw new Error(problem.error || 'Unable to fetch combined graph');
+    }
+    const payload = await response.json();
+    renderGraph(payload);
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message);
+  }
+}
+
+async function loadRootGraph(rootAccount, options = {}) {
+  if (!currentJobId) {
+    return;
+  }
+  const rootId = (rootAccount || rootInput.value || '').trim();
+  if (!rootId) {
+    setStatus('Enter an account ID to load its connections.');
+    return;
+  }
+  currentView = { type: 'root', id: rootId };
+  const limit = typeof options.limit === 'number' ? options.limit : parseInt(nodeLimitInput.value, 10) || undefined;
+  setStatus(`Loading component containing ${rootId} with limit ${limit || 'all'}…`);
+  try {
+    const params = new URLSearchParams();
+    if (limit) {
+      params.set('limit', limit);
+    }
+    params.set('rootAccount', rootId);
+    const response = await fetch(`/api/job/${currentJobId}/graph?${params.toString()}`);
+    if (!response.ok) {
+      const problem = await response.json().catch(() => ({}));
+      throw new Error(problem.error || 'Unable to fetch account graph');
+    }
+    const payload = await response.json();
+    currentComponentId = payload.componentId;
+    renderGraph(payload);
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message);
+  }
 }
 
 function focusOnNode() {
@@ -273,3 +356,5 @@ focusButton.addEventListener('click', focusOnNode);
 resetViewButton.addEventListener('click', resetView);
 exportPngButton.addEventListener('click', exportPNG);
 exportSvgButton.addEventListener('click', exportSVG);
+loadAllButton.addEventListener('click', () => loadAllComponents());
+loadRootButton.addEventListener('click', () => loadRootGraph());
