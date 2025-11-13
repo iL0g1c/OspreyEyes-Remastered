@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Callsign Graph Explorer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script src="{{ url_for('static', filename='vendor/force-graph.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Callsign Graph Explorer</h1>
+      <p>
+        Upload a MongoDB export of the <code>user</code> collection to build a
+        high performance force-directed graph of shared call signs.
+      </p>
+    </header>
+    <main>
+      <section class="panel" id="upload-panel">
+        <h2>1. Upload MongoDB JSON</h2>
+        <form id="upload-form">
+          <input type="file" name="file" accept="application/json,.json" required />
+          <button type="submit">Upload &amp; Process</button>
+        </form>
+        <div id="upload-status" class="status">Waiting for upload…</div>
+      </section>
+      <section class="panel" id="components-panel">
+        <h2>2. Pick a Component</h2>
+        <div id="component-list" class="component-list empty">
+          Upload data to see connected groups. Largest components appear first and
+          each one receives its own color so isolated communities stand out.
+        </div>
+      </section>
+      <section class="panel" id="graph-panel">
+        <h2>3. Explore the Graph</h2>
+        <div class="controls">
+          <label>
+            Node limit:
+            <input type="number" id="node-limit" min="100" max="200000" value="1500" step="100" />
+          </label>
+          <button id="apply-limit">Apply limit</button>
+          <button id="load-all">Load all components</button>
+          <label>
+            Focus on account ID:
+            <input type="text" id="focus-id" placeholder="Account ID" />
+          </label>
+          <button id="focus-button">Focus</button>
+          <label>
+            Root account ID:
+            <input type="text" id="root-account" placeholder="Account ID" />
+          </label>
+          <button id="load-root">Load root group</button>
+          <button id="reset-view">Reset view</button>
+          <button id="export-png">Export PNG</button>
+          <button id="export-svg">Export SVG</button>
+        </div>
+        <div id="graph"></div>
+        <p class="hint">
+          The simulation automatically cools until nodes settle into their lowest-tension state.
+          Use the node limit together with the "Load all" and "Root account" controls to explore safely without freezing the browser.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
