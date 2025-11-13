@@ -35,6 +35,7 @@ let highlightedNode = null;
 let hoverNeighbors = new Set();
 let searchTimeout = null;
 let progressHideTimeout = null;
+let graphBuildToken = 0;
 
 const graph = ForceGraph()(graphContainer)
   .nodeId('id')
@@ -159,13 +160,24 @@ exportPngBtn.addEventListener('click', () => exportPng());
 
 function regenerateGraph() {
   if (!rawAccounts.length) return;
+  const buildToken = ++graphBuildToken;
+  const options = {
+    minCallsigns: parseInt(minCallsignsInput.value, 10),
+    maxAccountsPerCallsign: parseInt(linkThresholdInput.value, 10),
+    preferredDistance: parseInt(distanceInput.value, 10)
+  };
   setStatus('Rebuilding graph with current parameters...');
-  runWhenIdle(() => {
-    currentGraph = buildGraph(rawAccounts, {
-      minCallsigns: parseInt(minCallsignsInput.value, 10),
-      maxAccountsPerCallsign: parseInt(linkThresholdInput.value, 10),
-      preferredDistance: parseInt(distanceInput.value, 10)
+  runWhenIdle(() => rebuildGraphAsync(buildToken, rawAccounts, options));
+}
+
+async function rebuildGraphAsync(token, accounts, options) {
+  try {
+    const graphData = await buildGraphAsync(accounts, options, progress => {
+      if (token !== graphBuildToken) return;
+      setStatus(formatGraphBuildStatus(progress));
     });
+    if (token !== graphBuildToken) return;
+    currentGraph = graphData;
     adjacencyMap = buildAdjacency(currentGraph.links);
     graph.graphData(currentGraph);
     updateStats(currentGraph);
@@ -178,37 +190,64 @@ function regenerateGraph() {
       message += ' No shared callsigns were detected. Try lowering the minimum callsigns per node or increasing the maximum accounts per callsign if you expect overlaps.';
     }
     setStatus(message);
-  });
+  } catch (error) {
+    if (token !== graphBuildToken) return;
+    console.error(error);
+    setStatus(`Unable to rebuild graph: ${error.message}`);
+  }
 }
 
-function buildGraph(accounts, options) {
+async function buildGraphAsync(accounts, options, onProgress) {
   const nodes = [];
   const nodeById = new Map();
   const callsignIndex = new Map();
   const minCalls = Math.max(1, options.minCallsigns || 1);
   const maxPerCallsign = Math.max(2, options.maxAccountsPerCallsign || 12);
 
-  accounts.forEach((account, index) => {
+  const yieldProgress = createYieldController(1200, 180);
+  const totalAccounts = accounts.length;
+
+  for (let index = 0; index < totalAccounts; index += 1) {
+    const account = accounts[index];
     const normalised = normalizeAccount(account, index);
-    if (!normalised || normalised.callsignCount < minCalls) return;
+    if (normalised && normalised.callsignCount >= minCalls) {
+      nodes.push(normalised);
+      nodeById.set(normalised.id, normalised);
 
-    nodes.push(normalised);
-    nodeById.set(normalised.id, normalised);
+      normalised.callsigns.forEach(entry => {
+        const key = entry.normalized ?? (typeof entry.value === 'string' ? entry.value.toLowerCase() : entry.value);
+        if (!key) return;
+        if (!callsignIndex.has(key)) {
+          callsignIndex.set(key, []);
+        }
+        const list = callsignIndex.get(key);
+        list.push({ nodeId: normalised.id, timestamp: entry.timestamp, score: entry.score });
+        if (list.length > maxPerCallsign) {
+          list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          list.length = maxPerCallsign;
+        }
+      });
+    }
 
-    normalised.callsigns.forEach(entry => {
-      const key = entry.normalized ?? (typeof entry.value === 'string' ? entry.value.toLowerCase() : entry.value);
-      if (!key) return;
-      if (!callsignIndex.has(key)) {
-        callsignIndex.set(key, []);
-      }
-      callsignIndex.get(key).push({ nodeId: normalised.id, timestamp: entry.timestamp, score: entry.score });
-    });
-  });
+    if (typeof onProgress === 'function' && index % 500 === 0) {
+      onProgress({ phase: 'indexing', current: index + 1, total: totalAccounts });
+    }
+
+    if (index % 400 === 0) {
+      await yieldProgress();
+    }
+  }
+
+  if (typeof onProgress === 'function') {
+    onProgress({ phase: 'indexing', current: totalAccounts, total: totalAccounts });
+  }
 
   const linkMap = new Map();
-  for (const [callsign, entryList] of callsignIndex.entries()) {
+  const entries = Array.from(callsignIndex.entries());
+  const totalCallsigns = entries.length;
+  for (let idx = 0; idx < entries.length; idx += 1) {
+    const [callsign, entryList] = entries[idx];
     if (entryList.length < 2) continue;
-    entryList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     const limit = Math.min(entryList.length, maxPerCallsign);
     for (let i = 0; i < limit; i += 1) {
       for (let j = i + 1; j < limit; j += 1) {
@@ -224,9 +263,16 @@ function buildGraph(accounts, options) {
           });
         }
         const link = linkMap.get(key);
-        link.weight += first.score + second.score;
+        link.weight += (first.score || 0) + (second.score || 0);
         link.callsigns.add(callsign);
       }
+    }
+
+    if (typeof onProgress === 'function' && idx % 200 === 0) {
+      onProgress({ phase: 'linking', current: idx + 1, total: totalCallsigns });
+    }
+    if (idx % 150 === 0) {
+      await yieldProgress();
     }
   }
 
@@ -238,13 +284,20 @@ function buildGraph(accounts, options) {
     distance: Math.max(40, (options.preferredDistance || 140) - Math.log2(1 + link.weight) * 8)
   }));
 
-  assignComponentColors(nodes, links, nodeById);
+  await assignComponentColors(nodes, links, nodeById, yieldProgress, progress => {
+    if (typeof onProgress !== 'function') return;
+    onProgress({ phase: 'coloring', ...progress });
+  });
 
-  links.forEach(link => {
+  for (let i = 0; i < links.length; i += 1) {
+    const link = links[i];
     const source = nodeById.get(link.source);
     const target = nodeById.get(link.target);
-    link.color = mixColors(source.color, target.color);
-  });
+    link.color = mixColors(source?.color, target?.color);
+    if (i % 500 === 0) {
+      await yieldProgress();
+    }
+  }
 
   return { nodes, links };
 }
@@ -648,15 +701,22 @@ function extractDate(value) {
   return null;
 }
 
-function assignComponentColors(nodes, links, nodeById) {
+async function assignComponentColors(nodes, links, nodeById, yieldFn = async () => {}, onProgress) {
   if (!nodes.length) return;
   const adjacency = buildAdjacency(links);
   const visited = new Set();
   let hueSeed = 0.12;
   const golden = 0.61803398875;
+  let processed = 0;
 
-  nodes.forEach(node => {
-    if (visited.has(node.id)) return;
+  const report = () => {
+    if (typeof onProgress === 'function') {
+      onProgress({ current: processed, total: nodes.length });
+    }
+  };
+
+  for (const node of nodes) {
+    if (visited.has(node.id)) continue;
     hueSeed = (hueSeed + golden) % 1;
     const baseHue = hueSeed * 360;
     const queue = [{ id: node.id, depth: 0 }];
@@ -666,6 +726,11 @@ function assignComponentColors(nodes, links, nodeById) {
       const current = nodeById.get(id);
       if (!current) continue;
       current.color = hslToHex(baseHue, 60, clamp(30 + depth * 4, 25, 65));
+      processed += 1;
+      if (processed % 500 === 0) {
+        await yieldFn();
+      }
+      report();
       const neighbors = adjacency.get(id);
       if (!neighbors) continue;
       neighbors.forEach(neighborId => {
@@ -674,7 +739,9 @@ function assignComponentColors(nodes, links, nodeById) {
         queue.push({ id: neighborId, depth: depth + 1 });
       });
     }
-  });
+  }
+
+  report();
 }
 
 function buildAdjacency(links) {
@@ -757,6 +824,22 @@ function clamp(value, min, max) {
 
 function setStatus(message) {
   statusEl.textContent = message;
+}
+
+function formatGraphBuildStatus(progress) {
+  if (!progress) return 'Rebuilding graph...';
+  const phaseLabels = {
+    indexing: 'Indexing accounts',
+    linking: 'Linking shared callsigns',
+    coloring: 'Coloring connected components'
+  };
+  const label = phaseLabels[progress.phase] || 'Processing graph';
+  if (Number.isFinite(progress.current) && Number.isFinite(progress.total) && progress.total > 0) {
+    const clamped = Math.min(progress.current, progress.total);
+    const percent = ((clamped / progress.total) * 100).toFixed(1);
+    return `${label} • ${clamped.toLocaleString()} / ${progress.total.toLocaleString()} (${percent}%)`;
+  }
+  return `${label}...`;
 }
 
 function updateStats(graphData) {
@@ -905,10 +988,20 @@ function resetGraph() {
 }
 
 function runWhenIdle(cb) {
+  const runner = () => {
+    try {
+      const result = cb();
+      if (result && typeof result.then === 'function') {
+        result.catch(error => console.error(error));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   if (typeof window.requestIdleCallback === 'function') {
-    window.requestIdleCallback(cb);
+    window.requestIdleCallback(runner);
   } else {
-    setTimeout(cb, 0);
+    setTimeout(runner, 0);
   }
 }
 

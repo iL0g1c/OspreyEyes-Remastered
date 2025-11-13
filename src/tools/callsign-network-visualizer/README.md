@@ -11,6 +11,8 @@ This lightweight, browser-based tool renders a force-directed "web of accounts" 
 
 Large MongoDB exports (100 MB+) are streamed and parsed incrementally so you can upload multi-gigabyte datasets without exhausting browser memory. The status banner and inline progress bar show live byte/percentage progress plus how many accounts have been parsed so far.
 
+Once a file is parsed, the force-graph is built in asynchronous batches: the status copy now calls out whether the tool is indexing accounts, linking shared callsigns, or coloring connected components so you always know the graph build is still moving—even when processing 200k+ accounts.
+
 > Want to make sure everything is wired up before loading a large dump? Upload
 > `sample-data/multi-account-example.json`, which contains three synthetic accounts that intentionally share
 > callsigns so the graph immediately renders two links.
