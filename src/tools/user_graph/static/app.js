@@ -79,6 +79,19 @@ if (graph.d3Force) {
     console.info('Applying fallback center gravity force.');
     graph.d3Force('centerGravity', createCenterGravityForce(0.02));
   }
+
+  const chargeForce = graph.d3Force('charge');
+  if (chargeForce && typeof chargeForce.strength === 'function') {
+    chargeForce.strength(-45);
+    if (typeof chargeForce.distanceMax === 'function') {
+      chargeForce.distanceMax(500);
+    }
+    if (typeof chargeForce.distanceMin === 'function') {
+      chargeForce.distanceMin(5);
+    }
+  } else {
+    console.warn('ForceGraph charge force unavailable; nodes may overlap.');
+  }
 }
 
 graph.onEngineStop(() => {
