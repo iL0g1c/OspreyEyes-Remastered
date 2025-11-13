@@ -1,0 +1,170 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  background-color: #05060a;
+  color: #f5f7fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 2rem 0.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  color: #9ea7bb;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.file-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #4f46e5, #9333ea);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.file-label input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+button {
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 0 2rem 1rem;
+}
+
+.control {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control input[type='number'],
+.control input[type='search'],
+.control input[type='range'] {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+  color: inherit;
+  padding: 0.5rem 0.75rem;
+}
+
+.status-panel {
+  padding: 0 2rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #d3d7e6;
+}
+
+#graph {
+  flex: 1;
+  min-height: 60vh;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+}
+
+#graph canvas {
+  width: 100% !important;
+  height: calc(100vh - 260px) !important;
+  border-radius: 20px;
+  background: radial-gradient(circle at top, rgba(79, 70, 229, 0.12), transparent 60%),
+    rgba(5, 6, 10, 0.95);
+}
+
+.tooltip {
+  background: rgba(8, 9, 13, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  max-width: 260px;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-body {
+  font-size: 0.9rem;
+  color: #b9c1d8;
+}
+
+@media (max-width: 768px) {
+  header,
+  .controls,
+  .status-panel {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  #graph canvas {
+    height: calc(100vh - 320px) !important;
+  }
+}

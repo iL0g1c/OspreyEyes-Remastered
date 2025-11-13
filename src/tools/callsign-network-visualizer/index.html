@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Callsign Lineage Explorer</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Callsign Lineage Explorer</h1>
+        <p class="subtitle">
+          Upload a MongoDB export of the <code>users</code> collection to explore
+          how recycled callsigns connect accounts.
+        </p>
+      </div>
+      <div class="actions">
+        <label class="file-label">
+          <input type="file" id="file-input" accept="application/json,.json" />
+          <span>Upload JSON Export</span>
+        </label>
+        <button id="export-svg" disabled>Export SVG</button>
+        <button id="export-png" disabled>Export PNG</button>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="control">
+        <label for="min-callsigns">Minimum callsigns per node</label>
+        <input id="min-callsigns" type="number" value="1" min="1" max="50" />
+      </div>
+      <div class="control">
+        <label for="link-threshold">Maximum accounts per callsign</label>
+        <input id="link-threshold" type="number" value="12" min="2" max="200" />
+      </div>
+      <div class="control">
+        <label for="repulsion">Repulsion strength</label>
+        <input id="repulsion" type="range" min="-800" max="-50" value="-200" />
+      </div>
+      <div class="control">
+        <label for="distance">Preferred link distance</label>
+        <input id="distance" type="range" min="40" max="320" value="160" />
+      </div>
+      <div class="control">
+        <label for="search">Find account</label>
+        <input id="search" type="search" placeholder="Account ID or callsign" />
+      </div>
+    </section>
+
+    <section class="status-panel">
+      <div id="status">Waiting for a JSON file...</div>
+      <div id="stats"></div>
+    </section>
+
+    <main>
+      <div id="graph" aria-label="Callsign reuse network visualization"></div>
+    </main>
+
+    <template id="tooltip-template">
+      <div class="tooltip">
+        <div class="tooltip-title"></div>
+        <div class="tooltip-body"></div>
+      </div>
+    </template>
+
+    <script src="https://unpkg.com/force-graph"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
