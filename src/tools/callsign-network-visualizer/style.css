@@ -119,6 +119,37 @@ button:not(:disabled):hover {
   color: #d3d7e6;
 }
 
+.progress-wrapper {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progress-bar {
+  position: relative;
+  flex: 1;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: linear-gradient(120deg, #4f46e5, #9333ea);
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  min-width: 210px;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: #b9c1d8;
+}
+
 #graph {
   flex: 1;
   min-height: 60vh;

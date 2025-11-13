@@ -9,6 +9,10 @@ const repulsionInput = document.getElementById('repulsion');
 const distanceInput = document.getElementById('distance');
 const searchInput = document.getElementById('search');
 const graphContainer = document.getElementById('graph');
+const progressWrapper = document.getElementById('progress-wrapper');
+const progressBar = document.getElementById('progress-bar');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
 
 let rawAccounts = [];
 let currentGraph = { nodes: [], links: [] };
@@ -30,6 +34,7 @@ window.callsignGraphState = {
 let highlightedNode = null;
 let hoverNeighbors = new Set();
 let searchTimeout = null;
+let progressHideTimeout = null;
 
 const graph = ForceGraph()(graphContainer)
   .nodeId('id')
@@ -88,23 +93,31 @@ fileInput.addEventListener('change', async event => {
   if (!file) return;
   resetGraph();
   setStatus(`Loading ${file.name}...`);
+  showProgress(`Preparing ${file.name}...`);
   try {
     rawAccounts = await loadDatasetFromFile(file, progress => {
       const percent = progress.totalBytes
         ? ((progress.bytesRead / progress.totalBytes) * 100).toFixed(1)
         : '0.0';
       const parsed = progress.parsed.toLocaleString();
+      updateProgress(Number(percent),
+        progress.totalBytes
+          ? `${percent}% · ${formatBytes(progress.bytesRead)} of ${formatBytes(progress.totalBytes)} · ${parsed} accounts`
+          : `${formatBytes(progress.bytesRead)} processed · ${parsed} accounts`
+      );
       setStatus(
         `Parsing ${file.name}: ${percent}% (${formatBytes(progress.bytesRead)} of ${formatBytes(
           progress.totalBytes
         )}) · ${parsed} accounts processed...`
       );
     });
+    completeProgress(`Parsed ${rawAccounts.length.toLocaleString()} accounts.`);
     setStatus(`Loaded ${rawAccounts.length.toLocaleString()} accounts. Building graph...`);
     regenerateGraph();
   } catch (error) {
     console.error(error);
     setStatus(`Unable to load file: ${error.message}`);
+    failProgress('Upload failed.');
   }
 });
 
@@ -244,8 +257,15 @@ function normalizeDataset(text) {
 async function loadDatasetFromFile(file, onProgress) {
   const LARGE_FILE_THRESHOLD = 120 * 1024 * 1024; // 120 MB
   if (file.size <= LARGE_FILE_THRESHOLD || typeof file.stream !== 'function') {
+    if (typeof onProgress === 'function') {
+      onProgress({ bytesRead: 0, totalBytes: file.size, parsed: 0 });
+    }
     const text = await file.text();
-    return normalizeDataset(text);
+    const result = normalizeDataset(text);
+    if (typeof onProgress === 'function') {
+      onProgress({ bytesRead: file.size, totalBytes: file.size, parsed: result.length });
+    }
+    return result;
   }
   return streamLargeDataset(file, onProgress);
 }
@@ -412,6 +432,51 @@ function formatBytes(bytes) {
   const power = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
   const value = bytes / 1024 ** power;
   return `${value.toFixed(power === 0 ? 0 : 1)} ${units[power]}`;
+}
+
+function showProgress(message) {
+  if (!progressWrapper) return;
+  if (progressHideTimeout) {
+    clearTimeout(progressHideTimeout);
+    progressHideTimeout = null;
+  }
+  progressWrapper.hidden = false;
+  progressFill.style.width = '0%';
+  progressBar.setAttribute('aria-valuenow', '0');
+  progressText.textContent = message;
+}
+
+function updateProgress(percent, message) {
+  if (!progressWrapper) return;
+  const clamped = Math.max(0, Math.min(100, Number.isFinite(percent) ? percent : 0));
+  progressFill.style.width = `${clamped}%`;
+  progressBar.setAttribute('aria-valuenow', clamped.toFixed(1));
+  if (message) {
+    progressText.textContent = message;
+  }
+}
+
+function completeProgress(message) {
+  updateProgress(100, message);
+  hideProgressAfter(700);
+}
+
+function failProgress(message) {
+  updateProgress(100, message);
+  hideProgressAfter(1400);
+}
+
+function hideProgressAfter(delay) {
+  if (!progressWrapper) return;
+  if (progressHideTimeout) {
+    clearTimeout(progressHideTimeout);
+  }
+  progressHideTimeout = setTimeout(() => {
+    progressWrapper.hidden = true;
+    progressFill.style.width = '0%';
+    progressBar.setAttribute('aria-valuenow', '0');
+    progressText.textContent = '';
+  }, delay);
 }
 
 function normalizeAccount(account, fallbackIndex) {

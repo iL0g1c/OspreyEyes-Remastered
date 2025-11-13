@@ -57,6 +57,20 @@
     <section class="status-panel">
       <div id="status">Waiting for a JSON file...</div>
       <div id="stats"></div>
+      <div class="progress-wrapper" id="progress-wrapper" hidden>
+        <div
+          class="progress-bar"
+          id="progress-bar"
+          role="progressbar"
+          aria-label="Upload progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Preparing upload…</div>
+      </div>
     </section>
 
     <main>
