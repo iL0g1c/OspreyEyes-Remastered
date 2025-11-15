@@ -204,11 +204,17 @@ class DataCollectionLayer():
         for message in self.current_chat_messages:
             for item in ["mindseye", "minds eye", "minds-eye"]:
                 if  item in message["msg"].lower():
-                    url = f"http://localhost:5001/bot-mention"
+                    url1 = f"http://localhost:5001/bot-mention"
+                    url2 = f"http://localhost:5002/bot-mention"
                     data = {"message": True}
                     self.systemLogs.log(20, "Detected pilot mentioned bot.")
                     try:
-                        response = requests.post(url, json=data)
+                        response = requests.post(url1, json=data)
+                    except Exception as e:
+                        self.systemLogs.log(40, f"Failed to trigger event. Error: {e}")
+                    
+                    try:
+                        response = requests.post(url2, json=data)
                     except Exception as e:
                         self.systemLogs.log(40, f"Failed to trigger event. Error: {e}")
 
@@ -351,6 +357,7 @@ class DataCollectionLayer():
             if uid not in exist_map and configs['displayNewAccounts']:
                 self.newAccountLogs.info(f"New account detected: {uid} with callsign {cs}.")
                 self.queues['new_account'].put({'url':'http://localhost:5001/new-account','data':{'acid':uid,'callsign':cs}})
+                self.queues['new_account'].put({'url':'http://localhost:5002/new-account','data':{'acid':uid,'callsign':cs}})
                 self.update_airforce_patrol_logs(True, {'accountID':uid,'currentCallsign':cs}, filters)
             # event detection
             evts = []
@@ -367,6 +374,7 @@ class DataCollectionLayer():
                 self.aircraftChangeLogs.info(f"Aircraft change: {uid} from {old_ac} to {ac}")
                 evts.append({'eventType':'aircraftChange','oldAircraft':old_ac,'newAircraft':ac,'timestamp':datetime.now()})
                 self.queues['aircraft_change'].put({'url':'http://localhost:5001/aircraft-change','data':{'callsign':cs,'oldAircraft':old_ac,'newAircraft':ac}})
+                self.queues['aircraft_change'].put({'url':'http://localhost:5002/aircraft-change','data':{'callsign':cs,'oldAircraft':old_ac,'newAircraft':ac}})
             # callsign change
             old_cs = exist_map.get(uid, {}).get('currentCallsign')
             if old_cs and old_cs != cs:
@@ -374,6 +382,7 @@ class DataCollectionLayer():
                 evts.append({'eventType':'callsignChange','oldCallsign':old_cs,'newCallsign':cs,'timestamp':datetime.now()})
                 if configs['displayCallsignChanges']:
                     self.queues['callsign_change'].put({'url':'http://localhost:5001/callsign-change','data':{'acid':uid,'oldCallsign':old_cs,'newCallsign':cs}})
+                    self.queues['callsign_change'].put({'url':'http://localhost:5002/callsign-change','data':{'acid':uid,'oldCallsign':old_cs,'newCallsign':cs}})
 
             # upsert user doc
             upsert = UpdateOne(
