@@ -338,7 +338,7 @@ class DataCollectionLayer():
                 )
                 self.update_airforce_patrol_logs(False, doc, self.get_force_callsign_filters())
 
-                self.queues['activity_change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "offline"}})
+                self.queues['activity_change'].put({'url':'http://localhost:5002/activity-change','data':{'acid':uid,'status': "offline"}})
         # handle users going online
         going_online = list(user_coll.find({
             'Online': False,
@@ -355,7 +355,7 @@ class DataCollectionLayer():
             )
             self.update_airforce_patrol_logs(True, doc, self.get_force_callsign_filters())
 
-            self.queues['activity_change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "online"}})
+            self.queues['activity_change'].put({'url':'http://localhost:5002/activity-change','data':{'acid':uid,'status': "online"}})
 
         # Process current online users
         filters = self.get_force_callsign_filters()
@@ -377,7 +377,7 @@ class DataCollectionLayer():
                     self.teleportationLogs.info(f"Account ID: {uid} teleported {round(dist)} km.")
                     evts.append({'eventType':'teleportation','oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist})
                     
-                    self.queues['teleporation'].put({'url':'http://localhost:5001/teleporation','data':{'oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist}})
+                    self.queues['teleporation'].put({'url':'http://localhost:5001/teleporation','data':{'acid': uid, 'oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist}})
             # aircraft change
             old_ac = exist_map.get(uid, {}).get('currentAircraft')
             if configs['logAircraftChanges'] and old_ac and ac != old_ac:
