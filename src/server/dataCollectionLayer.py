@@ -379,7 +379,7 @@ class DataCollectionLayer():
                     evts.append({'eventType':'teleportation','oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist})
 
                     self.queues['teleporation'].put({'url':'http://localhost:5002/teleporation','data':{'acid': uid, 'oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist}})
-                    print(json(self.queues))
+                    print(self.queues)
 
             # aircraft change
             old_ac = exist_map.get(uid, {}).get('currentAircraft')
