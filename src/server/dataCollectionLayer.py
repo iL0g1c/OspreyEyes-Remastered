@@ -376,8 +376,9 @@ class DataCollectionLayer():
                 if dist >= 50:
                     self.teleportationLogs.info(f"Account ID: {uid} teleported {round(dist)} km.")
                     evts.append({'eventType':'teleportation','oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist})
-                    
+                    self.logger.log(20, "1")
                     self.queues['teleporation'].put({'url':'http://localhost:5002/teleporation','data':{'acid': uid, 'oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist}})
+                    self.logger.log(20, "2")
             # aircraft change
             old_ac = exist_map.get(uid, {}).get('currentAircraft')
             if configs['logAircraftChanges'] and old_ac and ac != old_ac:
