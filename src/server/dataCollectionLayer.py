@@ -184,6 +184,7 @@ class DataCollectionLayer():
             try:
                 if not self.queues[queue_name].empty():
                     batch.append(self.queues[queue_name].get())
+                    print(self.queues["teleportation"].get())
                 if len(batch) >= batch_size or (time.time() - last_send_time) >= timeout:
                     if batch:
                         self.send_batch(batch, self.sessions[queue_name])
@@ -379,7 +380,6 @@ class DataCollectionLayer():
                     evts.append({'eventType':'teleportation','oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist})
 
                     self.queues['teleporation'].put({'url':'http://localhost:5002/teleporation','data':{'acid': uid, 'oldLatitude':old[0],'oldLongitude':old[1],'newLatitude':pos[0],'newLongitude':pos[1],'timestamp':datetime.now(),'distance':dist}})
-                    print(self.queues)
 
             # aircraft change
             old_ac = exist_map.get(uid, {}).get('currentAircraft')
