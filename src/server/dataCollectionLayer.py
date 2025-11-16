@@ -338,7 +338,7 @@ class DataCollectionLayer():
                 )
                 self.update_airforce_patrol_logs(False, doc, self.get_force_callsign_filters())
 
-                self.queues['activity-change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "offline"}})
+                self.queues['activity_change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "offline"}})
         # handle users going online
         going_online = list(user_coll.find({
             'Online': False,
@@ -355,7 +355,7 @@ class DataCollectionLayer():
             )
             self.update_airforce_patrol_logs(True, doc, self.get_force_callsign_filters())
 
-            self.queues['activity-change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "online"}})
+            self.queues['activity_change'].put({'url':'http://localhost:5002/activity_change','data':{'acid':uid,'status': "online"}})
 
         # Process current online users
         filters = self.get_force_callsign_filters()
